@@ -193,6 +193,7 @@
 \newtheorem{remark}{注}
 \newtheorem{openproblem}{公开问题}
 \newtheorem{observation}{观察}
+\renewcommand{\proofname}{证明}
 
 \numberwithin{figure}{chapter}
 \numberwithin{table}{chapter}
