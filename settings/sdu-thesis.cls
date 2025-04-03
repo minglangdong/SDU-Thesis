@@ -126,10 +126,15 @@
 	\makeheadrule
 }
 \chead{\zihao{5}\the\ThesisHeader}
+% \ifSST@opt@double
+% 	\fancyfoot[LE,RO]{--{~\thepage~}--}
+% \else
+% 	\fancyfoot[R]{--{~\thepage~}--}
+% \fi
 \ifSST@opt@double
-	\fancyfoot[LE,RO]{--{~\thepage~}--}
+	\fancyfoot[LE,RO]{\thepage}
 \else
-	\fancyfoot[R]{--{~\thepage~}--}
+	\fancyfoot[R]{\thepage}
 \fi
 \makeatother
 
@@ -188,11 +193,11 @@
 \newtheorem{claim}[theorem]{断言}
 \newtheorem{proposition}[theorem]{命题}
 \newtheorem{example}[theorem]{例}
-\newtheorem{definition}{定义}
-\newtheorem{conjecture}{猜想}
-\newtheorem{remark}{注}
+\newtheorem{definition}[theorem]{定义}
+\newtheorem{conjecture}[theorem]{猜想}
+\newtheorem{remark}[theorem]{注}
 \newtheorem{openproblem}{公开问题}
-\newtheorem{observation}{观察}
+\newtheorem{observation}[theorem]{观察}
 \renewcommand{\proofname}{证明}
 
 \numberwithin{figure}{chapter}
@@ -209,7 +214,7 @@
 	\cleartochapter
 	\makestatement
 	\cleartochapter
-	\pagenumbering{roman}
+	\pagenumbering{Roman}
 	\setcounter{page}{1}
 }
 
@@ -238,7 +243,6 @@
 
 \makeatletter
 \newcommand{\maketableofcontents}{%
-	%\pagenumbering{roman}
 	\tableofcontents
 }
 \makeatother
