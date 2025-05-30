@@ -90,6 +90,7 @@
 	\ifSST@opt@fzfont
 		\newCJKfontfamily[fzbighei]{\fzbHei}{方正粗黑宋简体}
 		%\newCJKfontfamily[fzckjw]{\fzckjw}{方正粗楷简体}
+		%\newcommand{\fzbHei}{\heiti}
 	\else
 		\newcommand{\fzbHei}{\heiti}
 	\fi
@@ -179,6 +180,14 @@
 			number = \Alph{chapter} },
 		today = small
 	}
+
+\RequirePackage{caption}
+\captionsetup{
+    font = {footnotesize}, % 字体大小和族（small/bf/sf等）
+    textfont = {footnotesize},      % 正文文本斜体（可选）
+    %justification = centering, % 居中
+    labelsep = quad      % 标签与文本间距
+}
 
 % ---- 英文标题 ----
 \newcommand\echapter[1]{\addengcontents{chapter}{#1}}
@@ -280,7 +289,7 @@
 }
 % ---- 英文摘要 ----
 \newcommand\enabstractname{ABSTRACT}
-\newcommand\enkeywordsname{Key words}
+\newcommand\enkeywordsname{Keywords}
 \newcommand\enkeywords[1]{\vspace{1cm}\noindent{\bfseries\zihao{-4}\enkeywordsname: }#1}
 \newenvironment{enabstract}{%
 	\cleartochapter
