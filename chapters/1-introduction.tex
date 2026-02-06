@@ -1,0 +1,182 @@
+\chapter{绪论}
+\echapter{Introduction}
+
+\section{研究背景与意义}
+\esection{Research Background and Significance}
+
+随着大数据、人工智能和云计算技术的飞速发展，数据已演变为驱动社会创新与经济增长的关键生产要素。政府部门、金融机构、医疗系统以及互联网企业积累了海量的高价值数据，通过跨机构的数据融合与联合分析，可以挖掘出更深层次的数据价值，赋能精准医疗、金融风控、联合营销等应用场景。然而，在数据共享的过程中，“数据孤岛”与“隐私保护”之间的矛盾日益凸显。
+
+一方面，数据孤岛现象严重阻碍了数据价值的释放。出于商业机密保护或行政壁垒的考量以及对数据流失的担忧，各数据持有方往往不愿或不能将其私有数据直接对外开放。另一方面，日益严格的隐私保护法律法规对数据流通提出了极高的合规要求。欧盟的《通用数据保护条例》（GDPR）、中国的《中华人民共和国数据安全法》和《中华人民共和国个人信息保护法》等均明确规定，个人信息的处理必须遵循合法、正当、必要的原则，且严厉限制了未经授权的数据共享行为。如何在严格保护各方数据隐私及主权的前提下，实现数据的“可用不可见”，已成为学术界和产业界共同关注的焦点。
+
+在这一背景下，安全多方计算（Secure Multi-party Computation, MPC）技术应运而生。作为密码学的一个重要分支，MPC 允许互不信任的多个参与方在不泄露各自私有输入的前提下，协同计算某个约定函数的输出。姚期智院士在 1982 年提出的“百万富翁问题”奠定了 MPC 的理论基础 \cite{Yao-FOCS-1982}，随后 GMW 协议 \cite{GMW-STOC-1987} 和 BGW 协议 \cite{BGW-STOC-1988} 进一步完善了其通用框架。
+
+尽管通用 MPC 协议在理论上能够计算任意函数，但在处理大规模数据集的实际应用中，将其编译为布尔电路或算术电路往往会带来巨大的计算和通信开销，难以满足高频、海量数据场景下的实时性需求。因此，针对特定功能设计高效的\textbf{专用 MPC 协议}成为了该领域的重要研究方向。在众多专用协议中，\textbf{隐私集合运算（Private Set Operations, PSO）}因其在现实场景中的广泛适用性而备受瞩目，以Google、Facebook、Microsoft等为代表的科技公司投入了大量资源研究PSO技术。
+PSO 允许参与方在各自持有私有集合的前提下，协同完成对私有集合的计算，且不泄露任何额外信息。
+根据参与方的数量，PSO 可划分为\textbf{两方隐私集合运算}和\textbf{多方隐私集合运算（Multi-party Private Set Operations, MPSO）}。
+
+两方PSO因只涉及两个输入集合$X$、$Y$，通常只考虑计算交集$X \cap Y$和并集$X \cup Y$，功能相对局限。具体地，两方PSO主要包括以下三类功能：
+\begin{itemize}
+    \item \textbf{两方隐私集合求交（Private Set Intersection, PSI）.} 允许持有隐私集合的双方共同计算交集 $X \cap Y$。该技术已广泛应用于隐私保护下的联系人发现 \cite{NTLHB-NDSS-2011}、广告转化率归因 \cite{Ion-EUROSP-2020} 等场景。
+
+    \item \textbf{两方隐私交集计算（Private Computation on Set Intersection, PCSI）.} 在不泄露交集的前提下，允许持有隐私集合的双方共同计算交集 $X \cap Y$的部分或汇总信息（如基数或关联数据之和）。这在需要统计分析但严禁泄露个体身份的场景（如打击儿童性虐待材料传播 \cite{BBM21}、疫情流调统计 \cite{BBV20}）中至关重要。
+
+    \item \textbf{两方隐私集合求并（Private Set Union, PSU）.} 允许持有隐私集合的双方共同计算并集 $X \cup Y$。常用于两家机构联合构建全量的 IP 黑名单库或漏洞数据库 \cite{HLSSSYY16}。
+\end{itemize}
+目前，两方 PSO 技术已相对成熟。特别是两方 PSI 取得了巨大进展~\cite{PSZ-USENIX-2014,KKRT-CCS-2016,PRTY-CRYPTO-2019,CM-CRYPTO-2020,PRTY20,RS-EUROCRYPT-2021,RR-CCS-2022}，现有最先进的协议 \cite{RR-CCS-2022} 已能实现与不安全的朴素哈希 PSI 方案相当的性能。近年来，两方PCSI和两方PSU也迅猛发展，出现了一系列高效且安全的两方PCSI~\cite{GMRSS-PKC-2021,ZCZDL-2024}和两方PSU~\cite{KRTW-ASIACRYPT-2019,GMRSS-PKC-2021,Jia-USENIX-2022,ZCLZL-USENIX-2023,ZCZDL-2024,Jia0ZG24}协议构造，并形成了统一的两方PSO框架~\cite{ZCZDL-2024}，开始在实际业务中逐步大规模落地。
+
+与两方场景不同，MPSO 涉及多个输入集合 $X_1, \dots, X_m$ ($m > 2$)。由于集合运算的组合方式呈指数级增长，理想条件下的 MPSO 协议应该能够计算由有限次二元集合运算（包括交集、并集和差集）组成的任意集合公式 $f(X_1, \dots, X_m)$。这使得 MPSO 涵盖了更加丰富的功能。然而，目前 MPSO 的研究主要聚焦于以下四类特定功能：
+\begin{itemize}
+    \item \textbf{多方隐私集合求交（Multi-party Private Set Intersection, MPSI）.} 允许 $m$ ($m > 2$) 个参与方分别持有隐私集合 $X_i$ ($1 \le i \le m$)，最终准确地共同计算出所有集合的交集 $\bigcap_{i=1}^m X_i$。其典型应用包括隐私保护下的位置信息共享 \cite{NTLHB-NDSS-2011}、隐私通讯录的公共联系人发现~\cite{DRRT-PPET-2018}、DNA 检测和模式匹配 \cite{TKC-CCS-2007}、以及联合僵尸网络检测等。
+    
+    \item \textbf{多方隐私交集计算（Multi-party Private Computation on Set Intersection, MPCSI）.} 允许 $m$ 个参与方分别持有隐私集合 $X_i$，最终输出交集 $\bigcap_{i=1}^m X_i$ 的部分或汇总信息。MPCSI 主要包括基于电路的 MPSI 协议（Circuit-MPSI）、多方隐私交集求势协议（MPSI-card）和多方隐私交集求势与和协议（MPSI-card-sum）。其中，Circuit-MPSI 允许参与方在交集上计算任意函数 $f(\bigcap_{i=1}^m X_i)$；MPSI-card 用于计算交集的基数；MPSI-card-sum 用于计算交集基数及对应权值的总和。这类功能被广泛应用于在线广告效果评估 \cite{Ion-EUROSP-2020}、打击儿童性虐待材料（CSAM）传播 \cite{BBM21} 以及 COVID-19 隐私接触者追踪 \cite{BBV20,DPT20,DIL20}。
+    
+    \item \textbf{多方隐私集合求并（Multi-party Private Set Union, MPSU）.} 允许 $m$ 个参与方分别持有隐私集合 $X_i$，最终准确地共同计算出所有集合的并集 $\bigcup_{i=1}^m X_i$。该功能是信息安全风险评估 \cite{LV04}、IP 黑名单和漏洞数据聚合 \cite{HLSSSYY16}、联合图计算 \cite{BllS05}、分布式网络监控 \cite{KS-CRYPTO-2005} 的核心技术，也是构建支持全连接的隐私数据库 \cite{KRTW-ASIACRYPT-2019} 和 Private ID 协议 \cite{GMRSS-PKC-2021} 的核心组件。
+    
+    \item \textbf{多方隐私并集计算（Multi-party Private Computation on Set Union, MPCSU）.} 允许 $m$ 个参与方分别持有隐私集合 $X_i$，最终输出并集 $\bigcup_{i=1}^m X_i$ 的部分或汇总信息。MPCSU 主要包括基于电路的 MPSU 协议（Circuit-MPSU）和多方隐私并集求势协议（MPSU-card）。该类功能同样存在许多潜在应用，例如，政府卫生部门可以通过 MPSU-card 协议统计某月内所有医院确诊某类传染病的总人数（即并集基数），而在统计过程中不泄露任何患者的具体身份。
+\end{itemize}
+
+虽然多方场景赋予了MPSO更加广阔的应用前景，但其复杂性导致了两方场景下的成熟技术无法直接迁移，进一步增加了MPSO协议设计的难度与挑战。具体地，MPSO 领域面临着以下的重大挑战：
+\begin{enumerate}
+	\item \textbf{安全性弱.} 许多现有的 MPSO 协议（甚至是部分最新的研究成果，如 \cite{LG-ASIACRYPT-2023,Zhang23c,GaoTY24,SC-abs-2309}）的安全性依赖于“非共谋假设”（Non-collusion Assumption），即假设某些参与方之间不会共谋。该假设在现实世界的开放网络环境或存在利益冲突的商业合作中难以成立，导致这些协议难以抵御实际场景中的任意共谋攻击，一旦落地存在严重的安全风险。
+
+	\item \textbf{效率低下.} 现有的MPSO 协议的构造主要遵循两类技术路线，包括基于公钥密码技术的路线和基于不经意传输（Oblivious Transfer, OT）与对称密钥技术的路线。前者由于涉及大量昂贵的公钥操作，实际运行效率极低；后者虽然执行速度快，但渐进复杂度较差。目前的各类MPSO协议尚未能做到统筹兼顾，难以在保证理论最优性的同时实现实际可用的性能。
+
+    \item \textbf{功能局限.} 现有的 MPSO 协议功能单一，缺乏对计算任意集合公式的支持，难以满足现实场景中的复杂需求。例如，公共卫生部门希望筛选某项健康计划的候选人，条件是“患有特定疾病”且“收入低于特定标准”。这需要各医院首先联合计算患病人员的\textbf{并集}，随后与福利部门的低收入名单计算\textbf{交集} \cite{KS-CRYPTO-2005}。这种“先求并、再求交”的复合运算超出了现有仅关注单一功能的 MPSO 协议的能力范畴，缺乏实用的专用解决方案。
+    
+    \item \textbf{缺乏统一性.} 现有的 MPSO 研究呈现出严重的“功能孤岛”特征。研究工作大多聚焦于某一特定功能（如仅针对 MPSI 或仅针对 MPSU）的优化，并采用了异构的技术路线，导致产生了大量孤立的协议，缺乏一个统一的理论框架。这种现状不仅增加了系统的开发与维护成本，也使得难以通过模块化组合来应对复杂多变的业务需求。
+\end{enumerate}
+
+针对上述背景与挑战，本文致力于研究安全、高效的多方隐私集合运算协议，并构建支持任意集合公式计算的多方隐私集合运算统一框架，从而解决现有 MPSO 领域安全性弱、效率低下、功能局限及缺乏统一性等关键问题，为打破数据孤岛、促进数据要素的安全流通提供坚实的技术支撑。
+
+\section{研究现状}
+\esection{Research Status}
+
+据粗略估计，多方隐私集合运算（MPSO）领域的相关研究文献已达数百篇，且正以指数级的速度增长。然而，在这海量的文献中，大部分工作并未给出严谨的安全性证明。即便着眼于那些提供了安全性证明的文献，许多协议在安全性假设或正确性保障上仍存在显著局限。例如，部分协议 \cite{LiW07,BA-ASIACCS-2012,SCK12,ChandranD0OSS21,LG-ASIACRYPT-2023,Zhang23c,GaoTY24,SC-abs-2309} 引入了云服务器辅助（Server-Aided）模型或依赖于“特定参与方不共谋”的非共谋假设，这使其难以抵御现实应用场景中复杂的任意共谋攻击；另一些协议 \cite{BayEHSV22,VCE22} 则存在不可忽略的假阳性率（False Positives），即以不可忽略的概率错误地将原本不属于结果集合的元素包含在协议输出中，这在金融风控误报、医疗误诊等高敏感场景下是不可接受的。
+
+鉴于此，本文将重点关注那些在标准半诚实模型下安全（即能够抵抗任意参与方的共谋）、且协议输出的错误概率可忽略的 MPSO 协议。同时，为了梳理技术演进脉络，本文也会回顾部分虽然未完全达到标准半诚实安全，但其构造思想对后续工作产生深远影响的经典协议。
+
+目前MPSO的研究分布呈现出极端的不均衡性：多方隐私集合求交（MPSI）占据$90\%$以上的比例，得到了广泛的研究 \cite{FreedmanNP04,KS-CRYPTO-2005,HazayV17,KMPRT-CCS-2017,InbarOP18,GPRTY-CRYPTO-2021,NTY-CCS-2021,BNOP-AsiaCCS-2022,WuYC24}；多方隐私集合求并（MPSU）受到的关注相对稀缺 \cite{KS-CRYPTO-2005,Frikken-ACNS-2007,GaoNT24}。不过，随着近年来 Liu 和 Gao \cite{LG-ASIACRYPT-2023} 等高影响力工作的发表，该方向的研究热度正出现上涨趋势。至于多方隐私交集计算（MPCSI）和多方隐私并集计算（MPCSU），相关的安全协议寥寥无几 \cite{KS-CRYPTO-2005,ChenDGB22,GiorgiLOV24}。特别是在不诚实多数（Dishonest Majority）\footnote{不诚实大多数要求敌手腐化参与方数量的阈值$t$满足 $t \ge m/2$，而标准半诚实安全要求$t = m - 1$（即最大腐化阈值）。安全性依赖于非共谋假设的协议不满足半诚实安全定义，但往往能实现不诚实大多数。}设定下，学术界甚至尚未有工作能够实现 Circuit-MPSI、MPSU-card 以及 Circuit-MPSU 协议。
+
+下面我们将分类详细阐述各类协议的研究现状。
+
+\subsection{多方隐私集合求交}
+
+作为 MPSO 中研究最深入的功能，MPSI 协议主要遵循两条技术路线：基于公钥密码技术的路线和基于对称密钥技术的路线。
+
+\begin{trivlist}
+\item \textbf{基于公钥密码技术的 MPSI.}
+Freedman 等人 \cite{FreedmanNP04} 提出了首个基于不经意多项式求值（Oblivious Polynomial Evaluation, OPE）的 MPSI 协议，该 OPE 利用加法同态加密（Additively Homomorphic Encryption, AHE）实现。Kissner 和 Song \cite{KS-CRYPTO-2005} 同样利用 OPE 技术结合多项式表示提出了一个 MPSI 协议。然而，这两个协议的计算复杂度对于每个参与方而言均为集合大小 $n$ 的二次方，导致其实际效率低下，难以应用于大规模数据集。
+
+\item \textbf{基于对称密钥技术的 MPSI.}
+近年来，基于不经意传输（OT）和对称密钥操作的 MPSI 协议因其高效性成为了研究主流。Kolesnikov 等人 \cite{KMPRT-CCS-2017} 提出了两个半诚实 MPSI 协议：第一个实现了最优复杂度，但仅在增强半诚实模型（Augmented Semi-Honest Model）下安全；第二个在标准半诚实模型下安全，但客户端的复杂度依赖于共谋阈值 $t$。Garimella 等人 \cite{GPRTY-CRYPTO-2021} 利用不经意键值存储（Oblivious Key-Value Store, OKVS）\cite{PRTY20,RR-CCS-2022,BPSY-USENIX-2023} 对上述协议进行了改进，并证明了第一个协议实际上支持恶意安全。在此基础上，Nevo 等人 \cite{NTY-CCS-2021} 进一步优化了 $t < m-1$ 设定下的恶意 MPSI 协议。
+
+Inbar 等人 \cite{InbarOP18} 基于 OT 和混淆布隆过滤器（Garbled Bloom Filter），分别在增强半诚实和标准半诚实模型下提出了 MPSI 协议，其单方计算复杂度为 $O(mn)$。Ben-Efraim 等人 \cite{BNOP-AsiaCCS-2022} 随后将其扩展至恶意模型。最近，Wu 等人 \cite{WuYC24} 提出了两个基于不经意伪随机函数（OPRF）和 OKVS 的半诚实 MPSI 协议，展现出了优于前人工作的性能。尽管 MPSI 研究已相当成熟，但目前尚无标准半诚实 MPSI 协议能够达到与 \cite{KMPRT-CCS-2017} 中增强半诚实协议相同的渐进复杂度。
+\end{trivlist}
+
+\subsection{多方隐私交集计算}
+
+MPCSI 旨在计算交集的统计信息而非交集本身。目前主要关注 MPSI-card 和 MPSI-card-sum 两类功能。
+
+\begin{trivlist}
+\item \textbf{MPSI-card 与 MPSI-card-sum。}
+Kissner 和 Song \cite{KS-CRYPTO-2005} 的方案虽然可以支持这些功能，但依赖昂贵的同态加密，效率较低。Chen 等人 \cite{ChenDGB22} 提出了首个基于 OT 和对称密钥操作的 MPSI-card 和 MPSI-card-sum 协议，这也是目前在标准半诚实模型下唯一实用的同类协议。然而，其协议复杂度尚未达到最优（Leader 复杂度为 $O(mn + tn \log n)$，Client 复杂度为 $O(tn)$）。Giorgi 等人 \cite{GiorgiLOV24} 近期也探索了相关方向，但在标准半诚实模型下的高效性仍有提升空间。
+\end{trivlist}
+
+\subsection{多方隐私集合求并}
+
+与 MPSI 相比，MPSU 的研究相对滞后且挑战更大。现有的 MPSU 工作同样可以分为基于公钥密码技术和基于对称密钥技术两类。
+
+\begin{trivlist}
+\item \textbf{基于公钥密码技术的 MPSU.}
+Kissner 和 Song \cite{KS-CRYPTO-2005} 提出了首个 MPSU 协议，基于多项式表示和加法同态加密（AHE）。由于涉及大量的 AHE 操作和高次多项式计算，该协议完全不具备实用性。Frikken \cite{Frikken-ACNS-2007} 通过降低多项式次数改进了 \cite{KS-CRYPTO-2005}，但由于仍需对加密多项式进行多点求值，其 AHE 操作次数相对于集合大小仍是二次方的。
+
+Vos 等人 \cite{VCE22} 提出了一种基于位向量表示和 ElGamal 加密的 MPSU 协议，通过对位向量执行隐私 OR 操作来计算并集。然而，据 Liu 和 Gao \cite{LG-ASIACRYPT-2023} 的实验报告，该协议的具体效率较差，且 Leader 的计算和通信复杂度随参与方数量呈二次增长。
+
+最近，Gao 等人 \cite{GaoNT24}（即文中的 \cite{GNT-eprint-2023}）提出了一种渐进复杂度较优的 MPSU 协议。然而，我们在研究中发现该协议在安全性上存在漏洞，无法抵御任意共谋攻击（详见本文相关章节的分析），因此并不符合本文的安全标准。此外，Blanton 等人 \cite{BA-ASIACCS-2012} 基于不经意排序和通用 MPC 构造了 MPSU，但由于严重依赖通用 MPC，效率极低。
+
+\item \textbf{基于对称密钥技术的 MPSU.}
+Liu 和 Gao \cite{LG-ASIACRYPT-2023} 提出了首个(也是唯一一个)基于 OT 和对称密钥操作的 MPSU 协议。该协议在性能上取得了巨大突破，是首个实际可用的 MPSU 协议。在 $3$ 方参与，每个参与方的集合大小为 $2^{10}$ 的设定下，该协议比 \cite{VCE22} 快了 $109$ 倍。然而，该协议的安全性依赖于“非共谋假设”，无法在标准半诚实模型下证明安全。
+
+\end{trivlist}
+
+\subsection{多方隐私集合运算通用框架}
+
+除了针对特定功能的专用协议外，构建能够支持任意集合公式计算的 MPSO 通用框架也是一个重要的研究方向。
+
+\begin{trivlist}
+\item \textbf{通用框架的研究现状.}
+Kissner 和 Song \cite{KS-CRYPTO-2005} 曾尝试构建一个通用的 MPSO 框架，但并未完全实现。其协议仅支持由交集和并集组成的集合公式，无法处理差集运算（例如 $X_2 \setminus (X_1 \cap X_3)$），且严重依赖同态加密，计算成本极高。Blanton 和 Aguiar \cite{BA-ASIACCS-2012} 重新设计了集合运算电路，并通过通用 MPC 协议实现了对交、并、差运算的任意组合。虽然在功能上实现了通用性，但这带来了巨大的计算开销。例如，其实验报告中仅针对 3 个参与方、每方 $2^{11}$ 个元素的最简单 MPSI 任务，耗时就长达 24.8 秒，且仅支持诚实多数（Honest Majority）设定。因此，目前仍缺乏一个在标准半诚实模型下既安全又高效的 MPSO 通用框架。
+\end{trivlist}
+
+\subsection{多方隐私集合求交}
+% 对应 MPSI
+
+\subsection{多方隐私交集计算}
+% 对应 MPCSI
+
+\subsection{多方隐私集合求并}
+% 对应 MPSU
+
+\subsection{多方隐私集合运算框架}
+% 对应 General Framework for MPSO
+
+\section{本文主要贡献}
+\esection{Main Contributions}
+
+针对目前多方隐私集合运算（MPSO）领域在安全性、效率、功能完备性及统一性方面存在的显著不足，以及研究资源在不同功能间分布极度不均衡的现状，本文开展了系统性的研究工作，主要研究内容和贡献总结如下：
+
+\subsection{多方隐私集合求并协议的研究}
+
+首先，本文从应用价值巨大但研究相对匮乏的多方隐私集合求并（MPSU）入手，直面现有 MPSU 协议面临的“安全性弱”（依赖于非共谋假设）与“效率低下”（实际性能难以支撑应用或理论复杂度未达线性）两大核心痛点，分别基于对称密钥和公钥体制提出了安全高效的解决方案：前者是首个在标准半诚实模型下证明安全的实际可用的 MPSU 协议，后者则是首个在理论上实现线性复杂度的 MPSU 协议。
+
+具体创新点和贡献如下：
+
+\begin{enumerate}
+	\item \textbf{高效的批量秘密分享隐私成员测试（batch ssPMT）原语.} 
+	本文深入分析了现有唯一的基于对称密钥技术的 MPSU 协议 \cite{LG-ASIACRYPT-2023}，并针对其核心组件 —— 多查询秘密分享隐私成员测试（multi-query secret-shared private membership test, mq-ssPMT）协议，抽象出一种全新的原语 —— 批量秘密分享隐私成员测试（batch secret-shared private membership test, batch ssPMT）。相比于 mq-ssPMT 的实例化严重依赖于昂贵的通用 MPC 技术所导致的性能瓶颈，本文提出的 batch ssPMT 能够仅利用轻量级密码学组件进行高效实例化。通过结合哈希分桶（hashing-to-bins）技术，该原语能够在不引入任何额外信息泄露的前提下，完全替代现有基于对称密钥技术的 MPSU 框架中的 mq-ssPMT 组件。该原语不仅构成了本文两个 MPSU 协议的核心构建模块，其高效的构造也是协议实际性能获得显著提升的关键所在。此外，该原语在本文后续构建的 MPSO 框架中也发挥着关键作用，被用于高效构造其核心共性子协议 —— 成员零分享（Membership Zero-Sharing）协议，从而为任意集合公式的计算提供了底层支撑。
+
+    \item \textbf{首个标准半诚实模型下基于对称密钥的 MPSU 协议.} 
+    本文将随机不经意传输（Random Oblivious Transfer, ROT）的概念推广至多方场景，定义并构造了多方秘密分享随机不经意传输（multi-party secret-shared ROT, mss-ROT）原语。基于 batch ssPMT 和 mss-ROT，本文提出了首个在标准半诚实模型下证明安全且基于对称密钥技术的 MPSU 协议。该协议不仅成功消除了现有基于对称密钥的方案对非合谋假设的依赖，显著增强了安全性，还表现出更加优异的具体性能。 特别是在局域网（LAN）环境下，其在线阶段的运行效率比之前最先进协议 \cite{LG-ASIACRYPT-2023} 提升了 $3.9 \sim 10.0$ 倍，整体运行效率提升了 $1.2 \sim 7.8$ 倍。
+
+    \item \textbf{首个具有线性复杂度的 MPSU 协议.} 
+    基于 batch ssPMT 和多密钥重随机化公钥加密（Multi-Key Rerandomizable Public-Key Encryption, MKR-PKE） \cite{GNT-eprint-2023}，本文提出了首个同时实现线性计算复杂度和线性通信复杂度的 MPSU 协议。得益于其优越的渐进复杂度，该协议极大地降低了通信开销。实验数据显示，相比于现有最先进协议 \cite{LG-ASIACRYPT-2023}，该协议的总通信量降低了 $3.0 \sim 36.5$ 倍，使其在带宽受限的广域网（WAN）环境下具有显著的应用优势。
+\end{enumerate}
+
+
+\subsection{多方隐私集合运算框架的研究}
+
+为了突破 MPSO 领域“功能局限”与“缺乏统一性”的瓶颈，本文随后聚焦于支持任意集合公式计算的通用 MPSO 功能，在标准半诚实模型下，利用不经意传输（OT）与对称密钥技术，构建了首个实现通用 MPSO 功能的统一框架，并将该框架进一步扩展，实现了更为复杂的任意集合公式结果求势（MPSO-card）及基于电路的通用MPSO（Circuit-MPSO）功能。
+
+具体创新点和贡献如下：
+
+\begin{itemize}
+    \item \textbf{任意集合公式的统一谓词公式表示.} 
+    为了解决现有 MPSO 框架在表示层面的两极化难题 —— 要么将目标集合公式表示为交、并及元素规约（element reduction）操作的组合导致通用性受限 \cite{KS-CRYPTO-2005}，要么直接基于集合代数运算的组合导致协议严重依赖于通用 MPC 从而效率低下 \cite{BA-ASIACCS-2012}，本文引入了一种名为“规范集合谓词公式”（Canonical Set Predicate Formula, CSPF）的新型表示方法，将目标集合公式表示为一类由原子集合谓词（形如 $x \in X_i$ 或 $x \notin X_i$）构成的析取范式，其中每个子公式满足特定的结构，子公式共同表示了目标集合的一个划分。本文严格证明了任意集合公式均可转化为 CSPF 表示，且 CSPF 的结构特性（如子公式数量）直接决定了协议的性能。
+
+    \item \textbf{谓词零分享（Predicative Zero-Sharing）与其松弛定义.} 本文提出了一类新型的密码学原语“谓词零分享”（Predicative Zero-Sharing）。该原语表示一族协议，其中每个协议均关联一个谓词公式，如果该公式在所有参与方输入上的真值为真，那么各方输出 0 的秘密分享；否则，输出随机值的秘密分享。本文首先给出了一种简化的、基于模拟范式的谓词零分享安全性定义，并严格证明了其与标准半诚实安全定义的等价性。基于此定义，本文进一步提出了谓词零分享的松弛版本（Relaxed Predicative Zero-Sharing），该版本具有极强的抽象能力，能够涵盖随机不经意传输（ROT）、等值条件随机数生成（ECRG）\cite{Jia0ZG24} 等现有原语。
+    在此基础上，本文建立了针对松弛谓词零分享的\textbf{组合技术（Composition Technique）}与\textbf{转化技术（Transformation Technique）}。结合这两项技术，可以以模块化的方式，从关联于原子命题（或其否定）的松弛谓词零分享出发，自底向上地构造出关联于任意复杂谓词公式的、满足标准半诚实安全的谓词零分享协议。这一通用的构造范式是本文 MPSO 框架能够灵活支持任意集合公式计算、并保持协议结构统一性的核心技术支撑。
+
+    \item \textbf{高效的成员零分享（Membership Zero-Sharing）原语.} 为了将谓词零分享这一抽象原语应用于具体的集合运算，本文引入了其在 MPSO 场景下的特化实例 —— “成员零分享”（Membership Zero-Sharing）。具体而言，该协议指定一名参与方（记作 $P_\mathsf{pivot}$）输入单个元素 $x$，而其他每个参与方 $P_i$ 输入集合 $X_i$。每个协议实例均关联一个由原子集合谓词 $x \in X_i$ 和 $x \notin X_i$ 通过逻辑与 $\mathsf{AND}$、逻辑或 $\mathsf{OR}$ 操作符连接而成的集合谓词公式。如果 $P_\mathsf{pivot}$ 的输入元素 $x$ 使得该公式成立，则各方输出 0 的秘密分享；否则，输出随机值的秘密分享。
+    基于不经意可编程伪随机函数（oblivious programmable pseudorandom function, OPPRF）、批量秘密分享隐私成员测试（batch ssPMT）和随机不经意传输（ROT）等轻量级组件，本文分别针对 $x \in X_i$ 和 $x \notin X_i$ 给出了成员零分享的松弛版本（Relaxed Membership Zero-Sharing）的高效实例化。进而，遵循任意谓词零分享的通用构造范式，本文成功实例化了关联于任意集合谓词公式的标准安全成员零分享协议。该协议作为 MPSO 统一框架的核心底层组件，成功弥合了 MPSO 领域中“通用性”与“实用性”之间的鸿沟：其对任意集合谓词公式的支持赋予了框架计算任意集合运算的通用能力，而其基于轻量级组件的高效实例化则保障了框架优异的实际性能。
+
+    \item \textbf{实现通用 MPSO 功能的统一框架及其扩展.} 基于上述集合公式的统一表示和成员零分享作为底层原语，本文构建了支持任意集合公式计算的 MPSO 统一框架：首先，利用CPSF表示法将目标集合公式转化为若干结构化的子公式；随后，针对每一个子公式，参与方以各自的隐私集合为输入，调用关联于该子公式的标准安全成员零分享协议，生成关于目标集合元素的加法秘密分享序列；为了消除秘密分享顺序可能泄露的元数据信息（如元素来源），参与方调用多方秘密分享洗牌（multi-party secret-shared shuffle）协议对所有分享进行随机置换。在标准 MPSO 功能中，打乱后的秘密分享被发送给结果接收方进行重构，通过特定的编码格式筛除随机值后即可恢复出目标集合。此外，得益于洗牌后的输出仍保持秘密分享的形式，该框架具有极强的扩展性，首次实现了更为复杂的任意集合公式结果求势（MPSO-card）及基于电路的通用MPSO（Circuit-MPSO）功能：若应用场景仅需输出集合的统计信息或需进行后续保密计算，参与方可直接对秘密分享进行操作（如统计有效分享数量以计算基数，或将其作为输入馈送至通用 MPC 电路）。
+\end{itemize}
+
+除了上述理论贡献外，本文通过实例化通用框架，在各个 MPSO 子领域也做出了独立的贡献。理论分析与实验评估表明，这些从框架派生的协议在标准半诚实模型下均达到了理论最优或接近最优的性能：
+
+\begin{itemize}
+    \item \textbf{MPSI.} 本文实现的 MPSI 协议是首个在标准半诚实模型下达到最优渐进复杂度（即 Leader 计算与通信复杂度为 $O(mn)$，Client 为 $O(n)$，与不安全朴素方案同级）且不依赖大量公钥操作的 MPSI 构造。此前达到该复杂度的协议 \cite{KMPRT-CCS-2017} 仅在增强半诚实模型（Augmented Semi-Honest）下安全，本文填补了这一空白。同时，该协议也是目前在线效率最高的 MPSI 协议，在 LAN（WAN）环境下比 SOTA 协议 \cite{WuYC24} 快 $2.4 \sim 5.2$ 倍（$1.1 \sim 2.6$ 倍）。
+    
+    \item \textbf{MPSI-card, MPSI-card-sum 与 Circuit-MPSI.} 本文给出了首个在标准半诚实模型下具有最优计算和通信复杂度的 MPSI-card 和 MPSI-card-sum 协议。其中 MPSI-card 的在线通信量比 SOTA \cite{ChenDGB22} 降低了 $14.0 \sim 20.3$ 倍。Circuit-MPSI 协议则是首个在不诚实多数（Dishonest Majority）设定下的实现，此前相关工作仅考虑了诚实多数设定。
+    
+    \item \textbf{MPSU.} 基于框架实例化的 MPSU 协议可以被视为基于秘密分享的 MPSU 范式的一个实例（该范式抽象了 \cite{LG-ASIACRYPT-2023, DongCZB24}）。本文协议首次实现了该范式的最优复杂度（Leader $O(m^2 n)$, Client $O(mn)$）。其实际性能与本文前述的专用 SK-MPSU 协议 \cite{DongCZB24} 相当，但在线通信开销进一步降低了 $1.8$ 倍，在带宽受限网络中具有更强的竞争力。
+    
+    \item \textbf{MPSU-card 与 Circuit-MPSU.} 本文提供了目前唯一高效的 MPSU-card 和 Circuit-MPSU 构造，其性能与本文的 MPSU 协议几乎相同。
+\end{itemize}
+    
+    % \item \textbf{基于公钥体制的通用框架扩展.} 
+    % 作为对对称密钥框架的补充，本文在附录中提出了基于公钥体制的通用框架（基于谓词加密零），虽然其实际效率略低，但在渐进复杂度上具有独特的理论优势，从而构建了一个完整的 MPSO 技术体系。
+
+
+\section{本文组织结构}
+\esection{Organization of the Thesis}
