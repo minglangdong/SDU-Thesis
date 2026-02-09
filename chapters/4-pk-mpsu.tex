@@ -1,8 +1,61 @@
 \chapter{基于公钥体制的线性多方隐私集合求并协议}
-\echapter{Linear Multi-Party Private Set Union Protocol Based on Public-Key Cryptography}
+\echapter{Linear Multi-Party Private Set Union Protocol Based on Public-Key Operations}
 
 \section{引言}
 \esection{Introduction}
+
+在第三章中，我们详细探讨了基于对称密钥技术（SK-MPSU）的协议构造，提出了一种在标准半诚实模型下安全且在局域网（LAN）环境下具有高效在线性能的 MPSU 协议。然而，尽管该协议在实际运行效率上取得了显著提升，但其渐进复杂度（Asymptotic Complexity）仍有待优化。特别是，正如我们在第一章所述，现有的 MPSU 协议，无论是基于公钥密码技术（PK-MPSU）还是基于对称密钥技术（SK-MPSU），都面临着一个共同的局限性：\textbf{目前尚无任何协议能够同时实现线性的计算复杂度和线性的通信复杂度}。
+
+在本章的语境中，“线性复杂度”特指每个参与方的复杂度与所有参与方集合大小的总和呈线性关系。本文主要考虑平衡设定，即每个参与方持有的集合大小相等（均为 $n$），因此线性复杂度意味着每个参与方的复杂度应随参与方数量 $m$ 和集合大小 $n$ 呈线性增长（即 $O(mn)$）。
+
+为了更直观地展示现有工作的局限性及本章的研究动机，表 \ref{tab:comparisons} 对现有的 MPSU 协议与本文提出的协议进行了全面的理论复杂度对比。
+
+\begin{table*}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+        \hline 
+        \multirow{2}{*}{\textbf{协议}} & \multicolumn{2}{c|}{\textbf{计算复杂度}} & \multicolumn{2}{c|}{\textbf{通信复杂度}} & \multirow{2}{*}{\textbf{轮数}} & \multirow{2}{*}{\textbf{安全性}}\\ 
+        \cline{2-5}
+        & Leader & Client & Leader & Client & & \\
+        \hline
+      \cite{KS-CRYPTO-2005} & $m^2 n^3$ pub & $m^2 n^3$ pub & $\lambda m^3 n^2$ &$ \lambda m^3 n^2$ & $m$ &$\cmark$\\
+        \hline
+      \cite{Frikken-ACNS-2007} & $m n^2$ pub & $m n^2$ pub & $\lambda m n$ & $\lambda m n$ & $m$ &$\cmark$\\
+        \hline
+      \cite{VCE22} & $l m^2 n$ pub & $l m n$ pub & $\lambda l m^2 n$ & $\lambda l m n$ & $l$ &$\cmark$\\
+        \hline
+      \cite{BA-ASIACCS-2012} & \multicolumn{2}{c|}{$\sigma m n \log n + m^2$ sym} & \multicolumn{2}{c|}{$\sigma^2 m n \log n + \sigma m^2$} & $\log m$ &$\cmark$\\
+        \hline
+        \cite{GNT-eprint-2023} & \multicolumn{2}{c|}{$m n (\log n / \log \log n)$ pub} & \multicolumn{2}{c|}{$(\gamma + \lambda) m n (\log n / \log \log n)$} & $\log \gamma + m$ &$\xmark$\\
+        \hline
+        \cite{LG-ASIACRYPT-2023} & $(T + \gamma' + m) m n$ sym & $(T + \gamma') m n$ sym & $(T + \gamma') m n + l m^2 n$ & $(T + \gamma') m n$ & $\log (l - \log n) + m$ &$\xmark$\\
+        \hline
+        \textbf{本文 SK-MPSU} & $m^2 n$ sym & $m^2 n$ sym & $\gamma m n + l m^2 n$ & $(\gamma + l+ m) m n$ & $\log \gamma + m$ &$\cmark$\\
+        \hline
+        \textbf{本文 PK-MPSU} & $m n$ pub & $m n$ pub & $(\gamma + \lambda) m n$ & $(\gamma + \lambda) m n$ & $\log \gamma + m$&$\cmark$\\
+        \hline
+  \end{tabular}}
+  \caption{半诚实模型下 MPSU 协议的渐进通信（比特）与计算开销对比。为了便于比较，此处省略了大 $O$ 符号并仅保留了主导项。$\cmark$ 表示协议在标准半诚实模型下安全，$\xmark$ 表示协议依赖非共谋假设。pub：公钥操作；sym：对称密钥操作。其中，$n$ 为集合大小，$m$ 为参与方数量，$\lambda$ 和 $\sigma$ 分别为计算和统计安全参数，$T$ 为 \cite{LG-ASIACRYPT-2023} 中 SKE 解密电路的 AND 门数量，$l$ 为输入元素的比特长度，$\gamma$ 为 OPPRF 的输出长度，$\gamma'$ 为 SKE 密文长度（$\gamma' \approx \gamma$）。典型参数设置为：$n \le 2^{24}$, $m \le 32$, $\lambda = 128$, $\sigma = 40$, $T \approx 600$, $l \le 128$, $\gamma \le 64$。}
+  \label{tab:comparisons}
+\end{table*}
+
+从表 \ref{tab:comparisons} 可以看出：
+\begin{itemize}
+    \item 现有的 PK-MPSU 协议（如 \cite{KS-CRYPTO-2005, Frikken-ACNS-2007, VCE22}）虽然在某些情况下通信复杂度表现尚可（如 \cite{Frikken-ACNS-2007} 实现了 $O(mn)$ 的通信复杂度），但其计算复杂度往往随集合大小 $n$ 呈超线性增长（例如 $n^2$ 或 $n^3$），其中 \cite{GNT-eprint-2023} 实现了目前最好的计算复杂度，但是相对于$n$仍是超线性。
+    \item 现有的 SK-MPSU 协议（如 \cite{LG-ASIACRYPT-2023} 以及本文第三章提出的协议）虽然利用高效的对称操作实现了较好的计算复杂度（$O(mn)$ 级别），但其通信复杂度中通常包含与 $m^2$ 相关的项（例如 $l m^2 n$），这意味着随着参与方数量的增加，通信量将呈二次方增长，限制了其在大规模网络中的扩展性。
+\end{itemize}
+
+因此，设计一个在标准半诚实模型下安全，且同时具备线性计算复杂度和线性通信复杂度的 MPSU 协议，仍是一个未解决的挑战。受此启发，本章提出以下核心问题：
+
+\begin{center}
+\emph{能否构造一个同时实现线性计算复杂度和线性通信复杂度的 MPSU 协议？}
+\end{center}
+
+针对这一问题，本章将利用多密钥重随机化公钥加密技术，给出一个肯定的回答。
+
+\section{技术路线概述}
+\esection{Technical Overview}
 
 \section{协议构造及安全性证明}
 \esection{Protocol Construction and Security Proof}
@@ -10,8 +63,8 @@
 \section{复杂度分析与对比}
 \esection{Complexity Analysis and Comparison}
 
-\section{实现与性能分析}
-\esection{Implementation and Performance Analysis}
+\section{MPSU 协议的实现与性能评估}
+\esection{MPSU Implementations and Performance Evaluation}
 
 \section{本章小结}
 \esection{Summary}

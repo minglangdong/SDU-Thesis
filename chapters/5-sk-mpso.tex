@@ -1,8 +1,36 @@
-\chapter{基于对称密钥的多方隐私集合运算通用框架}
-\echapter{General Framework for Multi-Party Private Set Operations Based on Symmetric Keys}
+\chapter{基于对称密钥的通用多方隐私集合运算框架}
+\echapter{Generic Multi-Party Private Set Operations Framework Based on Symmetric-Key Operations}
 
 \section{引言}
 \esection{Introduction}
+
+在前面的第三章和第四章中，我们重点关注了多方隐私集合求并（MPSU）这一特定的功能，并分别基于对称密钥和公钥体制提出了安全高效的解决方案。然而，多方隐私集合运算（MPSO）的应用场景远不止于单一的交集或并集计算。在实际的复杂数据协作场景中，往往需要计算涉及多个集合的复合逻辑公式。以下三个典型应用场景生动地说明了对任意集合公式计算的迫切需求：
+
+\begin{itemize}
+    \item \textbf{公共卫生监测（差集运算）}：
+    在传染病防控中，卫生部门可能需要筛选“确诊特定疾病”但“未接种相关疫苗”的高风险人群。假设医院持有确诊名单 $A$，疾控中心持有接种名单 $B$，该需求即对应于计算集合差集 $A \setminus B$。
+    
+    \item \textbf{联合金融风控（并集后差集）}：
+    在跨机构反欺诈中，银行联盟希望构建一个综合的风险数据库，但需剔除各行的高价值白名单客户。这需要将多家机构的黑名单 $B_1, B_2, \dots$ 进行聚合，并从中减去特定的白名单 $W$。该需求对应于计算复合公式 $(\bigcup B_i) \setminus W$。
+    
+    \item \textbf{数字营销效果分析（复合逻辑运算）}：
+    在广告归因分析中，需求往往更加多样化。例如，广告主希望衡量全渠道广告对线下购买的综合转化效果，这需要计算所有平台受众并集与购买列表的交集 $(\bigcup V_i) \cap P$；或者，广告主希望评估某新平台的独家拉新能力，这需要计算购买列表与新平台受众的交集，并剔除其他平台受众，即 $(P \cap V_{\text{new}}) \setminus (\bigcup V_{\text{others}})$。
+\end{itemize}
+
+构建能够支持上述任意集合公式计算的 MPSO 通用框架，一直是该领域的一个核心挑战。早期的经典工作尝试解决这一问题，但往往顾此失彼：Kissner 和 Song \cite{KS-CRYPTO-2005} 的方案虽然基于同态加密构建了框架，但受限于多项式表示法，无法表达差集运算（难以覆盖上述场景一、二、三中的后半部分），通用性受限；Blanton 和 Aguiar \cite{BA-ASIACCS-2012} 虽然通过通用 MPC 技术实现了全功能覆盖，但其昂贵的计算开销使其难以在实际规模的数据集上部署。因此，学术界和工业界迫切需要一个在标准半诚实模型下，既能完全覆盖通用 MPSO 功能，又具备实际可用效率的统一框架。
+
+为了解决上述挑战，本章提出了一种全新的 MPSO 通用统一框架。该框架的设计核心在于寻找一种能够平衡“表达能力”与“计算效率”的方法论：
+
+\begin{enumerate}
+    \item \textbf{在表示层}，本章引入了“规范集合谓词公式”（Canonical Set Predicate Formula, CPF）。这是一种特定的析取范式结构，能够将任意复杂的集合公式转化为若干个相互独立的子问题，从而为并行化和模块化处理奠定了理论基础。
+    \item \textbf{在原语层}，本章提出了一种名为“谓词零分享”（Predicative Zero-Sharing, PZS）的新型密码学原语及其在集合运算中的特化实例——“成员零分享”（Membership Zero-Sharing）。该原语能够将逻辑谓词的真值编码为秘密分享形式，巧妙地规避了通用 MPC 中昂贵的布尔电路评估。
+    \item \textbf{在构造层}，本章利用不经意传输（OT）及伪随机函数（PRF）等轻量级组件高效实例化了基础的成员零分享协议，并通过组合与转化技术构建了完整的框架。
+\end{enumerate}
+
+本章的后续内容安排如下：5.2 节将详细介绍规范集合谓词公式（CPF）的定义及其转化定理；5.3 节将形式化定义谓词零分享与成员零分享原语；5.4 节将给出成员零分享的基础组件（交集成员/并集非成员零分享）的高效构造；5.5 节将描述通用框架的完整执行流程；最后，5.6 节将对本章内容进行总结。
+
+\section{规范集合谓词公式表示}
+\esection{Canonical Set Predicate Formula Representation}
 
 \section{谓词零分享}
 \esection{Predicative Zero-Sharing}
@@ -10,23 +38,23 @@
 \section{成员零分享}
 \esection{Membership Zero-Sharing}
 
-\section{框架构造}
-\esection{Framework Construction}
+\section{框架构造及安全性证明}
+\esection{Framework Construction and Security Proof}
 
-\section{典型实例化}
-\esection{Typical Instantiations}
+% \section{典型实例化}
+% \esection{Typical Instantiations}
 
-\subsection{多方隐私集合求交、求势及电路MPSI} 
-% 对应 MPSI, MPSI-card and Circuit MPSI
+% \subsection{多方隐私集合求交、求势及电路MPSI} 
+% % 对应 MPSI, MPSI-card and Circuit MPSI
 
-\subsection{多方隐私交集求势与和} 
-% 对应 MPSI-card-sum
+% \subsection{多方隐私交集求势与和} 
+% % 对应 MPSI-card-sum
 
-\subsection{多方隐私集合求并、求势及电路MPSU} 
-% 对应 MPSU, MPSU-card and Circuit MPSU
+% \subsection{多方隐私集合求并、求势及电路MPSU} 
+% % 对应 MPSU, MPSU-card and Circuit MPSU
 
-\section{实现与性能分析}
-\esection{Implementation and Performance Analysis}
+% \section{实现与性能分析}
+% \esection{Implementation and Performance Analysis}
 
 \section{本章小结}
 \esection{Summary}
