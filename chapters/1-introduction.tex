@@ -24,7 +24,7 @@ PSO 允许参与方在各自持有私有集合的前提下，协同完成对私�
 \end{itemize}
 目前，两方 PSO 技术已相对成熟。特别是两方 PSI 取得了巨大进展~\cite{PSZ-USENIX-2014,KKRT-CCS-2016,PRTY-CRYPTO-2019,CM-CRYPTO-2020,PRTY20,RS-EUROCRYPT-2021,RR-CCS-2022}，现有最先进的协议 \cite{RR-CCS-2022} 已能实现与不安全的朴素哈希 PSI 方案相当的性能。近年来，两方PCSI和两方PSU也迅猛发展，出现了一系列高效且安全的两方PCSI~\cite{GMRSS-PKC-2021,ZCZDL-2024}和两方PSU~\cite{KRTW-ASIACRYPT-2019,GMRSS-PKC-2021,Jia-USENIX-2022,ZCLZL-USENIX-2023,ZCZDL-2024,Jia0ZG24}协议构造，并形成了统一的两方PSO框架~\cite{ZCZDL-2024}，开始在实际业务中逐步大规模落地。
 
-与两方场景不同，MPSO 涉及多个输入集合 $X_1, \dots, X_m$ ($m > 2$)。由于集合运算的组合方式呈指数级增长，理想条件下的 MPSO 协议应该能够计算由有限次二元集合运算（包括交集、并集和差集）组成的任意集合公式 $f(X_1, \dots, X_m)$。\footnote{在 MPSO 中，通常规定仅由一名参与方（称为 Leader）获得结果集合，而其他参与方（称为 Client）无法获取除自身输入外的任何信息。}这使得 MPSO 涵盖了更加丰富的功能。然而，目前 MPSO 的研究主要聚焦于以下四类特定功能：
+与两方场景不同，MPSO 涉及多个输入集合 $X_1, \dots, X_m$ ($m > 2$)。由于集合运算的组合方式呈指数级增长，理想条件下的 MPSO 协议应该能够计算由有限次二元集合运算（包括交集、并集和差集）组成的任意集合公式 $f(X_1, \dots, X_m)$。\footnote{在 MPSO 的设定中，通常指定一名领导者（Leader）获得结果集合，而其他参与方（Client）无法获取除自身输入外的任何信息。}这使得 MPSO 涵盖了更加丰富的功能。然而，目前 MPSO 的研究主要聚焦于以下四类特定功能：
 \begin{itemize}
     \item \textbf{多方隐私集合求交（Multi-party Private Set Intersection, MPSI）.} 允许 $m$ ($m > 2$) 个参与方分别持有隐私集合 $X_i$ ($1 \le i \le m$)，最终准确地共同计算出所有集合的交集 $\bigcap_{i=1}^m X_i$。其典型应用包括隐私保护下的位置信息共享 \cite{NTLHB-NDSS-2011}、隐私通讯录的公共联系人发现~\cite{DRRT-PPET-2018}、DNA 检测和模式匹配 \cite{TKC-CCS-2007}、以及联合僵尸网络检测等。
     
@@ -68,7 +68,7 @@ PSO 允许参与方在各自持有私有集合的前提下，协同完成对私�
 Freedman 等人 \cite{FreedmanNP04} 基于不经意多项式求值（Oblivious Polynomial Evaluation, OPE）提出了首个 MPSI 协议，其中 OPE 利用加法同态加密（Additively Homomorphic Encryption, AHE）实现。Kissner 和 Song \cite{KS-CRYPTO-2005} 同样利用 OPE 技术结合多项式表示提出了一个 MPSI 协议。然而，这两个协议的计算复杂度对于每个参与方而言均为集合大小 $n$ 的二次方，导致其实际效率低下，根本难以应用于大规模数据集。
 
 \item \textbf{基于对称密钥技术的 MPSI.}
-近年来，基于不经意传输（OT）和对称密钥操作的 MPSI 协议因其实际可用的效率成为了研究主流。Kolesnikov 等人 \cite{KMPRT-CCS-2017} 提出了两个 MPSI 协议：第一个协议实现了最优渐进复杂度\footnote{在MPSI 和 MPCSI 中，最优渐进复杂度定义为 Leader 的计算和通信复杂度均为 $O(mn)$，且每个 Client 的计算和通信复杂度均为 $O(n)$（其中 $n$ 为集合大小，$m$ 为参与方数量）。这是因为在不考虑隐私的朴素方案中（即各 Client 直接发送集合给 Leader，由 Leader 直接计算出结果集合），所需的复杂度即为此量级。}，但仅在增强半诚实模型（Augmented Semi-Honest Model）下安全。 （增强半诚实模型的安全性要弱于标准半诚实模型，关于两者的关系详见文献 \cite{HazayL10} 的 2.4.4 节）。第二个协议虽然在标准半诚实模型下安全，但 Client 的复杂度依赖于腐化阈值 $t$，未能达到最优。
+近年来，基于不经意传输（OT）和对称密钥操作的 MPSI 协议因其实际可用的效率成为了研究主流。Kolesnikov 等人 \cite{KMPRT-CCS-2017} 提出了两个 MPSI 协议：第一个协议实现了最优渐进复杂度，\footnote{在MPSI 和 MPCSI 中，最优渐进复杂度定义为 Leader 的计算和通信复杂度均为 $O(mn)$，且每个 Client 的计算和通信复杂度均为 $O(n)$（其中 $n$ 为集合大小，$m$ 为参与方数量）。这是因为在不考虑隐私的朴素方案中（即各 Client 直接发送集合给 Leader，由 Leader 直接计算出结果集合），所需的复杂度即为此量级。}但仅在增强半诚实模型（Augmented Semi-Honest Model）下安全。 （增强半诚实模型的安全性要弱于标准半诚实模型，关于两者的关系详见文献 \cite{HazayL10} 的 2.4.4 节）。第二个协议虽然在标准半诚实模型下安全，但 Client 的复杂度依赖于腐化阈值 $t$，未能达到最优。
 
 Garimella 等人 \cite{GPRTY-CRYPTO-2021} 通过提出并优化不经意键值存储（Oblivious Key-Value Store, OKVS）\cite{PRTY20,RR-CCS-2022,BPSY-USENIX-2023} 对上述协议的效率进行了改进，并证明了第一个协议实际上支持恶意安全。在此基础上，Nevo 等人 \cite{NTY-CCS-2021} 进一步优化了 $t < m-1$ 设定下的恶意 MPSI 协议。Inbar 等人 \cite{InbarOP18} 基于 OT 和混淆布隆过滤器（Garbled Bloom Filter），分别在增强半诚实和标准半诚实模型下各提出了一个 MPSI 协议，但其每个参与方的计算复杂度均为 $O(mn)$。Ben-Efraim 等人 \cite{BNOP-AsiaCCS-2022} 随后将其扩展至恶意安全模型。
 
@@ -98,7 +98,7 @@ Kissner 和 Song \cite{KS-CRYPTO-2005} 基于多项式表示和加法同态加�
 
 Vos 等人 \cite{VCE22} 提出了一种基于位向量表示和 ElGamal 加密 \cite{ElGamal-IEEE-IT-1985}的 MPSU 协议，通过对位向量执行隐私 OR 操作来计算并集。然而，据 Liu 和 Gao \cite{LG-ASIACRYPT-2023} 的实验报告，该协议的具体效率较差（例如，在 10 个参与方、每方集合大小为 $2^{10}$ 的规模下，运行时间长达 75 秒），且 Leader 的计算和通信复杂度随参与方数量 $m$ 呈二次增长。
 
-最近，Gao 等人 \cite{GaoNT24} 基于多密钥重随机化公钥加密（Multi-Key Rerandomizable Public-Key Encryption, MKR-PKE）提出了一种渐进复杂度较优的 MPSU 协议。尽管该协议是目前渐进复杂度最佳的 MPSU 协议，但其仍未能达到线性复杂度\footnote{在 MPSU 中，线性复杂度意味着每个参与方的复杂度与所有参与方集合大小的总和呈线性关系。本文考虑平衡设定，即每个参与方持有的集合大小相等，因此线性复杂度指每个参与方的复杂度与参与方数量 $m$ 和集合大小 $n$ 均呈线性关系。}。
+最近，Gao 等人 \cite{GaoNT24} 基于多密钥重随机化公钥加密（Multi-Key Rerandomizable Public-Key Encryption, MKR-PKE）提出了一种渐进复杂度较优的 MPSU 协议。尽管该协议是目前渐进复杂度最佳的 MPSU 协议，但其仍未能达到线性复杂度。\footnote{在 MPSU 的设定中，线性复杂度意味着每个参与方的复杂度与所有参与方集合大小的总和呈线性关系。本文考虑平衡设定，即每个参与方持有的集合大小相等，因此线性复杂度指每个参与方的复杂度与参与方数量 $m$ 和集合大小 $n$ 均呈线性关系。}
 
 \item \textbf{基于对称密钥技术的 MPSU.}
 Liu 和 Gao \cite{LG-ASIACRYPT-2023} 提出了首个(也是目前唯一一个)基于 OT 和对称密钥操作的 MPSU 协议。该协议在性能上取得了巨大突破，是首个实际可用的 MPSU 协议。在 $3$ 方参与，每个参与方的集合大小为 $2^{10}$ 的设定下，该协议比 \cite{VCE22} 快了 $109$ 倍。然而，该协议的安全性依赖于“非共谋假设”，无法在标准半诚实模型下证明安全。
@@ -150,7 +150,7 @@ Kissner 和 Song \cite{KS-CRYPTO-2005} 在 MPSO 发展的早期阶段就尝试�
     为了解决现有 MPSO 框架在表示层面的两极化难题 —— 要么将目标集合公式表示为交、并及元素规约（element reduction）操作的组合导致通用性受限 \cite{KS-CRYPTO-2005}，要么直接基于集合代数运算的组合导致协议严重依赖于通用 MPC 从而效率低下 \cite{BA-ASIACCS-2012}，本文引入了一种名为“规范集合谓词公式”（Canonical Set Predicate Formula, CSPF）的新型表示方法，将目标集合公式表示为一类由原子集合谓词（形如 $x \in X_i$ 或 $x \notin X_i$）构成的析取范式，其中每个子公式满足特定的结构，子公式共同表示了目标集合的一个划分。本文严格证明了任意集合公式均可转化为 CSPF 表示，且 CSPF 的结构特性（如子公式数量）直接决定了协议的性能。
 
     \item \textbf{谓词零分享（Predicative Zero-Sharing）与其松弛定义.} 本文提出了一类新型的密码学原语“谓词零分享”（Predicative Zero-Sharing）。该原语表示一族协议，其中每个协议均关联一个谓词公式，如果该公式在所有参与方输入上的真值为真，那么各方输出 0 的加法秘密分享；否则，输出随机值的加法秘密分享。本文首先给出了一种简化的、基于模拟范式的谓词零分享安全性定义，并严格证明了其与标准半诚实安全定义的等价性。基于此定义，本文进一步提出了谓词零分享的松弛版本（Relaxed Predicative Zero-Sharing），该版本具有极强的抽象能力，能够涵盖随机不经意传输（ROT）、等值条件随机数生成（ECRG）\cite{Jia0ZG24} 等现有原语。
-    在此基础上，本文建立了针对松弛谓词零分享的\textbf{组合技术（Composition Technique）}与\textbf{转化技术（Transformation Technique）}。结合这两项技术，可以以模块化的方式，从关联于原子命题（或其否定）的松弛谓词零分享出发，自底向上地构造出关联于任意复杂谓词公式的、满足标准半诚实安全的谓词零分享协议。这一通用的构造范式是本文 MPSO 框架能够灵活支持任意集合公式计算、并保持协议结构统一性的核心技术支撑。
+    在此基础上，本文建立了针对松弛谓词零分享的\textbf{组合技术（Composition Technique）}与\textbf{转化技术（Transformation Technique）}。结合这两项技术，可以以模块化的方式，从关联于原子命题（或其否定）的松弛谓词零分享出发，自底向上地构造出关联于任意复杂谓词公式的、满足标准半诚实安全的谓词零分享协议。这一构造范式是本文 MPSO 框架能够灵活支持任意集合公式计算、并保持协议结构统一性的核心技术支撑。
 
     \item \textbf{高效的成员零分享（Membership Zero-Sharing）原语.} 为了将谓词零分享这一抽象原语应用于具体的集合运算，本文引入了其在 MPSO 场景下的特化实例 —— “成员零分享”（Membership Zero-Sharing）。具体而言，该协议指定一名参与方（记作 $P_\mathsf{pivot}$）输入单个元素 $x$，而其他每个参与方 $P_i$ 输入集合 $X_i$。每个协议实例均关联一个由原子集合谓词 $x \in X_i$ 和 $x \notin X_i$ 通过逻辑与 $\mathsf{AND}$、逻辑或 $\mathsf{OR}$ 操作符连接而成的集合谓词公式。如果 $P_\mathsf{pivot}$ 的输入元素 $x$ 使得该公式成立，则各方输出 0 的加法秘密分享；否则，输出随机值的加法秘密分享。
     基于不经意可编程伪随机函数（oblivious programmable pseudorandom function, OPPRF）、批量秘密分享隐私成员测试（batch ssPMT）和随机不经意传输（ROT）等轻量级组件，本文分别针对 $x \in X_i$ 和 $x \notin X_i$ 给出了成员零分享的松弛版本（Relaxed Membership Zero-Sharing）的高效实例化。进而，遵循任意谓词零分享的通用构造范式，本文成功实例化了关联于任意集合谓词公式的标准安全成员零分享协议。该协议作为 MPSO 统一框架的核心底层组件，成功弥合了 MPSO 领域中“通用性”与“实用性”之间的鸿沟：其对任意集合谓词公式的支持赋予了框架计算任意集合运算的通用能力，而其基于轻量级组件的高效实例化则保障了框架优异的实际性能。

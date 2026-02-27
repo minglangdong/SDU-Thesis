@@ -19,7 +19,109 @@
 
 \documentclass{settings/sdu-thesis}
 
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{framed}
+\usepackage{lscape}
+\usepackage[misc]{ifsym}
+\usepackage{breakcites}
+\usepackage{colortbl}
+\usepackage{amssymb}
+\usepackage{makecell}
+\usepackage{stmaryrd} % 提供 \llbracket 和 \rrbracket (秘密分享符号)
+% \usepackage[colorlinks, anchorcolor=blue, linkcolor=blue, citecolor=blue, urlcolor=cyan]{hyperref}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,    % 允许链接显示颜色
+    urlcolor=blue       % 设置 URL 链接的颜色为蓝色
+}
+\usepackage{pifont}
+\usepackage{lineno}
+\usepackage{multirow}
+\usepackage{enumitem}
+\usetikzlibrary{decorations.pathreplacing} % 需要加载库
 
+\newcommand{\Adv}{\mathcal{A}}
+\newcommand{\Combine}{\mathsf{Combine}}
+\newcommand{\Corr}{\mathcal{C}orr}
+\newcommand{\Cuckoo}{\mathsf{Cuckoo}}
+\newcommand{\Dec}{\mathsf{Dec}}
+\newcommand{\Decode}{\mathsf{Decode_H}}
+\newcommand{\Elem}{\mathsf{Elem}}
+\newcommand{\Enc}{\mathsf{Enc}}
+\newcommand{\Encode}{\mathsf{Encode_H}}
+\newcommand{\F}[1]{\mathbb{F}_{2^{#1}}}
+\newcommand{\Func}{\mathcal{F}}
+\newcommand{\FuncAND}[1]{\mathcal{F}_{{#1}\mathsf{-}\mathsf{AND}}}
+\newcommand{\FuncbMZE}{\mathcal{F}_\mathsf{bMZE}}
+\newcommand{\FuncbMZS}{\mathcal{F}_\mathsf{bMZS}}
+\newcommand{\FuncbOPRF}{\mathcal{F}_\mathsf{bOPRF}}
+\newcommand{\FuncbOPPRF}{\mathcal{F}_\mathsf{bOPPRF}}
+\newcommand{\FuncbpMZE}{\mathcal{F}_\mathsf{bpMZE}}
+\newcommand{\FuncbpMZEp}{\mathcal{F}_\mathsf{bpMZEp}}
+\newcommand{\FuncbpMZS}{\mathcal{F}_\mathsf{bpMZS}}
+\newcommand{\FuncbpMZSp}{\mathcal{F}_\mathsf{bpMZSp}}
+\newcommand{\FuncbpNMZS}{\mathcal{F}_\mathsf{bpNMZS}}
+\newcommand{\FuncbrPZS}{\mathcal{F}_\mathsf{brPZS}}
+\newcommand{\FuncbssPMT}{\mathcal{F}_\mathsf{bssPMT}}
+\newcommand{\FuncCPZS}{\mathcal{F}_\mathsf{CPZS}}
+\newcommand{\FuncMPID}{\mathcal{F}_\mathsf{MPID}}
+\newcommand{\FuncMPSO}{\mathcal{F}_\mathsf{MPSO}}
+\newcommand{\FuncMPSU}{\mathcal{F}_\mathsf{mpsu}}
+\newcommand{\FuncMS}{\mathcal{F}_\mathsf{shuffle}}
+\newcommand{\FuncMULT}{\mathcal{F}_\mathsf{mult}}
+\newcommand{\FuncMZE}{\mathcal{F}_\mathsf{MZE}}
+\newcommand{\FuncMZS}{\mathcal{F}_\mathsf{MZS}}
+\newcommand{\FuncmssROT}{\mathcal{F}_\mathsf{mss\mathsf{-}rot}}
+\newcommand{\FuncOPPRF}{\mathcal{F}_\mathsf{OPPRF}}
+\newcommand{\FuncPS}{\mathcal{F}_\mathsf{ps}}
+\newcommand{\FuncPSI}{\mathcal{F}_\mathsf{PSI}}
+\newcommand{\FuncPSO}{\mathcal{F}_\mathsf{PSO}}
+\newcommand{\FuncPZE}{\mathcal{F}_\mathsf{PZE}}
+\newcommand{\FuncPZS}{\mathcal{F}_\mathsf{PZS}}
+\newcommand{\FuncrPZS}{\mathcal{F}_\mathsf{rPZS}}
+\newcommand{\FuncROT}{\mathcal{F}_\mathsf{ROT}}
+\newcommand{\FuncSC}{\mathcal{F}_\mathsf{sc}}
+\newcommand{\FuncSPZS}{\mathcal{F}_\mathsf{SPZS}}
+\newcommand{\FuncssPEQT}{\mathcal{F}_\mathsf{ssPEQT}}
+\newcommand{\FuncssPMT}{\mathcal{F}_\mathsf{ss\mathsf{-}PMT}}
+\newcommand{\FuncSubVOLE}{\mathcal{F}_\mathsf{sub\mathsf{-}VOLE}}
+\newcommand{\FulDec}{\mathsf{FulDec}}
+\newcommand{\Gen}{\mathsf{Gen}}
+\newcommand{\Hash}{\mathsf{H}}
+\newcommand{\Hint}{\mathsf{Hint}}
+\newcommand{\Honest}{\mathcal{H}}
+\newcommand{\HW}{\mathsf{HW}}
+\newcommand{\ParDec}{\mathsf{ParDec}}
+\newcommand{\PRF}{\mathsf{PRF}}
+\newcommand{\ProtoAND}[1]{\Pi_{{#1}\mathsf{-}\mathsf{AND}}}
+\newcommand{\ProtobMZS}{\Pi_\mathsf{bMZS}}
+\newcommand{\ProtobOPPRF}{\Pi_\mathsf{bOPPRF}}
+\newcommand{\ProtobpMZS}{\Pi_\mathsf{bpMZS}}
+\newcommand{\ProtobpMZSp}{\Pi_\mathsf{bpMZSp}}
+\newcommand{\ProtobpNMZS}{\Pi_\mathsf{bpNMZS}}
+\newcommand{\ProtobssPMT}{\Pi_\mathsf{bssPMT}}
+\newcommand{\ProtoMPID}{\Pi_\mathsf{MPID}}
+\newcommand{\ProtoMPSUFour}{\Pi_\mathsf{PK\text{-}MPSU}}
+\newcommand{\ProtoMPSUTwo}{\Pi_\mathsf{SK\text{-}MPSU}}
+\newcommand{\ProtoMS}{\Pi_\mathsf{ms}}
+\newcommand{\ProtomssROT}{\Pi_\mathsf{mss\mathsf{-}rot}}
+\newcommand{\ProtoPZS}{\Pi_\mathsf{PZS}}
+\newcommand{\ProtossPEQT}{\Pi_\mathsf{ssPEQT}}
+\newcommand{\Rcv}{\mathcal{R}}
+\newcommand{\ReRand}{\mathsf{ReRand}}
+\newcommand{\Sd}{\mathcal{S}}
+\newcommand{\SimC}{\mathsf{Sim}_\mathcal{C}}
+\newcommand{\SimH}{\mathsf{Sim}_\mathcal{H}}
+\newcommand{\Simple}{\mathsf{Simple}}
+\newcommand{\Zero}{\mathsf{zero}}
+\newcommand{\ZeroRand}{\mathsf{ZeroRand}}
+\newcommand{\cmark}{\text{\ding{51}}}
+\newcommand{\ct}{\mathsf{ct}}
+\newcommand{\enumijB}[1]{({#1}_{i,j}^1, \cdots, {#1}_{i,j}^B)}
+\newcommand{\xmark}{\text{\ding{55}}}
 
 \begin{document}
 

@@ -4,36 +4,170 @@
 \section{引言}
 \esection{Introduction}
 
-在前面的第三章和第四章中，我们重点关注了多方隐私集合求并（MPSU）这一特定的功能，并分别基于对称密钥和公钥体制提出了安全高效的解决方案。然而，多方隐私集合运算（MPSO）的应用场景远不止于单一的交集或并集计算。在实际的复杂数据协作场景中，往往需要计算涉及多个集合的复合逻辑公式。以下三个典型应用场景生动地说明了对任意集合公式计算的迫切需求：
+在第三章和第四章中，本文重点研究了多方隐私集合求并（Multi-party Private Set Union, MPSU）这一特定功能，并分别基于对称密钥技术和公钥密码技术提出了满足标准半诚实安全的高效协议。然而，在实际应用中，多方隐私集合运算（MPSO）的需求远不止于单一的交集或并集计算。现实的数据协作场景通常需要对交、并、差等基本运算进行组合，从而形成更为复杂的集合公式计算。以下三个典型应用场景生动地说明了现实世界的数据共享与协作分析对集合复合公式计算的的迫切需求：
 
 \begin{itemize}
-    \item \textbf{公共卫生监测（差集运算）}：
-    在传染病防控中，卫生部门可能需要筛选“确诊特定疾病”但“未接种相关疫苗”的高风险人群。假设医院持有确诊名单 $A$，疾控中心持有接种名单 $B$，该需求即对应于计算集合差集 $A \setminus B$。
-    
-    \item \textbf{联合金融风控（并集后差集）}：
-    在跨机构反欺诈中，银行联盟希望构建一个综合的风险数据库，但需剔除各行的高价值白名单客户。这需要将多家机构的黑名单 $B_1, B_2, \dots$ 进行聚合，并从中减去特定的白名单 $W$。该需求对应于计算复合公式 $(\bigcup B_i) \setminus W$。
-    
-    \item \textbf{数字营销效果分析（复合逻辑运算）}：
-    在广告归因分析中，需求往往更加多样化。例如，广告主希望衡量全渠道广告对线下购买的综合转化效果，这需要计算所有平台受众并集与购买列表的交集 $(\bigcup V_i) \cap P$；或者，广告主希望评估某新平台的独家拉新能力，这需要计算购买列表与新平台受众的交集，并剔除其他平台受众，即 $(P \cap V_{\text{new}}) \setminus (\bigcup V_{\text{others}})$。
+    \item \textbf{公共卫生监测与决策支持.}在传染病防控中，卫生部门需精准识别“已接种特定疫苗但仍被确诊感染”的人群。这要求首先联合多家疾控中心的接种名单计算并集 $\bigcup V_i$，随后与各医疗机构持有的确诊名单的并集 $\bigcup D_i$ 计算交集 $(\bigcup V_i) \cap (\bigcup D_i)$，其中 $V_i$ 与 $D_i$ 分别代表第 $i$ 家疾控中心持有的接种名单与第 $i$ 家医疗机构持有的确诊名单。此类分析对于评估疫苗有效性及制定后续防疫政策至关重要。
+
+    \item \textbf{联合金融风控与反欺诈.} 在跨机构反欺诈场景中，银行联盟希望构建一个覆盖全行业的风险黑名单数据库，但为了保护高净值客户隐私，必须确保计算结果中排除了各行各自的白名单客户。该需求对应于计算复合公式 $(\bigcup B_i) \setminus (\bigcup W_i)$，其中 $B_i$ 与 $W_i$ 分别代表第 $i$ 个银行持有的黑名单与白名单。
+
+    \item \textbf{广告归因与转化效果评估.} 在广告归因分析中，广告商往往需要进行多维度的转化分析。例如，为衡量全渠道投放广告对线下购买的综合贡献，需计算所有投放平台浏览受众 $V_i$ 的并集与购买列表 $P$ 的交集 $(\bigcup V_i) \cap P$；为评估某新合作平台的独家拉新能力，这需要计算购买列表与新平台浏览该广告的受众的交集，并剔除所有其他平台的浏览受众的并集，即计算 $(P \cap V_{\text{new}}) \setminus (\bigcup V_{\text{others}})$。
 \end{itemize}
 
-构建能够支持上述任意集合公式计算的 MPSO 通用框架，一直是该领域的一个核心挑战。早期的经典工作尝试解决这一问题，但往往顾此失彼：Kissner 和 Song \cite{KS-CRYPTO-2005} 的方案虽然基于同态加密构建了框架，但受限于多项式表示法，无法表达差集运算（难以覆盖上述场景一、二、三中的后半部分），通用性受限；Blanton 和 Aguiar \cite{BA-ASIACCS-2012} 虽然通过通用 MPC 技术实现了全功能覆盖，但其昂贵的计算开销使其难以在实际规模的数据集上部署。因此，学术界和工业界迫切需要一个在标准半诚实模型下，既能完全覆盖通用 MPSO 功能，又具备实际可用效率的统一框架。
+针对上述需求中集合复合公式的安全计算问题，现有解决思路大体可分为两类：
+第一类思路是针对特定应用场景设计具体的 MPSO 协议。该类方法通常围绕特定功能进行深度优化，因此在目标场景下能够获得较高的执行效率。然而，该路线在实际应用中仍面临明显局限。一方面，学术界对复杂集合运算场景的关注相对有限，现有研究主要集中在交集与并集等基础且结构较为简单的功能上，导致许多实际应用需求（如前述三个典型应用场景）至今仍缺乏高效且可落地的具体解决方案。另一方面，由于不同协议往往基于异构的密码学技术路线独立设计，各协议之间缺乏统一的功能抽象与结构框架，整体表现出较差的灵活性与可扩展性。当应用需求发生变化时，系统往往需要重新设计或替换底层协议，从而显著增加系统部署、集成与运维成本，难以满足现实环境中对敏捷部署与长期演进的需求；
+第二类思路是构建通用的 MPSO 框架，实现计算任意集合公式的通用 MPSO 功能。这一直是MPSO领域的重要研究目标，但实现该目标面临显著的技术挑战。早在该领域发展的早期，Kissner 与 Song 在其经典工作中 \cite{KS-CRYPTO-2005} 即尝试解决这一问题。然而，该框架受限于其采用的集合公式表示方式 —— 将目标公式表示为交集、并集及元素规约（element reduction）操作的组合，仅能表达由交运算与并运算构成的集合表达式，无法支持差集运算。因此，该方法难以覆盖许多实际应用需求（例如前述应用场景二与三中的相关实例）。此外，该框架高度依赖加法同态加密，计算成本极高，其效率根本无法满足现实世界的应用需求，因此仅具有理论价值。此后的二十年间，关于 MPSO 框架的研究进展十分有限，仅有Blanton 和 Aguiar 提出的一项方案 \cite{BA-ASIACCS-2012} 基于通用 MPC 技术实现了完整的通用 MPSO 功能。尽管该方法在表达能力上具有完备性，但其依赖电路实现集合运算，导致计算和通信开销高。在现实规模数据场景下，其性能开销难以接受，从而限制了其在实际系统中的部署与应用。
 
-为了解决上述挑战，本章提出了一种全新的 MPSO 通用统一框架。该框架的设计核心在于寻找一种能够平衡“表达能力”与“计算效率”的方法论：
+综上所述，现有两类技术路线分别在灵活性与效率之间存在明显权衡：具体的 MPSO 协议效率较高但功能单一，而通用的 MPSO 框架表达能力完备却难以满足实际性能需求。这一矛盾表明，设计一种兼具通用性与高效率的任意集合公式计算框架，仍然是当前MPSO研究中亟待解决的关键问题。本章致力于解决这一长期悬而未决的开放性问题：
+\begin{center}
+\emph{能否在标准半诚实模型下，构建出同时实现通用 MPSO 功能并且具备实际可用效率的 MPSO 框架？}
+\end{center}
+
+本章围绕上述问题展开研究，从表示方法、密码学原语与系统框架三个层面提出了一套新的技术体系：
 
 \begin{enumerate}
-    \item \textbf{在表示层}，本章引入了“规范集合谓词公式”（Canonical Set Predicate Formula, CPF）。这是一种特定的析取范式结构，能够将任意复杂的集合公式转化为若干个相互独立的子问题，从而为并行化和模块化处理奠定了理论基础。
-    \item \textbf{在原语层}，本章提出了一种名为“谓词零分享”（Predicative Zero-Sharing, PZS）的新型密码学原语及其在集合运算中的特化实例——“成员零分享”（Membership Zero-Sharing）。该原语能够将逻辑谓词的真值编码为秘密分享形式，巧妙地规避了通用 MPC 中昂贵的布尔电路评估。
-    \item \textbf{在构造层}，本章利用不经意传输（OT）及伪随机函数（PRF）等轻量级组件高效实例化了基础的成员零分享协议，并通过组合与转化技术构建了完整的框架。
+    \item \textbf{表示层.} 本章引入了一种全新的任意集合公式表示方式 —— 规范集合谓词公式（Canonical Set Predicate Formula, CSPF）。该表示方式将目标集合公式表示为一类由原子集合谓词（形如 $x \in X_i$ 或 $x \notin X_i$）构成的析取范式，其中每个子公式满足特定的结构，子公式共同表示了目标集合的一个划分，从而将复杂的集合公式计算问题转化为若干个相互独立的子公式计算问题，为并行化与模块化计算提供基础。
+    \item \textbf{原语层.} 本章提出一种可组合的新型密码学原语 —— 谓词零分享（Predicative Zero-Sharing），并在集合运算场景下给出其特化实例 —— 成员零分享（Membership Zero-Sharing）。该原语的核心功能是将指定逻辑谓词在各参与方输入上的真值"不经意地"编码为秘密分享的形式，并支持基于逻辑运算的组合计算。为实现成员零分享的高效构造，本文首先提出谓词零分享的松弛版本（Relaxed Predicative Zero-Sharing）的定义，并设计了相应的组合技术与安全转化技术，从而给出一种自底向上的高效构造范式：从关联于原子命题（或其否定）的松弛谓词零分享出发，逐步构造关联于任意复杂谓词公式、满足标准半诚实安全的谓词零分享协议。基于该范式，本章通过分别针对成员原子集合谓词 $x \in X_i$ 和非成员原子集合谓词 $x \notin X_i$ 给出了成员零分享的松弛版本（Relaxed Membership Zero-Sharing）的高效实例化，最终实现了关联于任意集合谓词公式的标准安全成员零分享协议。该协议是本文提出的 MPSO 统一框架的核心底层组件，其高度的可组合性是本章提出的 MPSO 框架能够支持任意集合公式的核心依赖。
+    \item \textbf{框架层.} 基于 CSPF 表示法与成员零分享原语，并结合多方秘密分享洗牌协议，本章构建了支持任意集合公式计算的 MPSO 统一框架。该框架的基本思想是将输入集合中所有满足目标集合公式的元素转化为各方持有的秘密分享序列，这一思想赋予了该框架极强的扩展性，使得其能进一步实现任意集合公式结果求势（MPSO-card）及基于电路的通用MPSO（Circuit-MPSO）功能，从而满足更复杂的数据分析需求。
 \end{enumerate}
 
-本章的后续内容安排如下：5.2 节将详细介绍规范集合谓词公式（CPF）的定义及其转化定理；5.3 节将形式化定义谓词零分享与成员零分享原语；5.4 节将给出成员零分享的基础组件（交集成员/并集非成员零分享）的高效构造；5.5 节将描述通用框架的完整执行流程；最后，5.6 节将对本章内容进行总结。
+本章后续内容的安排如下：第 5.2 节提出规范集合谓词公式（CSPF）的定义，并证明任意集合公式转化为 CSPF 的等价性定理；第 5.3 节详细阐述谓词零分享原语的安全性定义、松弛定义以及组合与转化范式；第 5.4 节介绍成员零分享协议的实例化及关联于任意集合谓词公式的标准安全成员零分享协议的高效构造方案；第 5.5 节给出 MPSO 统一框架的完整执行流程及安全性证明、复杂度分析；最后，第 5.6 节对本章内容进行总结。
 
-\section{规范集合谓词公式表示}
-\esection{Canonical Set Predicate Formula Representation}
+\section{集合公式的谓词公式表示}~\label{sec:predicate_formula}
+\esection{Predicate Formula Representation of Set Formulas}
 
-\section{谓词零分享}
+本节给出一种用于表示任意集合公式的统一形式 —— 规范集合谓词公式（Canonical Set Predicate Formula, CSPF）。该表示方式是本章统一框架的表示层基础，通过把目标集合公式表示为若干个子公式的析取，将其对应的结果集合 $Y$ 划分为若干个相互不相交的子集合 $\{Y_1, \cdots, Y_s\}$，并且满足每个 $Y_i$ 一定是某个输入集合的子集，从而为后续 MPSO 框架的设计和其中基于成员零分享的模块化计算提供结构支持。下面通过定义一系列概念来精确地刻画这些结构性质，从而形式化规范集合谓词公式的定义。
+
+\subsection{可构造集合与集合谓词公式}
+
+设 $X_1,\cdots,X_m$ 为 $m$ 个参与方的私有集合。我们首先形式化由这些集合通过任意集合公式的计算所能得到的结果集合，统称为 $X_1, \cdots, X_m$ 上的可构造集合（constructible set）。
+
+\begin{definition}[可构造集合]
+给定集合 $X_1,\cdots,X_m$，若集合 $Y$ 可由 $X_1, \dots, X_m$ 经过有限次集合运算（包括求交、并、差集运算）导出，则称 $Y$ 为 $X_1, \cdots, X_m$ 上的可构造集合。\footnote{在上下文语境明确时，可简称为可构造集合。}
+\end{definition}
+
+特别地，若对于某个 $1 \le i \le m$，可构造集合 $Y$ 满足 $Y \subseteq X_i$，则称其为（$X_1, \cdots, X_m$ 上的）$X_i$-局部的可构造集合（$X_i$-local constructible set）。
+
+为了刻画集合元素级别的成员判定关系，下面引入集合谓词公式的概念。
+
+\begin{definition}[集合谓词公式]
+若谓词公式 $\varphi(x,X_1,\cdots,X_m)$ 由原子命题由形如 $M(x, X_i): x \in X_i$（$M$ 称为集合成员谓词）的原子命题组成，则称其为集合谓词公式。
+\end{definition}
+
+可构造集合和集合谓词公式之间存在如下对应关系。
+
+\begin{theorem}\label{theorem:set1}
+设 $Y$ 为 $X_1,\cdots,X_m$ 上的可构造集合，则存在一个集合谓词公式 $\varphi(x, X_1, \cdots, X_m)$，使得对于任意 $x$，满足：
+$$x \in Y \iff \varphi(x, X_1, \cdots, X_m) = 1.$$
+此时，称集合谓词公式 $\varphi$ 表示可构造集合 $Y$，或称 $\varphi$ 为 $Y$ 的集合谓词公式表示。
+\end{theorem}
+
+\begin{proof}
+下面通过对集合运算的次数进行数学归纳法构造 $\varphi$。
+\begin{itemize}
+    \item \textbf{基础情况.} 若存在某个 $i \in \{1, \cdots, m\}$ 使得 $Y = X_i$，显然 $\varphi(x, X_1, \cdots, X_m) = M(x, X_i): x \in X_i$。
+    \item \textbf{归纳假设.} 假设对于由 $X_1, \dots, X_m$ 出发经过 $k$ 次集合运算得到的任意集合 $A$ 和 $B$，均存在集合谓词公式 $\varphi_A$ 和 $\varphi_B$，使得：
+    $$x \in A \iff \varphi_A(x, X_1, \cdots, X_m) = 1, \quad x \in B \iff \varphi_B(x, X_1, \cdots, X_m) = 1.$$
+    \item \textbf{归纳步骤.} 考虑由 $A$ 和 $B$ 经过一次额外的集合运算得到的集合 $Y$（即从 $X_1, \cdots, X_m$ 出发需要 $k+1$ 次集合运算得到 $Y$），根据集合运算的类型构造 $\varphi$ 如下：
+    \begin{enumerate}
+        \item \textbf{并集.} 若 $Y = A \cup B$，则 $\varphi(x, X_1, \cdots, X_m) = \varphi_A(x, X_1, \cdots, X_m) \lor \varphi_B(x, X_1, \cdots, X_m)$。
+        \item \textbf{交集.} 若 $Y = A \cap B$，则 $\varphi(x, X_1, \cdots, X_m) = \varphi_A(x, X_1, \cdots, X_m) \land \varphi_B(x, X_1, \cdots, X_m)$。
+        \item \textbf{差集.} 若 $Y = A \setminus B$，则 $\varphi(x, X_1, \cdots, X_m) = \varphi_A(x, X_1, \cdots, X_m) \land \neg \varphi_B(x, X_1, \cdots, X_m)$。
+    \end{enumerate}
+\end{itemize}
+以此类推，即可为任意可构造集合 $Y$ 构造相应的集合谓词公式 $\varphi$。证毕。
+\end{proof}
+
+上述定理表明，任意集合公式计的算问题均可转化为元素级的集合谓词逻辑判定问题。但是为了适配后续 MPSO 框架的设计，我们需要该表示具有特定的结构特性。下面先定义集合谓词公式相对于某一输入集合的“局部性”，这一性质使得该公式在输入集合上的计算结果可通过执行一次成员零分享协议的实例来实现秘密分享。
+
+
+\begin{definition}[局部性]\label{def:local}
+若集合谓词公式 $\varphi(x, X_1, \cdots, X_m)$ 可以写成如下形式：
+$$\varphi(x, X_1, \cdots, X_m) = (x \in X_i) \land \psi(x, X_1, \cdots, X_{i-1}, X_{i+1}, \cdots, X_m),$$
+其中 $\psi(x, X_1, \cdots, X_{i-1}, X_{i+1}, \cdots, X_m)$ 不包含关于 $X_i$ 的原子命题，则称 $\varphi$ 相对于 $X_i$ 是局部的（local to $X_i$）或称其为 $X_i$-局部的（$X_i$-local）集合谓词公式，同时，称 $\psi$ 为 $\varphi$ 相对于 $X_i$ 的集合剩余公式（set residual formula）。
+\end{definition}
+
+\begin{corollary}
+若可构造集合 $Y$ 的集合谓词公式表示为 $X_i$-局部的集合谓词公式，则 $Y$ 一定是 $X_i$-局部的可构造集合。
+\end{corollary}
+
+\subsection{规范集合谓词公式表示}
+
+在上述概念的基础上，下面正式给出规范集合谓词公式的定义。
+
+\begin{definition}[规范集合谓词公式（CSPF）]\label{def:cspf}
+设集合谓词公式 $\psi(x, X_1, \cdots, X_m)$ 为一个或多个子公式的析取\footnote{单个子公式的析取即为其自身。}，记作 $\psi = Q_1 \lor \cdots \lor Q_s (s \ge 1)$。若 $\psi$ 满足以下两个条件：
+\begin{enumerate}
+\item \textbf{局部性：} 每个子公式 $Q_i$ ($1 \leq i \leq s$)  相对于某个输入集合 $X_j$ ($1 \leq j \leq m$) 是局部的；
+\item \textbf{划分性：} 令 $Y$ 为 $\psi$ 所表示的可构造集合，$Y_i$ 为子公式 $Q_i$ 所表示的可构造集合，$\{Y_1,\cdots,Y_s\}$ 构成$Y$ 的一个划分，即 $$Y_i \cap Y_k = \emptyset \ (i \ne k), \quad \bigcup_{i=1}^s Y_i = Y;$$
+\end{enumerate}
+则称 $\psi(x, X_1, \cdots, X_m)$ 为一个（在 $X_1, \cdots, X_m$ 上的）规范集合谓词公式（CSPF）。
+\end{definition}
+
+以上 CSPF 的结构保证了其表示的目标集合可划分为若干个互不相交的局部子集，从而可在 MPSO 框架下分别计算。下面的定理证明了这种表示法的普适性。
+
+\begin{theorem}\label{theorem:set2}
+设 $Y$ 为 $X_1,\cdots,X_m$ 上的可构造集合，则存在一个 CSPF $\psi(x, X_1, \cdots, X_m)$，使得对于任意 $x$，满足：
+$$x \in Y \iff \psi(x, X_1, \cdots, X_m) = 1。$$
+\end{theorem}
+
+\begin{proof}
+根据定理 \ref{theorem:set1}，$Y$ 可以表示为一个集合谓词公式。因为任何集合谓词公式都可以转化为析取范式（Disjunctive Normal Form, DNF），$Y$ 可以表示为一个 DNF 公式：
+$$\varphi(x, X_1, \cdots, X_m) = C_1 \lor \cdots \lor C_n$$
+其中每个 $C_i$ ($1 \le i \le n$) 都是一个合取项。
+
+首先，利用反证法证明 $\varphi$ 可以转化为另一个包含 $s$ 个合取项 ($s > n$) 的 DNF 公式 $\psi$，使得每个 $C_i$ ($1 \le i \le s$) 至少包含一个形如 $x \in X_j$ 的原子命题，即 $C_i$ 可以写成 $C_i = (x \in X_j) \land D_i$ 的形式：
+假设存在一个合取项 $C_i$ 不包含任何形如 $x \in X_j$ 的原子命题，即 $C_i$ 是若干形如 $x \notin X_j$ 的原子命题的合取。考虑以下两种情况：
+\begin{itemize}
+    \item \textbf{情况 1：} $C_i = (x \notin X_{i_1}) \land \cdots \land (x \notin X_{i_{t}})$，其中 $t < m$。由于 $C_i$ 是 $\varphi$ 的一个合取项，其对应的集合 $Y'_i$ 是可构造集合 $Y$ 的子集，且 $Y'_i$ 本身也是一个可构造集合。因此，可以通过如下方式扩充 $C_i$：
+    \begin{align*}
+    C_i &= C_i \land \big((x \in X_1) \lor \cdots \lor (x \in X_m)\big) = (C_i \land (x \in X_1)) \lor \cdots \lor (C_i \land (x \in X_m)).
+    \end{align*}
+    对于任何同时包含 $x \in X_{i_d}$ 及其否定 $x \notin X_{i_d}$ ($1 \leq d \leq t$) 的合取项，其求值结果恒为 0，可以舍弃。剩余的公式为：
+    \begin{align*}
+    C_i = (C_i \land (x \in X_{j_1})) \lor \cdots \lor (C_i \land (x \in X_{j_{m-t}})) = C_{i,1} \lor \cdots \lor C_{i,m-t}.
+    \end{align*}
+    这将每个 $C_i$ 拆分为 $m-t$ 个合取项，其中每个合取项至少包含一个形如 $x \in X_j$ 的原子命题。将每个 $C_i$ 替换为上述等式，可得到新的 DNF 公式：
+    $$\psi(x, X_1, \cdots, X_m) = C_1 \lor \cdots \lor C_s,$$
+    其中每个 $C_i$ ($1 \le i \le s$) 表示某个 $X_j$-局部的可构造集合，但此时 $C_i$ 尚未满足 $X_j$-局部的集合谓词公式的定义，因为 $D_i$ 中可能仍包含与 $X_j$ 相关的原子命题。
+    \item \textbf{情况 2：} $C_i = (x \notin X_1) \land \cdots \land (x \notin X_m)$。这与 $C_i$ 表示的集合 $Y_i$ 可由 $X_1, \cdots, X_m$ 通过集合运算得到相矛盾（即元素不可能不属于任何输入集合，却在可构造集合中），因此这种情况不成立。
+\end{itemize}
+
+接下来，将新的 DNF 公式 $\psi$ 转换为表示互不相交集合 $\{Y_1, \cdots, Y_s\}$ 的子公式析取形式：由于 $\psi$ 的析取形式蕴含 $Y_1 \cup \cdots \cup Y_s = Y$，若能证明不相交性，则证明了 $\{Y_1, \cdots, Y_s\}$ 构成 $Y$ 的一个划分。
+令 $\psi_1(x, X_1, \cdots, X_m) = C_2 \lor \cdots \lor C_s$，则有 $\psi(x, X_1, \cdots, X_m) = C_1 \lor \psi_1(x, X_1, \cdots, X_m)$。我们将此式扩充为 $C_1 \lor ((C_1 \land \neg C_1) \lor \psi_1(x, X_1, \cdots, X_m))$，展开得到 $C_1 \lor (C_1 \land \psi_1(x, X_1, \cdots, X_m)) \lor (\neg C_1 \land \psi_1(x, X_1, \cdots, X_m))$。鉴于 $C_1 \land \psi_1 = 1$ 必然要求 $C_1 = 1$，故 $C_1 \lor (C_1 \land \psi_1) = C_1$，因此：
+$$\psi(x, X_1, \cdots, X_m) = C_1 \lor (\neg C_1 \land \psi_1(x, X_1, \cdots, X_m)).$$
+对所有的 $C_i$ ($1 \le i \le s$) 重复此过程，我们得到：
+$$\psi(x, X_1, \cdots, X_m) = C_1 \lor (\neg C_1 \land C_2) \lor \cdots \lor (\neg C_1 \land \neg C_2 \land \cdots \land \neg C_{s-1} \land C_s).$$
+记作 $\psi(x, X_1, \cdots, X_m) = C'_1 \lor C'_2 \cdots \lor C'_s$。可以看出任意两个不同的 $C'_i$ 和 $C'_k$均满足 $C'_i \land C'_k = 0$，因此 $C'_i$ 和 $C'_k$ 表示的集合 $Y_i$ 和 $Y_k$ 满足 $Y_i \cap Y_k = \emptyset$。因此，每个 $C'_i$ 表示一个互不相交的集合。
+
+最后，证明每个 $C'_i$ 都可以化简为 $X_j$-局部的集合谓词公式：
+根据定义，$C'_i$ 是先前合取项 $C_k$ ($1 \le k < i$) 的否定与 $C_i$ 的合取：
+$$C'_i = \bigwedge_{k=1}^{i-1} \neg C_k \land C_i.$$
+由于 $C_i$ 可以写成 $(x \in X_j) \land D_i$ 的形式（其中 $D_i$ 是合取项的剩余部分），代入 $C'_i$ 得到：
+$$C'_i = \bigwedge_{j=1}^{i-1} \neg C_j \land (x \in X_j) \land D_i = (x \in X_j) \land D'_i.$$
+此时，$D'_i$ 可能仍包含与 $X_j$ 相关的原子命题。要消除这些冗余项从而满足定义 \ref{def:local}，一个关键观察是：要使 $C'_i = 1$ 成立，条件 $x \in X_j$ 必须为真。因此，可以将 $C'_i$ 中所有形如 $x \in X_j$ 的项赋值为真，所有形如 $x \notin X_j$ 的项赋值为假，从而得到一个等价公式 $Q_i = (x \in X_j) \land Q'_i$。因为 $Q'_i$ 中不再包含任何与 $X_j$ 相关的原子命题，因此 $Q_i$ 满足 $X_j$-局部的集合谓词公式的定义。证毕。
+\end{proof}
+
+为了更直观地理解定理 \ref{theorem:set2}，下面给出三方场景下的3个可构造集合：交集 $Y = X_1 \cap X_2 \cap X_3$、并集 $Y = X_1 \cup X_2 \cup X_3$ 以及一个复合集合公式 $Y = ((X_1 \cap X_2) \cup (X_1 \cap X_3)) \setminus (X_1 \cap X_2 \cap X_3)$，并给出了每个可构造集合对应的 CSPF 表示 $\psi(x, X_1, X_2, X_3)$：
+
+\begin{trivlist}
+    \item \textbf{交集.} $\psi(x, X_1, X_2, X_3) = (x \in X_1) \land (x \in X_2) \land (x \in X_3)$。
+    在该情况下，$\psi$ 是单个子公式 $Q_1 = \psi$ 的析取，其表示的集合 $Y_1 = Y$。$Q_1$ 相对于 $X_1, X_2, X_3$ 均是局部的，并且 $Y_1$ 本身即为 $Y$ 的一个划分，因此 $\psi$ 满足定义 \ref{def:cspf}。
+    \item \textbf{并集.} $\psi(x, X_1, X_2, X_3) = (x \in X_1) \lor ((x \notin X_1) \land (x \in X_2)) \lor ((x \notin X_1) \land (x \notin X_2) \land (x \in X_3))$。
+    $\psi$ 是三个子公式 $Q_1, Q_2, Q_3$ 的析取，其中每个 $Q_i = (x \notin X_1) \land \cdots \land (x \notin X_{i-1}) \land (x \in X_i)$ 表示集合 $Y_i = X_i \setminus (X_1 \cup \cdots \cup X_{i-1})$，并且是 $X_i$-局部的集合谓词公式，$\{Y_1, Y_2, Y_3\}$ 是 $Y$ 的一个划分，因此 $\psi$ 满足定义 \ref{def:cspf}。
+    \item \textbf{复合集合公式.} 在该情况下，$Y$ 可表示为下面两种不同的 CSPF：
+    \begin{itemize}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
+      \item $\psi(x, X_1, X_2, X_3) = ((x \in X_1) \land (x \in X_2) \land (x \notin X_3)) \lor ((x \in X_1) \land (x \in X_3) \land (x \notin X_2))$。$\psi$ 是两个子公式 $Q_1, Q_2$ 的析取，其中 $Q_1$ 和 $Q_2$ 分别表示集合 $Y_1 = X_1 \cap X_2 \setminus X_3$ 和 $Y_2 = X_1 \cap X_3 \setminus X_2$。$Q_1$ 相对于 $X_1$ 和 $X_2$ 是局部的，而 $Q_2$ 相对于 $X_1$ 和 $X_3$ 是局部的，并且 $\{Y_1, Y_2\}$ 是 $Y$ 的一个划分，因此 $\psi$ 满足定义 \ref{def:cspf}。
+      \item $\psi(x, X_1, X_2, X_3) = (x \in X_1) \land [((x \in X_2) \land (x \notin X_3)) \lor ((x \in X_3) \land (x \notin X_2))]$。将 $\psi$ 看作单个子公式 $Q_1 = \psi$ 的析取，其中 $Q_1$ 相对于 $X_1$ 是局部的，因此 $\psi$ 满足定义 \ref{def:cspf}。
+      \end{itemize}
+\end{trivlist}
+
+第三个例子表明，给定可构造集合 $Y$，其 CSPF 表示通常并不唯一。不同的 CSPF 表示中对应的子公式数量将直接影响后续计算 $Y$ 的 MPSO 协议的计算与通信开销，因此，在实际构造中应尽可能减少子公式数量以提升整体效率。
+
+\section{谓词零分享}~\label{sec:pzs}
 \esection{Predicative Zero-Sharing}
+
+本节引入一种新型密码学原语 —— 谓词零分享（Predicative Zero-Sharing）。该原语本质上是一类协议族，其中每个协议都与一个谓词公式相关联，其核心功能是将该公式在参与方输入上的真值"不经意地"编码为参与方之间的一个零分享（当真值结果为真时）或随机分享（当真值结果为假时）。此类协议具有良好的组合性，支持相关联的谓词公式基于逻辑与（$\mathsf{AND}$）和逻辑或（$\mathsf{OR}$）操作符进行复合运算。
 
 \section{成员零分享}
 \esection{Membership Zero-Sharing}

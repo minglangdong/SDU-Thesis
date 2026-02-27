@@ -4,33 +4,425 @@
 \section{引言}
 \esection{Introduction}
 
-隐私集合求并（Private Set Union, PSU）允许一组互不信任的参与方在不泄露除并集外任何额外信息的前提下，协同计算各自私有集合的并集。PSU 在现实世界中拥有广泛的应用场景，包括网络安全风险评估 \cite{LV04}、IP 黑名单与漏洞数据聚合 \cite{HLSSSYY16}、联合图计算 \cite{BllS05}、分布式网络监控 \cite{KS-CRYPTO-2005}，以及作为构建支持全连接的隐私数据库 \cite{KRTW-ASIACRYPT-2019} 和 Private ID 协议 \cite{GMRSS-PKC-2021} 的核心组件。例如，在网络安全防御中，不同的安全机构往往希望联合各自的 IP 黑名单以获得更全面的威胁情报视图，但受限于数据的敏感性和隐私法规，直接共享黑名单是不可行的，PSU 为此类需求提供了理想的解决方案。
+隐私集合求并（Private Set Union, PSU）是隐私集合运算领域的一个重要研究分支，它允许一组互不信任的参与方在不泄露除并集外任何额外信息的前提下，协同计算各自私有集合的并集。PSU 在现实世界的协作计算和数据共享场景中具有广泛的应用价值。例如，在信息安全风险评估与管理中 \cite{LV04}，多个组织可以利用 PSU 联合各自持有的 IP 黑名单或漏洞数据库 \cite{HLSSSYY16}，从而构建更全面的威胁情报视图；在政务数据开放中，不同部门可以通过 PSU 聚合分布式的统计数据 \cite{KS-CRYPTO-2005}。此外，PSU 也是构建支持全连接（Full Join）的隐私数据库 \cite{KRTW-ASIACRYPT-2019} 以及 Private ID 协议 \cite{GMRSS-PKC-2021} 的核心底层组件。
 
-与受到广泛关注的隐私集合求交（Private Set Intersection, PSI），特别是技术已经高度成熟的两方 PSI （现有最高效的两方 PSI 协议 \cite{RR-CCS-2022} 的性能已足以媲美不安全的朴素哈希方案）相比，PSU 的研究起步较晚且发展相对缓慢。早期的两方 PSU 协议 \cite{KS-CRYPTO-2005} 及其后续工作主要依赖于加法同态加密（AHE）或复杂的通用电路，导致效率低下。直到 2019 年，Kolesnikov 等人 \cite{KRTW-ASIACRYPT-2019} 基于 OT 和对称密钥操作提出了首个适用于大规模数据集的高效的 两方 PSU 协议，实现了三个数量级的速度提升。随后的研究 \cite{GMRSS-PKC-2021, Jia-USENIX-2022} 继续在基于对称密钥的技术路线上探索，进一步降低了两方 PSU 协议的开销。张聪等人 \cite{ZCLZL-USENIX-2023} 和陈宇等人 \cite{ZCZDL-2024} 相继实现了线性复杂度，使得两方 PSU 技术也逐渐迈向成熟。
+与PSO中的另一研究分支 —— 隐私集合求交（Private Set Intersection, PSI）相比，PSU 的研究起步较晚且发展相对缓慢：目前的 PSI 技术已经相对成熟，尤其是两方 PSI 在效率和实用性方面已经达到较高水平~\cite{PSZ-USENIX-2014,KKRT-CCS-2016,PRTY-CRYPTO-2019,CM-CRYPTO-2020,PRTY20,RS-EUROCRYPT-2021,RR-CCS-2022}，其性能甚至可以接近不安全的朴素哈希方法。同时，多方 PSI 也在两方协议研究成果的基础上得到了充分发展，并提出了多种适用于大规模数据处理的高效方案~\cite{KMPRT-CCS-2017,NTY-CCS-2021,CDGOSS-CCS-2021,BNOP-AsiaCCS-2022}。然而，早期由 Kissner 和 Song \cite{KS-CRYPTO-2005} 提出的两方 PSU 协议及其后续改进工作 \cite{Frikken-ACNS-2007}主要依赖于加法同态加密（AHE）或复杂的通用电路，导致其实际效率低下。直到 2019 年，Kolesnikov 等人 \cite{KRTW-ASIACRYPT-2019} 基于 OT 和对称密钥操作提出了首个适用于大规模数据集的高效两方 PSU 协议，实现了相比基于公钥密码的方案三个数量级的速度提升。随后的研究 \cite{GMRSS-PKC-2021, Jia-USENIX-2022} 继续在基于对称密钥的技术路线上探索，利用不经意切换（Oblivious Switching）等技术降低了协议的通信与计算开销。近期的研究~\cite{ZCLZL-USENIX-2023,ZCZDL-2024} 已实现计算复杂度与通信复杂度均为线性的两方 PSU 协议，标志着两方 PSU 技术也逐渐迈向成熟。
 
-然而，多方隐私集合求并（MPSU）领域的研究进展依然十分缓慢，协议设计仍面临巨大挑战。根据底层使用的核心技术，现有的 MPSU 协议主要可以分为以下两类\footnote{本文不考虑基于通用 MPC 技术设计的MPSU方案，因其性能通常无法满足大规模应用需求。}：
-
+随着跨组织数据协作需求的增长，多方场景相较两方场景更具实际意义。与两方 PSU 相比，多方隐私集合求并（Multi-party Private Set Union, MPSU）在多组织联合数据分析、分布式威胁情报共享以及跨域数据协同计算等场景中具有更为广泛的应用需求。但 MPSU 领域的研究进展依然滞后，现有协议的效率与安全性方面仍面临较大挑战。
+根据底层所采用的密码学技术，现有的 MPSU 协议构造主要分为以下两类：\footnote{本文不考虑基于通用电路的 MPSU 方案，因为其性能开销在实际应用中通常难以接受。}
 \begin{itemize}
-    \item \textbf{基于公钥密码技术的 MPSU：} 这一类协议主要依赖于公钥加密技术（如 AHE、ElGamal 等），代表性工作包括 \cite{KS-CRYPTO-2005, Frikken-ACNS-2007, VCE22, GNT-eprint-2023}。这类方案的一个共同缺陷是每个参与方都需要执行大量的公钥操作（如模幂运算），导致计算开销巨大，实际运行效率较低，难以支撑大规模数据的实时处理。
-    
-    \item \textbf{基于对称密钥技术的 MPSU：} 这一类协议主要依赖于对称密钥操作和不经意传输（OT）技术。截至目前，Liu 和 Gao \cite{LG-ASIACRYPT-2023} 提出的协议是该类别中唯一且最先进的工作。该协议在具体性能上远超所有基于公钥的方案（例如在特定设置下比 \cite{VCE22} 快两个数量级）。然而，该协议存在一个严重的安全性缺陷：它无法在标准半诚实模型下证明安全，而是依赖于一个较弱的“非共谋假设”（Non-collusion Assumption），即假设获得结果的参与方（Leader）不会与其他参与方进行共谋。在现实世界的零信任环境中，这一假设往往难以成立。
+    \item \textbf{基于公钥密码技术的 MPSU：} 该类协议 \cite{KS-CRYPTO-2005, Frikken-ACNS-2007, VCE22, GNT-eprint-2023} 主要依赖于公钥密钥技术（如 AHE），其共同缺陷在于每个参与方需执行大量耗时的公钥操作，在多方和大规模数据场景下计算与通信开销较高，实际效率难以满足应用需求。
+    \item \textbf{基于对称密钥技术的 MPSU：} 这一路线目前仅有 Liu 和 Gao \cite{LG-ASIACRYPT-2023} 的工作。虽然该协议利用 OT 和对称密钥技术实现了远超公钥路线的性能（比 \cite{VCE22} 快约两个数量级），但其安全性存在严重缺陷：其安全性证明本质上依赖于“非共谋假设”（Non-collusion Assumption），即假设获得结果的领导者（Leader）不会与其他参与方（Client）共谋。在现实世界的开放网络或存在利益竞争的商业合作中，该假设难以成立，导致协议无法抵御任意共谋攻击，存在严重的安全风险。
+
 \end{itemize}
 
-综上所述，目前 MPSU 领域存在一个重要的开放性问题：\textbf{能否在标准半诚实模型下基于 OT 和对称密钥操作构造一个安全高效的 MPSU 协议？}
+综上所述，现有 MPSU 研究在效率与安全性之间仍存在明显权衡：基于公钥密码技术的方案安全性强但效率低，而基于对称密钥技术的方案效率高但安全性弱，由此引出了一个关键的研究问题：
+\begin{center}
+\emph{能否在标准半诚实模型下，构造出基于 OT 与对称密钥操作、且不依赖任何非共谋假设的高效 MPSU 协议？}
+\end{center}
 
-本章将通过提出两个新的密码学组件 —— 批量秘密分享隐私成员测试（batch secret-shared private membership test, batch ssPMT）方秘密分享随机不经意传输（multi-party secret-shared ROT, mss-ROT），并基于这两个组件分别突破现有基于对称密钥的 MPSU 方案的性能瓶颈和消除其对非共谋谋假设的依赖，从而实现在标准半诚实模型下首个安全高效的基于对称密钥的 MPSU 协议，最终对这一问题给出了肯定的回答。
+本章围绕上述问题展开研究，通过提出两种新型密码学组件 —— 批量秘密分享隐私成员测试（batch secret-shared private membership test, batch ssPMT）和多方秘密分享随机不经意传输（multi-party secret-shared ROT, mss-ROT），分别突破了现有对称密钥 MPSU 方案 \cite{LG-ASIACRYPT-2023} 的性能瓶颈和消除了其对非共谋假设的依赖，最终实现首个满足标准半诚实安全的基于对称密钥的高效 MPSU 协议。
 
 \section{技术路线概述}
 \esection{Technical Overview}
 
+本节从整体层面对本章的研究思路与技术路线进行概述。本节首先对 Liu 和 Gao \cite{LG-ASIACRYPT-2023} 提出的基于对称密钥的 MPSU 协议（以下简称 LG 协议）进行回顾与深度分析，指出其在性能和安全性方面的局限性。随后，本节将阐述本文如何通过引入“批量秘密分享隐私成员测试”（batch ssPMT）和“多方秘密分享随机不经意传输”（mss-ROT）这两个新原语，以逐个突破现有框架的性能和安全性瓶颈，从而构建满足标准半诚实安全且更高效的 MPSU 协议。
+
+\subsection{LG 协议的回顾与局限性分析}
+
+我们首先将 LG 协议抽象为一种基于秘密分享（Secret-Sharing）的 MPSU 框架。该框架的核心思想是将复杂的并集计算转化为一系列差集的秘密分享问题。
+设共有 $m$ 个参与方 $P_1,\dots,P_m$，各自输入集合 $X_1,\dots,X_m$。定义第 $j$ 个参与方的差集为 $Y_j = X_j \setminus (X_1 \cup \cdots \cup X_{j-1}), \quad 2 \le j \le m$，则有 $X_1 \cup \cdots \cup X_m = X_1 \cup Y_2 \cup \cdots \cup Y_m$，即所有的差集构成全集的一个划分。因此，只要各参与方能够获得所有差集元素的加法秘密分享，并在最终阶段由 Leader（以下指定为 $P_1$）重构，即可得到并集结果。该框架具体可分为以下两个阶段：
+\begin{enumerate}
+    \item \textbf{并集的秘密分享.} 该阶段涉及 $m-1$ 次差集的秘密分享，其中对于第 $j$ 次秘密分享过程（$2 \le j \le m$），$P_j$ 通过特定的交互协议将其差集 $Y_j$ 的元素以加法秘密分享的形式分布在所有参与方之间；而对于 $X_j$ 中不属于 $Y_j$ 的元素（即已存在于前面集合中的冗余元素），则让参与方获得随机值的秘密分享。在该阶段结束时，所有参与方共同持有了关于 $(X_1 \cup \dots \cup X_m) \setminus X_1$ 中所有元素的秘密分享，且这些分享按 $Y_2, \dots, Y_m$ 的顺序排列，中间穿插着随机值从而将每个差集的大小填充为 $n$。
+    
+    \item \textbf{洗牌与重构.} 如果所有参与方将持有的秘密分享发送给 $P_1$，由 $P_1$ 直接重构出元素，那么它将能够利用秘密分享排布的线性位置特征推断出每个元素的来源方。例如，若 $P_1$ 得到的某个重构出的元素位于第一个长度为 $n$ 的区块（即 $Y_2$ 的位置），则 $P_1$ 可断定该元素来自 $P_2$ 的输入。这种对应关系会导致隐私泄露。为了解决这一问题，各方在重构前需调用“多方秘密分享洗牌”（Multi-party Secret-shared Shuffle）协议，对所有分享进行随机置换。这确保了任何 $m-1$ 方共谋都无法获知洗牌的置换映射，从而掩盖了重构元素与各差集 $Y_j$ 之间的对应关系。最后，$P_1$ 将重构出的差集元素与自身的 $X_1$ 合并，得到最终并集。
+\end{enumerate}
+
+LG 协议利用两个核心组件来实现第一阶段：
+\begin{itemize}
+    \item \textbf{秘密分享隐私成员测试 (secret-shared private membership test, ssPMT).} 发送方 $\Sd$ 输入集合 $X$，接收方 $\Rcv$ 输入元素 $y$；若 $y \in X$ 则双方获得 1 的秘密分享，否则获得 0 的秘密分享。进一步地，Liu 和 Gao 提出了多查询 ssPMT（multi-query ssPMT, mq-ssPMT），支持接收方同时查询多个元素，其中 $\Sd$ 输入集合 $X$，$\Rcv$ 输入向量 $\textbf{y} = (y_1, \dots, y_n)$。双方获得测试 $\textbf{y}$ 中元素是否在 $X$ 中的结果比特向量的秘密分享：若 $y_i \in X$ 则第 $i$ 位分享值为 1，否则为 0。
+    \item \textbf{双选择比特随机不经意传输 (two-choice-bit ROT).} 发送方 $\Sd$ 和 $\Rcv$ 分别持有选择比特 $e_0, e_1$，$\Sd$ 获得两个随机数 $r_0, r_1$，$\Rcv$ 根据 $e_0 \oplus e_1$ 的结果获得其中之一：若 $e_0 \oplus e_1 = 0$，$\Rcv$ 获得随机消息 $r_0$，否则获得 $r_1$。
+\end{itemize}
+
+上述 LG 协议的构造存在两个严重的“痛点”：首先，在差集计算过程中，需要反复执行 mq-ssPMT 的现有实例化高度依赖昂贵的通用 MPC 技术，计算与通信开销较大，成为整个协议的效率瓶颈；其次，第一阶段无法抵抗 $P_1$ 与其他参与方之间的共谋攻击，其安全性依赖于非共谋假设，即要求最终获得结果的 $P_1$ 不与其他参与方共谋。基于上述观察，下面从效率与安全两个方面对 LG 进行改进。
+
+\subsection{高效的 batch ssPMT 原语}
+
+针对 mq-ssPMT 的效率瓶颈，本文提出了一种全新的原语 —— \textbf{批量秘密分享隐私成员测试（batch ssPMT）}。它是 ssPMT 的批量化版本：发送方 $\Sd$ 输入 $n$ 个不相交集合 $X_1, \dots, X_n$，接收方 $\Rcv$ 输入 $n$ 个元素 $y_1, \dots, y_n$；双方获得比特向量的秘密分享，若 $y_i \in X_i$ 则第 $i$ 位为 1，否则为 0。
+
+与 mq-ssPMT 相比，batch ssPMT 能够测试元素在多个不同集合中的成员关系，而非单一共同集合。两者的关系类似于 batch OPRF \cite{KKRT-CCS-2016} 与多点 OPRF \cite{PRTY-CRYPTO-2019} 之间的关系。这种“批量化”的特性允许更高效的构造，并能够通过结合哈希到桶（Hashing-to-bins）技术，在 MPSU 场景下完全替代 mq-ssPMT，具体构造如下：
+接收方 $\Rcv$ 利用布谷鸟哈希（Cuckoo Hashing）将输入向量 $\textbf{y}$ 中的元素分配至 $B$ 个桶中，布谷鸟哈希可以确保每个桶至多一个元素；发送方 $\Sd$ 则利用简单哈希（Simple Hashing）将输入集合 $X$ 中的元素分配至对应的所有桶中。随后，双方调用包含 $B$ 个ssPMT 实例的 batch ssPMT 协议。哈希到桶技术保证了只有当 $\Rcv$ 的第 $j$ 桶中的元素 $y_i \in X$，该元素才会存在于 $\Sd$ 的第 $j$ 个桶中所有元素组成的集合 $X_j$ 中，从而双方在调用 batch ssPMT 后才能获得 1 的分享。然而，由于该构造最终输出的秘密分享的顺序取决于 $\Rcv$使用布谷鸟哈希存放 $\textbf{y}$ 中各元素的位置，而该位置依赖于 $\textbf{y}$ 中所有元素，直接重构可能会泄露 $\Rcv$ 的输入向量中的元素信息。本文的关键洞察在于：第二阶段使用的多方秘密分享置换不仅消除了重构顺序与差集的之前对应关系，同时也消除了其与哈希位置的依赖。因此，上述基于哈希到桶和 batch ssPMT 的构造可以无缝嵌入现有的基于秘密分享的 MPSU 框架以取代 mq-ssPMT，而不会引入额外信息泄露。
+
+相比于依赖通用两方计算（2PC）的 mq-ssPMT，本文的 batch ssPMT 基于两个轻量级的组件构建：批量不经意可编程伪随机函数（batch oblivious programmable pseudorandom function, batch OPPRF）和秘密分享等值测试（secret-shared private equality test, ssPEQT）。其中，batch OPPRF 可通过 向量不经意线性求值（textbftor Oblivious Linear Evaluation, VOLE） 获得极其高效的实例化，而 ssPEQT 虽然需利用通用 2PC 实现，但因其仅涉及规模较小的电路，计算和通信开销小，并不会成为性能瓶颈。因此，该构造显著减少了协议对通用 2PC 的依赖，从而大幅提升了协议的整体性能。
+
+\subsection{基于 batch ssPMT 和 mss-ROT 的 SK-MPSU 协议} \label{sec:sk-overview}
+\esubsection{SK-MPSU from batch ssPMT and mss-ROT}
+
+本节将在 LG 协议的基础上以递增的方式重新设计 LG 协议的第一阶段，从而构建标准半诚实模型下的首个基于对称密钥的 MPSU 协议（以下称该协议为 SK-MPSU 协议）。首先给出用上述基于哈希到桶和 batch ssPMT 的构造替代 mq-ssPMT 后的新的秘密分享差集 $Y_j$ 的过程：令 $P_j$ 通过布谷鸟哈希预处理其集合 $X_j$，其余 $P_{i<j}$ 通过简单哈希预处理其集合 $X_i$。$P_j$ 作为接收方与每个 $P_i$ 执行 batch ssPMT。对于每个桶，$P_j$ 和 $P_i$ 分别获得成员关系比特的秘密分享 $e_{j,i}$ 和 $e_{i,j}$。随后，$P_j$ 作为发送方与每个 $P_i$ 执行双选择比特 ROT，其中 $P_j$ 输入 $e_{j,i}$，$P_i$ 输入 $e_{i,j}$。执行结束后，$P_j$ 获得随机对 $(r_{j,i}^0, r_{j,i}^1)$。若 $e_{j,i} \oplus e_{i,j} = 0$，则 $P_i$ 获得 $r_{j,i}^0$；否则获得 $r_{j,i}^1$。$P_i$ 将获得的输出 $r_{j,i}^{e_{j,i} \oplus e_{i,j}}$ 设为其秘密分享份额 $s_{j,i}$。$P_j$ 则将其分享份额 $s_{j,j}$ 设置为 $\bigoplus_{i=1}^{j-1} r_{j,i}^0 \oplus x \Vert \text{H}(x)$，其中 $x \in X_j$ 是 $P_j$ 桶中的元素，附加的哈希值 $\text{H}(x)$ 用于在重构阶段区分真实元素和随机秘密。
+上述构造的正确性在于：若 $x \in Y_j$，则对于所有 $i$ 都有 $e_{j,i} \oplus e_{i,j} = 0$，此时所有秘密分享份额之和 $\bigoplus_{i=1}^j s_{j,i} = x \Vert \text{H}(x)$，即各方持有该元素的秘密分享。反之，若 $x \notin Y_j$，则至少有一个 $r_{j,i}^0 \oplus r_{j,i}^1$ 项无法在求和中抵消，从而导致各方持有的是一个随机秘密的分享。
+
+尽管上述构造比 LG 协议更高效，但其同样无法抵御 $P_1$ 和其他参与方的共谋攻击。例如，在第二阶段中，若 $P_1$ 重构出秘密 $r_{j,i'}^0 \oplus r_{j,i'}^1 \oplus x \Vert \text{H}(x)$（$1 \le i' < j$），
+则说明在求和过程中仅有第 $i'$ 个随机项掩码（记为 $\Delta_{ji'} = r_{j,i'}^0 \oplus r_{j,i'}^1$）未被抵消。由于 $P_j$ 在与 $P_{i'}$ 的 ROT 中同时获得 $r_{j,i'}^0$ 与 $r_{j,i'}^1$，若 $P_j$ 与 $P_1$ 共谋，则 $P_1$ 可以推断出对于所有 $i \ne i'$，$e_{j,i} \oplus e_{i,j} = 0$ 均成立。进而，他们可以导出 $x \in X_{i'}$ 并且对于所有 $i \ne i'$，$x \notin X_i$，这泄露了关于 $P_2, \dots, P_{j-1}$ 的输入集合信息。因此，该协议与 LG 一样，需要假设 $P_1$ 不与其他参与方共谋才能证明安全性。
+
+该共谋攻击成立的根本原因在于：当 $x \notin Y_j$ 时，随机秘密的值在 $P_1$ 与其共谋方的视图中并非均匀随机；并且第二阶段中多方秘密分享置换的置换与重新分享并不会改变这些随机秘密的值。为了抵御该攻击，本章的解决方案是将每个随机项掩码 $\Delta_{ji} = r_{j,i}^0 \oplus r_{j,i}^1$ 在参与方子集 $\{P_2, \dots, P_j\}$ 之间进行加法秘密分享。这样，只要该子集中存在至少一个诚实方，求和式中任何潜在的剩余分量（包含至少一个随机项掩码）都仍是均匀随机的。为了实现该功能，将双选择比特 ROT 推广到多方场景，抽象出多方秘密分享随机不经意传输（mss-ROT）的概念：在 mss-ROT 中，选择比特由 $P_{\text{ch}_0}$ 和 $P_{\text{ch}_1}$ 分别持有，掩码 $\Delta$ 由参与方子集 $J$ 提供，最终各方输出零或随机值的秘密分享，其秘密是否为零由选择比特共同决定。具体地，设共有 $j$ 个参与方参与一次 mss-ROT，其中两方 $P_{\text{ch}_0}$ 和 $P_{\text{ch}_1}$ 分别持有选择比特 $b_0$ 和 $b_1$。设存在一个参与方子集 $J$，其中每个 $P_{j'} \in J$ 输入一个值 $\Delta_{j'}$。协议输出随机值 $r_{i'}$ 给每个参与方 $P_{i'}$作为秘密分享份额，满足：若 $b_0 \oplus b_1 = 0$，则 $\bigoplus r_{i'} = 0$；否则 $\bigoplus r_{i'} = \bigoplus_{j' \in J} \Delta_{j'}$。
+
+在引入 mss-ROT 后，对前述秘密分享差集 $Y_j$ 的过程进行如下修改：对于每个桶，在 $P_j$ 与 $P_i$ 获得 $e_{j,i}$ 和 $e_{i,j}$ 后，不再执行双选择比特 ROT，而是调用 mss-ROT。其中设 $J = \{P_2, \dots, P_j\}$，并由每个 $P_{j'} \in J$ 输入一个均匀随机值 $\Delta_{j',ji}$。根据 mss-ROT 的功能，若 $e_{j,i} \oplus e_{i,j} = 0$，则所有输出异或和为 0；否则所有输出异或和为 $\bigoplus_{j'=2}^j \Delta_{j', ji}$。在完成所有 mss-ROT 调用后，每个参与方将从多次 mss-ROT 调用中获得的输出进行异或，作为其对应该桶的最终分享份额，$P_j$ 额外异或 $x \Vert \text{H}(x)$。
+此时，若 $x \in Y_j$，则对所有 $i$ 均有 $e_{j,i} \oplus e_{i,j} = 0$, 因此所有 mss-ROT 输出的异或和为 $0$，最终各方得到 $x \Vert \Hash(x)$ 的秘密分享；若 $x \notin Y_j$，则异或和中至少存在一个随机项掩码 $\bigoplus_{j'=2}^j \Delta_{j', ji}$，并且该值以加法秘密分享形式分布在 $\{P_2,\cdots,P_j\}$ 中。因此，即使 $P_1$ 与 $\{P_2, \dots, P_j\}$ 其中最多 $m-2$ 方共谋，该异或和仍保持均匀分布，各方持有的仍是一个随机秘密。由于不包含 $P_1$ 的任何共谋子集都无法获知重构出的秘密，最终协议可以抵抗任意 $m-1$ 方共谋，从而在标准半诚实模型下证明安全。
+
 \section{批量秘密分享隐私成员测试}
 \esection{Batch Secret-Shared Private Membership Test}
 
-\section{协议构造及安全性证明}
-\esection{Protocol Construction and Security Proof}
+批量秘密分享隐私成员测试（batch secret-shared private membership test, batch ssPMT）是本章提出的 SK-MPSU 协议以及第四章提出的 PK-MPSU 协议的核心构建组件。作为一个两方协议，batch ssPMT 旨在发送方 $\Sd$ 和接收方 $\Rcv$ 之间批量地实现多个 ssPMT 实例。
+
+\subsection{功能定义}
+\esubsection{Functionality Definition}
+
+给定批量大小（batch size）为 $B$，$\Sd$ 输入 $B$ 个不相交的集合 $X_1, \dots, X_B$，$\Rcv$ 输入 $B$ 个元素组成的向量 $\textbf{x} = (x_1, \dots, x_B)$。协议执行结束后，双方分别获得分享份额向量 $\textbf{e}_S = (e_S^1, \dots, e_S^B)$ 和 $\textbf{e}_R = (e_R^1, \dots, e_R^B)$。其中对于每个 $i \in [B]$，若 $y_i \in X_i$，则 $e_S^i \oplus e_R^i = 1$；否则 $e_S^i \oplus e_R^i = 0$。
+图 \ref{fig:func-bssPMT} 形式化描述了 batch ssPMT 的理想功能 $\mathcal{F}_{\text{bssPMT}}$。
+
+\begin{figure}[!hbtp]
+\centering
+\begin{framed}
+\begin{trivlist}
+    \item \textbf{参数：} 发送方 $\Sd$，接收方 $\Rcv$；批量大小 $B$；集合元素的比特长度 $l$；OPPRF 输出的比特长度 $\gamma$。
+    \item \textbf{输入：} $\Sd$ 输入 $B$ 个不相交集合 $X_1, \dots, X_B$；$\Rcv$ 输入向量 $\textbf{x} \in (\{0,1\}^l)^B$。
+    \item \textbf{功能：} 收到双方输入后，对于每个 $i \in [B]$，随机采样两个比特 $e_S^i, e_R^i \in \{0,1\}$，满足：
+    \begin{itemize}
+        \item 若 $x_i \in X_i$，则 $e_S^i \oplus e_R^i = 1$；
+        \item 否则，$e_S^i \oplus e_R^i = 0$。
+    \end{itemize}
+    最后，将 $\textbf{e}_S = (e_S^1, \dots, e_S^B)$ 发送给 $\Sd$，将 $\textbf{e}_R = (e_R^1, \dots, e_R^B)$ 发送给 $\Rcv$。
+\end{trivlist}
+\end{framed}
+\caption{理想功能 $\mathcal{F}_{\text{bssPMT}}$}\label{fig:func-bssPMT}
+\end{figure}
+
+\subsection{协议构造与安全性证明}
+\esubsection{Protocol Construction and Security Proof}
+
+本节基于批量不经意可编程伪随机函数（batch OPPRF）和秘密分享等值测试（ssPEQT）给出 batch ssPMT 协议的高效构造，具体协议 $\Pi_{\text{bssPMT}}$ 如图 \ref{fig:proto-bssPMT} 所示。 
+
+\begin{figure}[!hbtp]
+\centering
+\begin{framed}
+\begin{enumerate}
+    \item \textbf{初始化：} 对于每个 $1 \le i \le B$，$\Sd$ 随机选取一个标签 $s_i \leftarrow \{0,1\}^\gamma$，并构造一个多重集（multiset） $S_i$，该集合包含 $|X_i|$ 个重复的元素，且所有元素均等于 $s_i$。
+    \item \textbf{执行 batch OPPRF：} 双方调用批量大小为 $B$ 的理想功能 $\mathcal{F}_{\text{bOPPRF}}$，其中：
+    \begin{itemize}
+        \item $\Sd$ 作为发送方，输入 $B$ 个键集合（Key Set） $X_1, \dots, X_B$ 和 $B$ 个值集合（Value Set） $S_1, \dots, S_B$。
+        \item $\Rcv$ 作为接收方，输入向量 $\textbf{x}$，并获得输出向量 $\textbf{t} = (t_1, \dots, t_B)$。
+    \end{itemize}
+    \item \textbf{执行 ssPEQT：} 双方调用 $B$ 个独立的 $\mathcal{F}_{\text{ssPEQT}}$ 实例。在第 $i$ 个实例中，$\Sd$ 输入 $s_i$，$\Rcv$ 输入 $t_i$。最终，双方分别获得比特 $e_S^i, e_R^i \in \{0,1\}$。
+\end{enumerate}
+\end{framed}
+\caption{协议 $\Pi_{\text{bssPMT}}$}\label{fig:proto-bssPMT}
+\end{figure}
+
+\begin{theorem} \label{theorem:bssPMT}
+在 $(\mathcal{F}_{\text{bOPPRF}}, \mathcal{F}_{\text{ssPEQT}})$-混合模型下，协议 $\Pi_{\text{bssPMT}}$ 安全地实现了功能 $\mathcal{F}_{\text{bssPMT}}$。
+\end{theorem}
+
+\begin{trivlist}
+\item \textbf{正确性分析.} 根据 batch OPPRF 的理想功能，若接收方的元素 $x_i \in X_i$，则接收方必然获得对应的预定义标签 $t_i = s_i$。随后在第 $i$ 个 ssPEQT 实例中，由于双方输入相等，其输出的比特秘密分享之和 $e_S^i \oplus e_R^i = 1$。
+反之，若 $x_i \notin X_i$，接收方获得的 $t_i$ 是一个伪随机值。此时 $t_i = s_i$ 发生碰撞的概率仅为 $2^{-\gamma}$。对于整个向量而言，发生至少一次错误碰撞的概率上限为 $B \cdot 2^{-\gamma}$。通过设置安全参数 $\gamma \ge \sigma + \log B$，可以使该碰撞概率忽略不计（negligible）。因此，若 $x_i \notin X_i$，ssPEQT 的输出以压倒性概率（overwhelming probability）满足 $e_S^i \oplus e_R^i = 0$。
+
+\item \textbf{安全性分析.} 协议 $\Pi_{\text{bssPMT}}$ 的安全性直接继承自底层原语 batch OPPRF 与 ssPEQT 协议的安全性。具体地，在理想世界中，给定 $\mathcal{F}_{\text{bssPMT}}$ 输出的前提下，模拟器依次调用 ssPEQT 与 batch OPPRF 协议的子模拟器。只要 batch OPPRF 与 ssPEQT 协议安全地实现了理想功能 $\mathcal{F}_{\text{ssPEQT}}$ 和 $\mathcal{F}_{\text{bOPPRF}}$，则模拟器在理想世界中模拟的敌手视图（即 batch OPPRF 与 ssPEQT 协议的子模拟器在理想世界中模拟的敌手视图的联合分布）与敌手在真实世界中的视图（敌手分别在 batch OPPRF 与 ssPEQT 协议的调用过程中视图的联合分布）是计算不可区分的。
+\end{trivlist}
+
+\subsection{复杂度分析及对比}
+\esubsection{Complexity Analysis and Comparison}
+
+在本章提出的 MPSU 协议以及后续章节 batch ssPMT 的使用中，batch ssPMT 始终与哈希到桶技术相结合，其中 $\Rcv$ 利用布谷鸟哈希将输入向量 $\textbf{y}$ 中的元素分配至 $B$ 个桶中，$\Sd$ 则利用简单哈希将输入集合 $X$ 中的元素分配至对应的所有桶中。双方调用包含 $B$ 个ssPMT 实例的 batch ssPMT 协议。本节将上述过程看作一个整体进行复杂度分析。为了使得调用包含 $B$ 个ssPMT 实例的 batch ssPMT 协议的计算与通信开销相对于集合规模 $n$ 呈线性增长，本文采用无 stash 的三哈希布谷鸟哈希技术 \cite{PSTY-EUROCRYPT-2019}，在该参数设置下，为保证哈希失败概率（即元素无法存入哈希表而必须存入 stash 的概率）小于 $2^{-40}$，本文设置桶数 $B = 1.27n = O(n)$。本文实现 batch ssPMT 相对于 $n$ 的线性复杂度，主要依靠两个关键技术：首先，本文遵循文献~\cite{PSTY-EUROCRYPT-2019} 的范式，利用批量不经意随机函数（batch oblivious pseudorandom function, batch OPRF）与不经意键值存储（oblivious key-value store, OKVS）~\cite{PRTY20,GPRTY-CRYPTO-2021,RR-CCS-2022,BPSY-USENIX-2023} 构造批量不经意可编程 PRF（batch OPPRF）。通过通信摊销技术，计算 $B = O(n)$ 个 OPPRF 实例的总通信开销仅与元素总数 $3n$ 相关。其次，本文采用子域向量不经意线性求值（subfield-VOLE）~\cite{BCGIKRS19,BCGIKS19,RRT23} 实例化 batch OPRF，并结合文献~\cite{RR-CCS-2022} 中的 OKVS 构造，确保了规模为 $O(n)$ 的 batch OPPRF 的计算复杂度与 $n$ 线性相关。
+
+\subsection{batch ssPMT 的复杂度细节}~\label{sec:analysis-bsspmt}
+
+$\ProtobssPMT$ 协议中各阶段的具体开销分析如下：
+
+\begin{trivlist}
+\item \textbf{1. 执行 batch OPPRF}：该部分的开销由 batch OPRF 和 OKVS 两部分组成。
+\begin{itemize}
+    \item \textbf{batch OPRF}：本文使用 subfield-VOLE 实例化 batch OPRF 功能 \cite{BuiC23}。对于 $1 \le k \le B$ 且 $B = O(n)$ 的 OPRF 实例，解随机化消息。对于 $B = O(n)$ 个 OPRF 实例，协议在离线阶段执行规模为 $B$ 的 subfield-VOLE，在线阶段发送 $B$ 个长度为 $l$ 的去随机化消息。本文采用基于带固定权重和正则噪声的对偶 LPN（Dual LPN with Fixed Weight and Regular Noise） \cite{BCGIKRS19,BCGIKS19}， 并使用 Expand-Convolute 码 \cite{RRT23} 以实现近线性的伴随式计算（syndrome computation）。
+    
+    设 OPPRF 的输出长度为 $\gamma$，其下界由 batch OPPRF 的总调用次数决定。在本章提出的 SK-MPSU 协议与后续章节提出的 MPSU 协议中，对于所有 $1 \le i < j \le m$，参与方 $P_i$ 与 $P_j$ 均需调用一次 batch OPPRF，总调用次数为 $(m^2 - m) / 2$。为保证当 $\textbf{x} \notin X_i$ 时，$t_i = s_i$ 发生的概率不大于 $2^{-\sigma}$，需满足 $((m^2 - m) / 2) B \cdot 2^{-\gamma} \le 2^{-\sigma}$，即 $\gamma \ge \sigma + \log((m^2 - m) / 2) + \log_2 B$。
+
+    \item \textbf{OKVS}：$\Sd$ 将简单哈希的桶中的 $3n$ 个元素编码至 OKVS，因此 OKVS 中键值对的规模为 $3n$。本文采用文献~\cite{RR-CCS-2022} 的 OKVS 构造，其 $\Encode$ 与 $\Decode$ 算法的计算复杂度均为 $O(n)$。在使用 $w=3$ 且簇大小为 $2^{14}$ 的参数设置下，OKVS 的存储开销约为 $1.28 \gamma \cdot (3n)$ 比特。
+\end{itemize}
+
+综上， batch OPPRF 的阶段性开销如下：
+\begin{itemize}
+    \item \textbf{离线阶段}：单方计算复杂度为 $O(n \log n)$，通信复杂度为 $O(t \lambda \log (n / t))$，轮数复杂度为 $O(1)$（其中 $t \approx 128$）。
+    \item \textbf{在线阶段}：单方计算复杂度为 $O(n)$，通信复杂度为 $O(\gamma n)$，轮数复杂度为 $O(1)$。
+\end{itemize}
+
+\item \textbf{2. 执行 ssPEQT}：
+对于每个桶，需要执行一次 ssPEQT 实例。本文利用通用 MPC 技术实例化 ssPEQT \cite{PSTY-EUROCRYPT-2019}。具体构造为用 GMW 协议~\cite{GMW-STOC-1987} 实现由 $\gamma-1$ 个 AND 门组成的电路。为降低轮复杂度，本文采用分治策略，将 AND 门递归地组织为二叉树结构，使得轮数缩减至 $O(\log \gamma)$。总计 $B$ 个 ssPEQT 实例涉及 $(\gamma-1)B$ 个 AND 门。
+
+通过在离线阶段利用 Silent OT 扩展 \cite{BCGIKRS19} 生成 Beaver 三元组，在线阶段每个 AND 门仅需 4 比特通信和 $O(1)$ 计算。因此，每次 ssPEQT 调用的在线通信为 $4\gamma$ 比特，计算复杂度为 $O(1)$。
+
+\begin{itemize}
+    \item \textbf{离线阶段}：单方计算复杂度为 $O(\gamma n \log n)$，通信复杂度为 $O(t \lambda \log (\gamma n / t))$，轮数复杂度为 $O(1)$。
+    \item \textbf{在线阶段}：单方计算复杂度为 $O(n)$，通信复杂度为 $O(\gamma n)$，轮数复杂度为 $O(\log \gamma)$。
+\end{itemize}
+\end{trivlist}
+
+\subsection{与 mq-ssPMT 的对比}~\label{compare:lg}
+
+Liu 和 Gao 将 \cite{ZCLZL-USENIX-2023} 中基于对称密钥加密（SKE）的 mq-RPMT构造改造为 mq-ssPMT，其核心开销来自其中的秘密分享不经意解密匹配（secret-shared oblivious decryption-then-matching, ssVODM）。该协议需通过 GMW 协议实现解密与比较电路，总计需要 $(T + \gamma' - \log n - 1)n$ 个 AND 门，其中 $T$ 为解密电路中的 AND 门数量，典型参数下 $T \approx 600$；$\gamma'$ 为 SKE 密文比特长度，其下界与 mq-ssPMT 的总调用次数有关：在 LG 协议中，对于 $1 \le i < j \le m$，总共存在 $1 + 2 + \dots + (m-1) = (m^2 - m) / 2$ 次 mq-ssPMT 调用。为了控制错误概率可忽略不计，需保证 $((m^2 - m) / 2) n \cdot 2^{-\gamma'} \le 2^{-\sigma}$，因此 $\gamma' \ge \sigma + \log((m^2 - m) / 2) + \log_2 n$。\footnote{LG 原文中错误地将 $\gamma'$ 设置为了输入元素的比特长度，这一参数设置可能导致其安全性在多方环境下无法得到保证。}
+
+相比之下，规模为 $B$ 的 batch ssPMT 由规模为 $B$ 的批量 OPPRF 和 $B$ 个 ssPEQT 实例构成。其中，batch OPPRF 采用了最先进的线性构造~\cite{CGS22,RS-EUROCRYPT-2021,RR-CCS-2022}，该部分可实现相对于 $n$ 的线性计算与通信复杂度。在 ssPEQT 环节，各参与方仅需协同处理 $1.27 (\gamma-1) n$ 个 AND 门，其中 $\gamma$ 为 OPPRF 的输出长度。
+在典型的参数设置下，$(T + \gamma' - \log n - 1) n$ 的规模远大于 $1.27 (\gamma-1) n$。这意味着 batch ssPMT 实际所需的 AND 门数量远少于 mq-ssPMT。因此，基于 batch ssPMT 的构造不仅极大地降低了对通用 2PC 组件的依赖，相较于 mq-ssPMT，在计算与通信复杂度上均实现了大幅度的性能优化。
+
+\section{多方秘密分享随机不经意传输}
+\esection{Multi-Party Secret-Shared Random Oblivious Transfer}
+
+在基于秘密分享的 MPSU 框架中，为了在标准半诚实模型下消除对非共谋假设的依赖，本节引入一种新的密码学原语 —— 多方秘密分享随机不经意传输（Multi-Party Secret-Shared Random Oblivious Transfer, mss-ROT）。该原语是对传统两方随机不经意传输（ROT）功能的扩展，将选择比特进行秘密分享，并允许参与方的任意非空子集共同提供随机掩码的秘密分享。
+
+\subsection{功能定义}
+\esubsection{Functionality Definition}
+
+在 MPC 中，基于秘密分享的设计方法被广泛采用。例如，ROT 的输出满足关系 $r_0 \oplus r_b = b \cdot \Delta$，其中 $\Delta = r_0 \oplus r_1$。因此 ROT 的功能可以看作将选择比特 $b$ 和掩码 $\Delta$ 标量乘后在两方之间进行秘密分享。对于前述的双选择比特 ROT，它可以看作是将 $b$ 秘密分享的版本，输出满足 $r_0 \oplus r_b = (b_0 \oplus b_1) \cdot \Delta$。
+为解决 LG 协议中 $P_1$ 与其他参与方共谋后重构出的 $\Delta$ 泄露诚实方信息的问题，
+本节进一步扩展 ROT 中秘密分享的思想，将 $\Delta$ 进行秘密分享，同时满足以下特定设计要求：
+\begin{enumerate}
+    \item \textbf{掩码分享灵活分布：} 允许参与方中的任何非空子集对 $\Delta$ 进行秘密分享，从而保证分享可以分布在任意潜在的共谋方集合 $J$ 中。这样，只要 $J$ 中存在一名诚实方，重构出的$\Delta$ 在敌手的视图中就是随机的。
+    \item \textbf{两方分享选择比特：} 选择比特仅在两方之间进行秘密分享，以便嵌入到本文的 MPSU 框架中。
+    \item \textbf{掩码不可复用：} 由于所有分享份额都在最终阶段重构，因此 mss-ROT 中的掩码 $\Delta$ 不能在多次调用之间复用。
+\end{enumerate}
+具体地，mss-ROT 定义为：将选择比特 $b = b_0 \oplus b_1$ 在两方 $P_{\text{ch}_0}$ 和 $P_{\text{ch}_1}$ 之间秘密分享。同时，掩码 $\Delta$ 同样以秘密分享的形式由参与方子集 $J$ 提供，即 $\Delta = \bigoplus_{j \in J} \Delta_j$。最终所有参与方获得随机输出 $r_i$，所有输出满足关系 $\bigoplus_{i=1}^m r_i = (b_0 \oplus b_1) \cdot \Delta = (b_0 \oplus b_1) \cdot (\bigoplus_{j \in J} \Delta_j)$，也就是说，若选择比特 $b = 0$，异或和等于 0 ；否则，异或和等于掩码 $\Delta$。
+图 \ref{fig:func-mssrot} 给出了 mss-ROT 的理想功能 $\FuncmssROT$ 的形式化描述。
+
+\begin{figure}[!hbtp]
+\centering
+\begin{framed}
+\begin{trivlist}
+    \item \textbf{参数：} 共有$m$ 个参与方 $P_1, \dots, P_m$，其中 $P_{\text{ch}_0}$ 和 $P_{\text{ch}_1}$ 输入选择比特的秘密分享，$\text{ch}_0, \text{ch}_1 \in \{1, \dots, m\}$。令 $J = \{j_1, \dots, j_d\}$ 表示输入掩码 $\Delta$ 秘密分享的参与方索引集合，其中 $d \le m$。消息长度为 $l$。
+    \item \textbf{输入：} $P_{\text{ch}_0}$ 输入 $b_0 \in \{0, 1\}$；$P_{\text{ch}_1}$ 输入 $b_1 \in \{0, 1\}$；对于每个 $j \in J$，$P_j$ 输入掩码的分享份额 $\Delta_j \in \{0, 1\}^l$。
+    \item \textbf{功能：} 收到来自 $P_{\text{ch}_0}$ 和 $P_{\text{ch}_1}$ 的选择比特秘密分享，以及来自每个 $P_j$ 的掩码分享后：
+    \begin{itemize}
+        \item 随机采样 $r_i \leftarrow \{0, 1\}^l$，并将 $r_i$ 发送给 $P_i$ ($2 \le i \le m$)。
+        \item 若 $b_0 \oplus b_1 = 0$，计算 $r_1 = \bigoplus_{i=2}^m r_i$。
+        \item 若 $b_0 \oplus b_1 = 1$，计算 $r_1 = \bigoplus_{i=2}^m r_i \oplus (\bigoplus_{j \in J} \Delta_j)$。
+        \item 将 $r_1$ 发送给 $P_1$。
+    \end{itemize}
+\end{trivlist}
+\end{framed}
+\caption{理想功能 $\FuncmssROT$}\label{fig:func-mssrot}
+\end{figure}
+
+\subsection{协议构造与安全性证明}
+\esubsection{Protocol Construction and Security Proof}
+
+本节基于 ROT 原语给出 mss-ROT 协议的高效构造，核心设计思路是将 $(b_0 \oplus b_1) \cdot (\bigoplus_{j \in J} \Delta_j)$ 化简为选择比特和掩码之间的两两乘积，对于每一对选择比特和掩码，通过调用 ROT 协议将乘积在两方之间秘密分享，最后每个参与方将从所有 ROT 的调用中得到的输出求和，作为自己的最终输出 $r_i$。具体协议 $\ProtomssROT$ 如图 \ref{fig:proto-mssrot} 所示。
+
+\begin{figure}[!hbtp]
+\centering
+\begin{framed}
+\begin{enumerate}
+    \item 每个 $P_i$（$1 \le i \le m$）初始化 $r_i = 0$。若 $\text{ch}_{j \in \{0,1\}} \in J$，则 $P_{\text{ch}_j}$ 设置 $r_{\text{ch}_j} = b_j \cdot \Delta_{\text{ch}_j}$（$\cdot$ 表示按位与）。
+    \item 对于每个 $j \in J$：$P_{\text{ch}_0}$ 与 $P_j$ 调用 $\FuncROT$，$P_{\text{ch}_0}$ 作为接收方输入 $b_0$，$P_j$ 作为发送方。$P_{\text{ch}_0}$ 获得输出 $u_{j,{\text{ch}_0}}^{b_0} \in \{0,1\}^l$，$P_j$ 获得输出 $u_{j,{\text{ch}_0}}^0, u_{j,{\text{ch}_0}}^1 \in \{0,1\}^l$。
+    $P_j$ 更新 $r_j = r_j \oplus u_{j,{\text{ch}_0}}^0$，并向 $P_{\text{ch}_0}$ 发送消息 $\Delta'_{j,{\text{ch}_0}} = u_{j,{\text{ch}_0}}^0 \oplus u_{j,{\text{ch}_0}}^1 \oplus \Delta_j$。$P_{\text{ch}_0}$ 更新 $r_{\text{ch}_0} = r_{\text{ch}_0} \oplus u_{j,{\text{ch}_0}}^{b_0} \oplus b_0 \cdot \Delta'_{j,{\text{ch}_0}}$。
+    \item 对于每个 $j \in J$：$P_{\text{ch}_1}$ 与 $P_j$ 调用 $\FuncROT$，$P_{\text{ch}_1}$ 作为接收方输入 $b_1$，$P_j$ 作为发送方。$P_{\text{ch}_1}$ 获得输出 $u_{j,{\text{ch}_1}}^{b_1} \in \{0,1\}^l$，$P_j$ 获得输出 $u_{j,{\text{ch}_1}}^0, u_{j,{\text{ch}_1}}^1 \in \{0,1\}^l$。
+    $P_j$ 更新 $r_j = r_j \oplus u_{j,{\text{ch}_1}}^0$，并向 $P_{\text{ch}_1}$ 发送消息 $\Delta'_{j,{\text{ch}_1}} = u_{j,{\text{ch}_1}}^0 \oplus u_{j,{\text{ch}_1}}^1 \oplus \Delta_j$。$P_{\text{ch}_1}$ 更新 $r_{\text{ch}_1} = r_{\text{ch}_1} \oplus u_{j,{\text{ch}_1}}^{b_1} \oplus b_1 \cdot \Delta'_{j,{\text{ch}_1}}$。
+    \item 若集合 $I = \{\text{ch}_0, \text{ch}_1\} \cup J$ 的大小满足 $|I| < m$，则每个 $P_i$（$i \in I$）采样随机数 $r'_{i,i'}$ 发送给每个 $P_{i'}$（$i' \in \{1, \dots, m\} \setminus I$），并更新 $r_i = r_i \oplus r'_{i,i'}$。$P_{i'}$ 更新 $r_{i'} = r_{i'} \oplus r'_{i,i'}$。
+    \item 每个 $P_i$（$1 \le i \le m$）输出 $r_i$ 的最终值。
+\end{enumerate}
+\end{framed}
+\caption{协议 $\ProtomssROT$}\label{fig:proto-mssrot}
+\end{figure}
+
+\begin{theorem}\label{theorem:mssrot}
+在 $\FuncROT$-混合模型下，协议 $\ProtomssROT$ 在任意半诚实敌手腐化不超过 $t < m$ 个参与方的情况下，安全地实现了功能 $\FuncmssROT$。
+\end{theorem}
+
+为证明该定理，考虑如下特定情形：设 $\text{ch}_0 = 1$，$\text{ch}_1 = m$，且 $J = \{1,2,\ldots,m\}$。即参与方 $P_1$ 与 $P_m$ 分别输入选择比特秘密分享 $b_1,b_m \in \{0,1\}$，并且每个参与方 $P_i$（$1 \le i \le m$）输入 $\Delta_i$。其他情形的证明与此类似。
+
+\begin{trivlist}
+\item \textbf{正确性分析.} 根据协议描述，可以得出以下等式：
+\begin{gather}
+    r_1 = \bigoplus_{j=2}^{m}(r_{j,1}^{b_1} \oplus b_1 \cdot u_{j,1}) \oplus r_{1,m}^0 \oplus b_1 \cdot \Delta_1,  \label{eq:1} \\
+    r_i = r_{i,1}^0 \oplus r_{i,m}^0 , 1 < i < m, \label{eq:2} \\
+    r_m = \bigoplus_{j=1}^{m-1}(r_{j,m}^{b_m} \oplus b_m \cdot u_{j,m}) \oplus r_{m,1}^0 \oplus b_m \cdot \Delta_m, \label{eq:3} \\
+    u_{j,1} = \Delta_j \oplus r_{j,1}^0 \oplus r_{j,1}^1, 
+    u_{j,m} = \Delta_j \oplus r_{j,m}^0 \oplus r_{j,m}^1\label{eq:4}
+\end{gather}
+根据 ROT 的功能定义，存在以下关系：
+\begin{gather}
+r_{j,1}^{b_1} = r_{j,1}^0 \oplus b_1 \cdot (r_{j,1}^0 \oplus r_{j,1}^1),\label{eq:5} \\
+r_{j,m}^{b_m} = r_{j,m}^0 \oplus b_m \cdot (r_{j,m}^0 \oplus r_{j,m}^1),\label{eq:6} 
+\end{gather}
+将等式 \eqref{eq:4}、\eqref{eq:5}、\eqref{eq:6} 代入等式 \eqref{eq:1}、\eqref{eq:2} 和 \eqref{eq:3} 中消去相同项，可得：
+\begin{gather}
+    r_1 = \bigoplus_{j=2}^{m}(r_{j,1}^{b_1} \oplus b_1 \cdot \Delta_j) \oplus r_{1,m}^0 \oplus b_1 \cdot \Delta_1,  \label{eq:7} \\
+    r_m = \bigoplus_{j=1}^{m-1}(r_{j,m}^{b_m} \oplus b_m \cdot \Delta_j) \oplus r_{m,1}^0 \oplus b_m \cdot \Delta_m, \label{eq:8} 
+\end{gather}
+将等式 \eqref{eq:2}、\eqref{eq:7}、\eqref{eq:8} 代入计算所有参与方输出的异或和 $r_1 \oplus (\bigoplus_{j=2}^{m-1}r_j) \oplus r_m$，可得 
+$r_1 \oplus (\bigoplus_{j=2}^{m-1}r_j) \oplus r_m = \bigoplus_{i=1}^{m} (b_1 \oplus b_m) \cdot \Delta_i$。由此可以总结出：若 $b_1 \oplus b_m = 0$，则 $r_1 = \bigoplus_{j=2}^m r_j$；否则 $r_1 = \Delta_1 \oplus (\bigoplus_{j=2}^m (r_j \oplus \Delta_j))$。这与理想功能 $\FuncmssROT$ 的定义完全一致，从而证明协议的正确性。
+
+\item \textbf{安全性分析.} 
+设被敌手腐化的参与方集合为 $\Corr$，诚实方集合为 $\Honest$，其中 $\lvert \Corr \rvert = t$。
+
+直觉上，各参与方的操作均仅限于调用 $\FuncROT$ 和接收随机消息，因此模拟器可以通过生成与诚实方输入无关的随机值来模拟 $\FuncROT$ 的输出和协议消息，然后通过调用 ROT 协议的子模拟器来模拟敌手的完整视图。
+具体地，模拟器接收所有被腐化方 $P_c \in \Corr$ 的输出 $r_c$，并需要模拟每个 $P_c$ 的视图。
+我们根据持有选择比特秘密分享的 $P_1$ 和 $P_m$ 是否被腐化，分为以下三种情况证明所有参与方的输出和敌手视图的联合分布在理想世界和真实协议中不可区分：
+
+\textbf{情况 1：$P_1$ 和 $P_m$ 均未被腐化.}
+每个 $P_c$ 的视图包括其输入的掩码分享 $\Delta_c$ 以及 $\FuncROT$ 的输出 $(r_{c,1}^0, r_{c,1}^1)$ 和 $(r_{c,m}^0, r_{c,m}^1)$。模拟器先随机生成 $\Delta_c$ 和上述 $\FuncROT$ 的输出，同时保证约束条件 $r_{c,1}^0 \oplus r_{c,m}^0 = r_c$。然后，模拟器扮演诚实方的角色按照协议与 $P_c$ 交互。由于这些值在真实执行中同样是均匀随机分布的，因此所有被腐化方的输出 $r_c$ 及其由模拟器生成的视图组成的联合分布，与真实协议中所有输出和敌手视图的联合分布计算不可区分。
+
+\textbf{情况 2：只有 $P_1$ 被腐化或只有 $P_m$ 被腐化.}
+利用协议在 $P_1$ 和 $P_m$ 角色上的对称性，该情况只需要考虑 $P_1$ 被腐化的情形。
+$P_1$的视图包含选择比特分享份额 $b_1$、输入的掩码分享 $\Delta_1$、$\FuncROT$ 的输出 $(r_{1,m}^0, r_{1,m}^1)$ 和 $\{r_{j,1}^{b_1}\}_{1 < j \le m}$，以及来自 $P_j$ 的协议消息 $\{u_{j,1}\}_{1 < j \le m}$；
+对于每个 $P_c (c \ne 1)$，其视图包含其输入的掩码分享 $\Delta_c$ 以及 $\FuncROT$ 的输出 $(r_{c,1}^0, r_{c,1}^1)$ 和 $(r_{c,m}^0, r_{c,m}^1)$。
+针对 $P_1$ 的视图，模拟器扮演诚实方的角色按照协议与 $P_1$ 交互，同时在保证 $\bigoplus_{j=2}^{m}(r_{j,1}^{b_1} \oplus b_1 \cdot u_{j,1}) \oplus r_{1,m}^0 \oplus b_1 \cdot \Delta_1 = r_1$ 成立的前提下，随机生成 $\FuncROT$ 的均匀输出 $(r_{1,m}^0, r_{1,m}^1)$、$r_{i,1}^{b_1}$ 以及来自诚实方 $P_i \in \Honest$ 的均匀随机消息 $u_{i,1}$；
+对于其他被腐化方的视图，模拟器扮演诚实方的角色按照协议执行，同时设置 $r_{c,m}^0 = r_{c,1}^0 \oplus r_c$ 并随机生成 $\FuncROT$ 的均匀输出 $r_{c,m}^1$。
+在真实协议的执行中，$P_1$ 接收到的消息为 $u_{i,1} = \Delta_i \oplus r_{i,1}^0 \oplus r_{i,1}^1$。根据 ROT 功能定义，$r_{i,1}^0$ 和 $r_{i,1}^1$ 都是均匀分布且独立于 $P_1$ 视图的。因此，消息 $u_{j,1}$ 对 $P_1$ 来说是均匀随机的，所有输出和敌手视图的联合分布在理想世界和真实协议中不可区分。
+
+\textbf{情况 3：$P_1$ 和 $P_m$ 均被腐化.}
+$P_1$ 的视图由选择比特分享份额 $b_1$、输入的掩码分享 $\Delta_1$、$\FuncROT$ 的输出 $(r_{1,m}^0, r_{1,m}^1)$ 和 $\{r_{j,1}^{b_1}\}_{1 < j \le m}$，以及来自 $P_j$ 的协议消息 $\{u_{j,1}\}_{1 < j \le m}$ 组成；
+对于每个 $P_c (c \ne 1, c \ne m)$，其视图由其输入的掩码分享 $\Delta_c$ 以及 $\FuncROT$ 的输出 $(r_{c,1}^0, r_{c,1}^1)$ 和 $(r_{c,m}^0, r_{c,m}^1)$ 组成；
+$P_m$ 的视图由输入的掩码分享 $\Delta_m$、$\FuncROT$ 的输出 $(r_{m,1}^0, r_{m,1}^1)$ 和 $\{r_{j,m}^{b_m}\}_{1 \le j < m}$，以及来自 $P_j$ 的协议消息 $\{u_{j,m}\}_{1 \le j < m}$ 组成。
+针对 $P_1$ 的视图，模拟器扮演诚实方的角色按照协议与 $P_1$ 交互，同时在保证 $\bigoplus_{j=2}^{m}(r_{j,1}^{b_1} \oplus b_1 \cdot u_{j,1}) \oplus r_{1,m}^0 \oplus b_1 \cdot \Delta_1 = r_1$  成立的前提下，随机生成 $\FuncROT$ 的均匀输出 $r_{i,1}^{b_1}$ 以及来自诚实方 $P_i \in \Honest$ 的均匀随机消息 $u_{i,1}$；
+针对 $P_c (c \ne 1, c \ne m)$ 的视图，模拟器扮演诚实方的角色按照协议与 $P_c$ 交互，同时设置 $r_{c,m}^0 = r_{c,1}^0 \oplus r_c$ 并随机生成 $\FuncROT$ 的均匀输出 $r_{c,m}^1$；
+针对 $P_m$ 的视图，模拟器扮演诚实方的角色按照协议与 $P_m$ 交互，除了对协议进行如下修改：
+\begin{itemize}
+    \item 在保证约束条件 $\bigoplus_{j=1}^{m-1} (r_{j,m}^{b_m} \oplus b_m \cdot u_{j,m}) \oplus r_{m,1}^0 \oplus b_m \cdot \Delta_m = r_m$ 成立的前提下，随机生成 $\FuncROT$ 的均匀输出 $r_{i,m}^{b_m}$ 以及来自诚实方 $P_i \in \Honest$ 的均匀消息 $u_{i,m}$。
+    \item 设置 $\FuncROT$ 的输出 $r_{c,m}^{b_m}$ 的值，使其与前述模拟中每个 $P_c (c \ne 1, c \ne m)$ 的部分视图 $(r_{c,m}^0, r_{c,m}^1)$ 保持一致。
+\end{itemize}
+可以看出，所有被腐化方的输出 $r_c$ 及其由模拟器生成的视图组成的联合分布，与真实协议中所有输出和敌手视图的联合分布计算不可区分。
+\end{trivlist}
+
+\section{SK-MPSU 协议构造及安全性证明}
+\esection{SK-MPSU Protocol Construction and Security Proof}
+
+本节将介绍如何利用 batch ssPMT 和 mss-ROT 构造 SK-MPSU 协议。该构造遵循引言中概述的基于秘密分享的 MPSU 框架：
+
+在第一阶段中，每个 $P_j$（$2 \le j \le m$）执行差集 $Y_j$ 的秘密分享过程。$P_j$ 通过布谷鸟哈希将 $X_j$ 分配到 $B$ 个桶中；每个 $P_i$（$1 \le i < j$）通过简单哈希将 $X_i$ 分配到 $B$ 个桶中。$P_j$ 作为接收方 $\Rcv$ 与每个 $P_i$ 执行 batch ssPMT。对于每个桶，$P_j$ 和 $P_i$ 获得成员关系比特的秘密分享 $e_{j,i}$ 和 $e_{i,j}$。接着，$\{P_{\min(2,i)}, \dots, P_j\}$ 调用 mss-ROT，其中 $P_j$ 和 $P_i$ 分别作为持有 $e_{j,i}$ 和 $e_{i,j}$ 的 $P_{\text{ch}_0}$ 和 $P_{\text{ch}_1}$，而每个 $P_{j'} \in \{P_2, \dots, P_j\}$ 均匀采样 $\Delta_{j',ji}$ 作为输入。每个 $P_{i'} \in \{P_{\min(2,i)}, \dots, P_j\}$ 获得输出 $r_{i',ji}$。若 $e_{j,i} \oplus e_{i,j} = 0$，则 $\bigoplus_{i'=\min(2,i)}^j r_{i',ji} = 0$；否则 $\bigoplus_{i'=\min(2,i)}^j r_{i',ji} = \bigoplus_{j'=2}^j \Delta_{j',ji}$。在该过程结束时，$P_1$ 设置自己的秘密分享份额 $s_{1,j} = r_{1,j1}$；每个 $P_{j'} \in \{P_2, \dots, P_{j-1}\}$ 设置自己的秘密分享份额 $s_{j',j} = \bigoplus_{i=1}^{j-1} r_{j',ji}$；$P_j$ 设置自己的秘密分享份额 $s_{j,j} = \bigoplus_{i=1}^{j-1} r_{j,ji} \oplus x \Vert \Hash(x)$，其中 $x \in X_j$ 是 $P_j$ 桶中的元素；对于未参与 mss-ROT 调用的参与方，将自己的秘密分享份额设为 0。此时有秘密分享之和为 $\bigoplus_{i=1}^j s_{i,j} = (\bigoplus_{i=1}^{j-1} (\bigoplus_{i'=\min(2,i)}^j r_{i',ji})) \oplus x \Vert \Hash(x)$。若 $x \in X_j \setminus (X_1 \cup \dots \cup X_{j-1})$，则对于所有 $i$，$e_{j,i} \oplus e_{i,j} = 0$ 且 $\bigoplus_{i'=\min(2,i)}^j r_{i',ji} = 0$ 成立，因此 $\bigoplus_{i=1}^j s_{i,j} = x \Vert \Hash(x)$。这使得参与方能够持有 $Y_j = X_j \setminus (X_1 \cup \dots \cup X_{j-1})$ 中每个元素的秘密分享。否则，至少有一个随机项 $\bigoplus_{i'=\min(2,i)}^j r_{i',ji}$ 无法被消去，并以秘密分享的形式分布在 $\{P_2, \dots, P_j\}$ 之间。因此，对于 $X_j \setminus Y_j$ 中的每个元素，参与方持有一个随机秘密的分享，即使 $P_1$ 与 $\{P_2, \dots, P_j\}$ 中最多 $m-2$ 个参与方共谋，该秘密也不会泄露任何信息。
+
+在第二阶段中，所有参与方调用多方秘密分享洗牌协议，对第一阶段生成的所有秘密分享进行随机置换和重新分享。随后，每个 $P_j$ 将其置换后的分享发送给 $P_1$，由 $P_1$ 重构 $(X_1 \cup \cdots \cup X_m)\setminus X_1$，再与 $X_1$ 合并，从而得到最终并集。
+
+图 \ref{fig:proto-mpsu2} 形式化地描述了 SK-MPSU 协议的具体执行步骤。
+
+\begin{figure}[!hbtp]
+\begin{framed}
+\begin{minipage}[center]{\textwidth}
+\begin{trivlist}
+\item \textbf{参数.} $m$ 个参与方 $P_1, \dots, P_m$。输入集合大小为 $n$。集合元素的比特长度为 $l$。布谷鸟哈希参数：哈希函数 $h_1, h_2, h_3$ 以及桶数 $B$。抗碰撞哈希函数 $\Hash(x): \{0,1\}^l \to \{0,1\}^{\kappa}$。$\Elem(\mathcal{C}^b)$ 表示 $\mathcal{C}^b$ 中的元素。
+\item \textbf{输入.} 每个参与方 $P_i$ 输入集合 $X_i = \{x_i^1, \dots, x_i^n\} \subseteq \{0,1\}^l$。
+% \item \textbf{协议.}
+\begin{enumerate} [itemsep=2pt,topsep=0pt,parsep=0pt]
+\item $P_1$ 执行 $\mathcal{T}_1^1, \dots, \mathcal{T}_1^B \gets \Simple_{h_1,h_2,h_3}^B(X_1)$。对于 $1 < j \le m $，$P_j$ 执行 $\mathcal{C}_j^1, \dots, \mathcal{C}_j^B \gets \Cuckoo_{h_1,h_2,h_3}^B(X_j)$ 以及 $\mathcal{T}_j^1, \dots, \mathcal{T}_j^B \gets \Simple_{h_1,h_2,h_3}^B(X_j)$。
+\item 对于每个 $1 < j \le m$：
+\begin{itemize} [itemsep=1pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
+  \item[-] 对于 $1 \le i < j$：$P_i$ 和 $P_j$ 调用批量大小为 $B$ 的 $\FuncbssPMT$，其中 $P_i$ 作为发送方输入 $\mathcal{T}_i^1, \dots, \mathcal{T}_i^B$，$P_j$ 作为接收方输入 $\mathcal{C}_j^1, \dots, \mathcal{C}_j^B$。对于实例 $b \in [B]$，$P_i$ 获得 $e_{i,j}^b \in \{0,1\}$，$P_j$ 获得 $e_{j,i}^b \in \{0,1\}$。
+\end{itemize}
+\item 对于每个 $1 < j \le m$：
+\begin{itemize} [itemsep=1pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
+  \item[-] 对于 $1 \le i < j$，针对每个桶 $b \in [B]$：$P_{\min(2,i)}, \dots, P_j$ 调用 $\FuncmssROT$，其中 $P_j$ 作为 $P_{\text{ch}_0}$ 输入 $e_{j,i}^b$，$P_i$ 作为 $P_{\text{ch}_1}$ 输入 $e_{i,j}^b$。对于 $1 < j' \le j$，$P_{j'}$ 采样 $\Delta_{j',ji}^b \gets \{0,1\}^{l+\kappa}$ 并将其作为 $\Delta$ 的份额输入。对于 $\min(2,i) \le i' \le j$，$P_{i'}$ 获得输出 $r_{i',ji}^b \in \{0,1\}^{l+\kappa}$。
+  \item[-] $P_1$ 设置 $s_{j,1}^b = r_{1,j1}^b$。对于 $1 < j' < j$，$P_{j'}$ 计算 $s_{j',j}^b = \bigoplus_{i=1}^{j-1} r_{j',ji}^b$。若 $\mathcal{C}_j^b$ 不对应于空桶，则 $P_j$ 计算 $s_{j,j}^b = \bigoplus_{i=1}^{j-1} r_{j,ji}^b \oplus (\Elem(\mathcal{C}_j^b) \Vert \Hash(\Elem(\mathcal{C}_j^b)))$；否则，随机选择 $s_{j,j}^b$。
+\end{itemize}
+\item 对于每个 $1 \le i \le m$，$P_i$ 计算向量 $\vec{sh}_i \in (\{0,1\}^{l+\kappa})^{(m-1)B}$ 如下：对于 $\max(2,i) \le j \le m, 1 \le b \le B$，令 $sh_{i,(j-2)B+b} = s_{i,j}^b$；将其他所有位置设为 $0$。
+\item 对于每个 $1 \le i \le m$，所有参与方 $P_i$ 以 $\vec{sh}_i$ 为输入调用 $\FuncMS$。$P_i$ 获得输出 $\vec{sh}_{i}'$。
+\item 对于每个 $1 < j \le m$，$P_j$ 将 $\vec{sh}_{j}'$ 发送给 $P_1$。
+\item $P_1$ 恢复 $\vec{v} = \bigoplus_{i=1}^m \vec{sh}_{i}'$ 并初始化 $Y = \emptyset$。对于 $1 \le i \le (m-1)B$，若存在 $x \in \{0,1\}^l$ 使得 $v_i = x \Vert \Hash(x)$ 成立，则将 $x$ 加入 $Y$。最终输出 $X_1 \cup Y$。
+\end{enumerate}
+\end{trivlist}
+\end{minipage}
+\end{framed}
+\caption{本章的 SK-MPSU 协议 $\ProtoMPSUTwo$}\label{fig:proto-mpsu2}
+\end{figure}
+
+\begin{theorem} \label{theorem:ske}
+在 $(\FuncbssPMT, \FuncmssROT, \FuncMS)$-混合模型下，协议 $\ProtoMPSUTwo$ 在任意半诚实敌手腐化不超过 $t < m$ 个参与方的情况下，安全地实现了功能 $\FuncMPSU$。
+\end{theorem}
+
+\begin{proof}
+根据 $P_1$ 是否被腐化，本证明分为两种情况。模拟器接收被腐化方 $P_c \in \Corr$ 的输入 $X_c$；若 $P_1 \in \Corr$，模拟器还接收 MPSU 协议的输出 $\bigcup_{i=1}^m X_i$。模拟器需要根据其接受的输出模拟被腐化方的视图。然而，$P_1 \in \Corr$ 和 $P_1 \notin \Corr$ 这两种情况下的模拟过程仅在输出的重构阶段存在差异，因此为了简化描述，我们将对之前阶段的模拟过程统一处理。
+
+对于每个被腐化方 $P_c$，其视图由其输入 $X_c$、$\FuncbssPMT$ 和 $\FuncmssROT$ 的输出、$\FuncMS$ 输出的最终秘密分享份额 $\vec{sh}_{c}'$、随机采样的 $\Delta$ 秘密分享份额组成；若 $P_1 \in \Corr$，$P_1$ 的视图还包括来自其他参与方 $P_i$ 的 $m-1$ 个分享份额的集合 $\{\vec{sh}_{i}'\}_{1 < i \le m}$。模拟器扮演诚实方的角色按照协议与 $P_c$ 交互来模拟其视图，除了对协议进行如下修改：
+\begin{itemize}
+    \item \textbf{步骤 2.} 若 $P_i, P_j \in \Honest$，随机生成 $\FuncbssPMT$ 的输出比特 $\{e_{c,j}^b\}_{c < j \le m}$ 和 $\{e_{c,i}^b\}_{1 \le i < c}$。
+    \item \textbf{步骤 3.} 若 $\min(2,i) \le d \le j$ 中包含诚实方 $P_d \in \Honest$，随机生成 $\FuncmssROT$ 的均匀输出 $\{r_{c,ji}^b\}_{c < j \le m, 1 \le i < j}$。若 $c \ne 1$，模拟器还需随机生成均匀的 $\{\Delta_{c,ji}^b\}_{c < j \le m, 1 \le i < j}$ 作为 $P_c$ 的随机带。
+    \item \textbf{步骤 4.} 随机生成 $\FuncMS$ 的均匀输出 $\vec{sh}_{c}'$。
+\end{itemize}
+
+现在先讨论 $P_1 \in \Corr$ 的情况。在步骤 4 和 5 中，模拟器计算 $Y = \bigcup_{i=1}^m X_i \setminus X_1$，并按照如下步骤构造向量 $\vec{v} \in (\{0,1\}^{l+\kappa})^{(m-1)B}$：
+\begin{itemize}
+    \item 对于所有属于 $Y$ 的元素 $x_i \in Y$，令 $v_i = x_i \Vert \Hash(x)$，其中 $1 \le i \le \lvert Y \rvert$。
+    \item 对于 $\lvert Y \rvert < i \le (m-1)B$，采样随机值 $v_i \gets \{0,1\}^{l+\kappa}$。
+\end{itemize}
+然后，模拟器采样一个随机置换 $\pi: [(m-1)B] \to [(m-1)B]$ 并计算 $\vec{v'} = \pi(\vec{v})$。对于 $1 \le i \le m$，模拟器采样份额 $\vec{sh}_{i}' \gets (\{0,1\}^{l+\kappa})^{(m-1)B}$，使其满足 $\bigoplus_{i=1}^m \vec{sh}_{i}' = \vec{v'}$ 且与之前为每个被腐化方 $P_c$ 采样的 $\vec{sh}_{c}'$ 保持一致。最后，分别将所有 $\vec{sh}_{i}'$ 加入 $P_1$ 的视图，并将 $\vec{sh}_{c'}'$ 作为其来自 $\FuncMS$ 的输出加入每个被腐化方 $P_{c'} (c' \ne 1)$ 的视图中。
+
+以上对 $\FuncbssPMT$ 和 $\FuncmssROT$ 的输出修改不会影响被腐化方 $P_c$ 的视图：根据 $\FuncbssPMT$ 的定义，当 $P_i, P_j \in \Honest$，输出 $e_{c,j}^b$ 和 $e_{c,i}^b$ 在敌手视角下作为 $P_c$ 与 $P_j$ 之间 和 $P_i$ 与 $P_c$之间的秘密分享份额而呈均匀随机分布。根据 $\FuncmssROT$ 的定义，若 $e_{i,j}^b \oplus e_{j,i}^b = 0$，则来自 $\FuncmssROT$ 的每个输出 $r_{c,ji}^b$ 是 $0$ 在 $P_{\min(2,i)}, \dots, P_j$ 之间的秘密分享；若 $e_{i,j}^b \oplus e_{j,i}^b = 1$，则是 $\bigoplus_{d=2}^j \Delta_{d,ji}^b$ 的秘密分享。因此，即使 $P_c$ 与他人共谋，从敌手的角度来看，$r_{c,ji}^b$ 仍然呈均匀随机分布，因为总存在一个持有其中一份份额的诚实方 $P_d \in \Honest (\min(2,i) \le d \le j)$。
+
+接下来只需证明 $\FuncMS$ 的输出除了并集之外不会泄露任何其他信息，该输出的取值分为两种情况：当 $P_1 \notin \Corr$ 时为 $\vec{sh}_{c}'$，当 $P_1 \in \Corr$ 时为所有输出 $\{\vec{sh}_{i}'\}_{1 \le i \le m}$）。在前一种情况较易处理下，由于输出 $\vec{sh}_{c}'$ 是所有参与方之间的秘密分享份额，因此从敌手的角度来看均匀随机分布的；在后一种情况下，对于所有 $1 < j \le m$，考虑一个元素 $x \in X_j$，且 $x$ 被 $P_j$ 放入第 $b$ 个桶中。在真实协议中，若不存在 $X_i (1 \le i < j)$ 使得 $x \in X_i$，则对于所有 $1 \le i < j$，有 $e_{i,j}^b \oplus e_{j,i}^b = 0$。根据图 \ref{fig:func-mssrot} 中的 $\FuncmssROT$ 功能定义，在满足 $\bigoplus_{d=\min(2,i)}^j r_{d,ji}^b = 0$ 的条件下，每个 $r_{d,ji}^b$ 在 $\{0,1\}^{l+\kappa}$ 中均匀随机分布。根据协议描述，可以推导出在满足 $\bigoplus_{d=\min(2,i)}^j u_{d,j}^b = x \Vert \Hash(x)$ 的条件下，每个 $u_{d,j}^b$ 在 $\{0,1\}^{l+\kappa}$ 中也是均匀随机分布的，也就是说，所有 $u_{d,j}^b$ 组成了 $x \Vert \Hash(x)$ 在所有参与方之间的秘密分享。这与模拟过程完全一致。
+
+若存在某个 $X_i (1 \le i < j)$ 使得 $x \in X_i$，则 $e_{i,j}^b \oplus e_{j,i}^b = 1$。根据图 \ref{fig:func-mssrot} 中的 $\FuncmssROT$ 功能定义，在满足 $\bigoplus_{d=\min(2,i)}^j r_{d,ji}^b = \bigoplus_{j'=2}^j \Delta_{j',ji}^b$ 的条件下，每个 $r_{d,ji}^b$ 是均匀随机分布的，其中每个 $\Delta_{j',ji}^b$ 由 $P_{j'} (1 < j' \le j)$ 随机生成。根据协议描述，可以推导出在满足 $\bigoplus_{d=\min(2,i)}^j u_{d,j}^b = x \Vert \Hash(x) \oplus \bigoplus_{j'=2}^j \Delta_{j',ji}^b \oplus r$（其中 $r$ 表示剩余项之和）的条件下，每个 $u_{d,j}^b$ 均匀随机分布。那么，即使 $P_1$ 与他人共谋，从敌手的角度来看，$\bigoplus_{d=\min(2,i)}^j u_{d,j}^b$ 仍然是均匀随机分布的，因为总存在一个参与方 $P_{j'} \in \Honest (1 < j' \le j)$ 随机且独立于诚实方输入地生成 $\Delta_{j',ji}^b$。对于所有空桶，$u_{d,j}^b$ 是均匀随机选择的，因此相应的 $\bigoplus_{d=1}^j u_{d,j}^b$ 也是均匀随机的，这与模拟一致。根据 $\FuncMS$ 的定义，所有参与方在随机置换下对 $\bigoplus_{d=1}^j u_{d,j}^b$ 进行加法秘密分享，该置换能够抵抗任意被腐化方共谋攻击，并分别接收到 $\{\vec{sh}_{i}'\}$。综上所述，$\FuncMS$ 的所有输出 $\{\vec{sh}_{i}'\}_{1 \le i \le m}$ 在真实执行和理想执行中的分布是相同的。
+\end{proof}
 
 \section{复杂度分析与对比}
 \esection{Complexity Analysis and Comparison}
+
+\subsection{SK-MPSU 的复杂度细节}~\label{sec:analysis-ske}
+
+本节对本章提出的 SK-MPSU 协议（图 \ref{fig:proto-mpsu2}）中各阶段的具体开销进行详细分析。
+\begin{trivlist}
+
+\item \textbf{1. 执行 batch ssPMT}
+
+对于所有 $1 \le i < j \le m$，参与方 $P_i$ 与 $P_j$ 均需调用一次 batch ssPMT。总体而言，每个参与方 $P_j$ 共涉及 $m-1$ 次 batch ssPMT 调用，其中在前 $j-1$ 次调用中担任接收方 $\Rcv$，在后 $m-j$ 次调用中担任发送方 $\Sd$。每次调用 batch ssPMT 的 批量大小为 $B = 1.27n = O(n)$，其开销参考 \ref{sec:analysis-bsspmt} 节中的分析。
+
+\begin{itemize}
+\item \textbf{离线阶段}：单方计算复杂度为 $O(\gamma m n \log n)$，通信复杂度为 $O(t \lambda m \log (\gamma n / t))$，轮数复杂度为 $O(1)$。
+\item \textbf{在线阶段}：单方计算复杂度为 $O(m n)$，通信复杂度为 $O(\gamma m n)$，轮数复杂度为 $O(\log \gamma)$。
+\end{itemize}
+
+\item \textbf{2. 执行 mss-ROT}
+
+每次调用 mss-ROT 相当于多个两方 OT 的执行，每个 OT 的执行包含两部分：在离线阶段，参与方调用随机选择比特 ROT，随后 $\Sd$ 向 $\Rcv$ 发送一条长度为 $l + \kappa$ 的消息（其中 $\kappa = \sigma + \log (m-1) + \log n$）；在在线阶段，$\Rcv$ 发送 1 比特的去随机化消息以将 ROT 转换为指定输入版本。若 $P_i$ 和 $P_j$ 持有选择比特，则 $P_i$ 和 $P_j$ 与 $\{P_2, \dots, P_j\} \setminus \{P_i, P_j\}$ 之外的成员调用 OT。对于 $1 \le i < j \le m$，各方针对 $B$ 个桶调用 mss-ROT，其中 $P_i$ 和 $P_j$ 持有两个选择比特。综合考虑 mss-ROT 的所有调用：$P_1$ 需调用 $[\sum_{j = 2}^m (j-1)]B = \frac{m^2B - mB}{2}$ 次两方 OT；对于 $1 < i \le m$，每个参与方 $P_i$ 需调用 $[(i - 1) + \sum_{j = i+1}^m 3(j-2)]B = \frac{3m^2B - 3i^2B - 9mB + 11iB - 2B}{2}$ 次两方 OT。
+
+\begin{itemize}
+    \item \textbf{离线阶段}：单方计算复杂度为 $O(m^2 n \log n)$，通信复杂度为 $O(t \lambda m^2 \log (n / t))$，轮数复杂度为 $O(1)$。
+    \item \textbf{在线阶段}：单方计算复杂度为 $O(m^2 n)$，通信复杂度为 $O(m^2 n)$，轮数复杂度为 $O(1)$。
+\end{itemize}
+
+\item \textbf{3. 执行多方秘密分享洗牌}
+
+本文采用文献~\cite{EB22} 提出的多方秘密分享洗牌协议。在离线阶段，每个参与方生成一个随机置换并与其他所有参与方执行规模为 $(m-1)B$、长度为 $l+\kappa$ 的 Share Translation 协议 \cite{CGP-ASIACRYPT-2020}，以最终生成一组满足分享相关性（share correlations）的相关联向量。在在线阶段，各参与方利用这些相关联向量以相对于数据规模 $n$ 线性的开销对输入的分享份额向量实现高效置换和重分享。
+
+\begin{itemize}
+\item \textbf{离线阶段}：单方计算复杂度为 $O(m^2 n \log (mn))$，通信复杂度为 $O(\lambda m^2 n \log (mn))$，轮数复杂度为 $O(1)$。
+\item \textbf{在线阶段}：对于 Leader $P_1$，计算复杂度为 $O(m^2 n)$，通信复杂度为 $O((l+\kappa)m^2 n)$；对于普通参与方 $P_j$，计算复杂度为 $O(m n)$，通信复杂度为 $O((l+\kappa)m n)$。轮数复杂度为 $O(m)$。
+\end{itemize}
+
+\item \textbf{4. 输出重构}
+
+对于每个 $1 < j \le m$，$P_j$ 在在线阶段将 $\vec{sh}_{j}' \in (\{0,1\}^{l+\kappa})^{(m-1)B}$ 发送给 $P_1$。$P_1$ 重构 $(m-1)B$ 个秘密，其中每个秘密拥有 $m$ 个分享份额。
+
+\begin{itemize}
+\item \textbf{在线阶段}：$P_1$ 的计算复杂度为 $O(m^2 n)$，通信复杂度为 $O((l+\kappa) m^2 n)$；$P_j$ 的计算复杂度为 $O((l+\kappa) m n)$；轮数复杂度为 $O(1)$。
+\end{itemize}
+\end{trivlist}
+
+\subsection{与 LG 协议的对比}~\label{sec:compare-lg}
+表 \ref{tab:compare-ske} 中展示了 LG 协议与本章提出的 SK-MPSU 协议在离线阶段和在线阶段中各参与方理论计算与通信复杂度的对比。
+
+\begin{table*}
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+\hline
+& \multicolumn{4}{c|}{\textbf{计算复杂度}} & \multicolumn{4}{c|}{\textbf{通信复杂度}} \\
+\cline{2-9}
+& \multicolumn{2}{c|}{\textbf{离线阶段}} & \multicolumn{2}{c|}{\textbf{在线阶段}} & \multicolumn{2}{c|}{\textbf{离线阶段}} & \multicolumn{2}{c|}{\textbf{在线阶段}} \\
+\cline{4-5} \cline{8-9}
+& \multicolumn{2}{c|}{} & Leader & Client & \multicolumn{2}{c|}{} & Leader & Client \\
+\hline
+~\cite{LG-ASIACRYPT-2023} & \multicolumn{2}{c|}{$(T + \gamma' + m) m n \log n$} & $(T + \gamma' + m) m n$ & $(T + \gamma') m n$ & \multicolumn{2}{c|}{$\lambda m^2 n \log n$} & $(T + \gamma') m n + l m^2 n$ & $(T + \gamma') m n$ \\
+\hline
+本文 SK-MPSU & \multicolumn{2}{c|}{$(\gamma + m) m n \log n$} & \multicolumn{2}{c|}{$m^2 n$} & \multicolumn{2}{c|}{$\lambda m^2 n \log n$} & $\gamma m n + l m^2 n$ & $(\gamma + l+ m) m n$ \\
+\hline
+\end{tabular}}
+\caption{LG 协议与本文 SK-MPSU 协议在离线和在线阶段的渐近通信（比特）与计算开销对比。其中 $n$ 为集合大小，$m$ 为参与方数量。$\lambda$ 和 $\sigma$ 分别表示计算和统计安全参数，且 $\lambda = 128, \sigma = 40$。$T$ 表示 SKE 解密电路中的 AND 门数量，$T \approx 600$。$l$ 表示输入元素的比特长度。$\gamma$ 为 OPPRF 的输出长度。$\gamma'$ 为 SKE 密文比特长度，且 $\gamma' \approx \gamma$。$t$ 为对偶 LPN 中的噪声权重，$t \approx 128$。}\label{tab:compare-ske}
+\end{table*}
 
 % \section{实现与性能分析}
 % \esection{Implementation and Performance Analysis}
