@@ -187,8 +187,8 @@ $$C'_i = \bigwedge_{j=1}^{i-1} \neg C_j \land (x \in X_j) \land D_i = (x \in X_j
 
 \subsection{安全性放松}\label{relaxed-pzs}
 
-谓词零分享的提出源于对许多现有 MPC 协议的高度抽象。在这些协议中：一些协议（如第三章提出的 mss-ROT）实现了标准的谓词零分享这一概率性功能。其安全性严格遵循标准定义 \ref{def:prob-secure}，该定义蕴含以下结论：当 $Q(x) = 0$ 时，参与方之间分享的随机秘密值独立于任意 $m-1$ 个参与方的联合视图；然而，更多的协议（如 ROT 和等值条件随机数生成（Equality-Conditional Randomness 
-Generation, ECRG） \cite{Jia0ZG24}）实现了一种十分类似但在安全性上略有不同的功能，其不同之处在于：当 $Q(x) = 0$ 时，参与方之间分享的随机秘密值并不独立于任意 $m-1$ 个参与方的联合视图。
+谓词零分享的提出源于对许多现有 MPC 协议的高度抽象。鉴于该功能的概率性本质，这些协议必须满足定义~\ref{def:prob-secure} 才能安全地计算谓词零分享。该定义蕴含以下结论：当 $Q(x) = 0$ 时，参与方之间分享的随机秘密值独立于任意 $m-1$ 个参与方的联合视图。在这些协议中，一些协议，例如第三章提出的 mss-ROT，其安全性严格遵循标准定义，实现了标准的谓词零分享功能；然而，我们注意到，更广泛的一类协议，例如 ROT 和等值条件随机数生成（Equality-Conditional Randomness Generation, ECRG）~\cite{Jia0ZG24} 实现的是一种类似的功能，其不同之处在于：若 $Q(x) = 0$，则参与方之间分享的均匀随机秘密值并不独立于任意 $m-1$ 个参与方的联合视图。
+下面以 ROT 为例说明 ROT 协议实现了该类松弛版本的谓词零分享（Relaxed Predicative Zero-Sharing）功能（其关联谓词公式为用于测试选择比特是否为 $1$ 的简单谓词：设发送方 $\Sd$ 将其分享份额设置为 $s_1 = -r_0$，其中 $r_0$ 是来自 ROT 的第一条消息；设接收方 $\Rcv$ 将其分享份额设置为 $s_2 = r_e$，即接收到的消息。鉴于 ROT 的功能可以表示为 $-r_0 + r_e = e \cdot (-r_0 + r_1)$，若 $e = 0$，则 $s_1 + s_2 = 0$；否则，$s_1 + s_2 = -r_0 + r_1$，该值是均匀随机的，但依赖于发送方 $\Sd$ 视图中 ROT 的输出消息。
 
 \section{成员零分享}
 \esection{Membership Zero-Sharing}
