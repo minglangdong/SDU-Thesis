@@ -126,7 +126,7 @@ LG 协议利用两个核心组件来实现第一阶段：
 \item \textbf{正确性分析.} 根据 batch OPPRF 的理想功能，若接收方的元素 $x_i \in X_i$，则接收方必然获得对应的预定义标签 $t_i = s_i$。随后在第 $i$ 个 ssPEQT 实例中，由于双方输入相等，其输出的比特秘密分享之和 $e_S^i \oplus e_R^i = 1$。
 反之，若 $x_i \notin X_i$，接收方获得的 $t_i$ 是一个伪随机值。此时 $t_i = s_i$ 发生碰撞的概率仅为 $2^{-\gamma}$。对于整个向量而言，发生至少一次错误碰撞的概率上限为 $B \cdot 2^{-\gamma}$。通过设置安全参数 $\gamma \ge \sigma + \log B$，可以使该碰撞概率忽略不计（negligible）。因此，若 $x_i \notin X_i$，ssPEQT 的输出以压倒性概率（overwhelming probability）满足 $e_S^i \oplus e_R^i = 0$。
 
-\item \textbf{安全性分析.} 协议 $\Pi_{\text{bssPMT}}$ 的安全性直接继承自底层原语 batch OPPRF 与 ssPEQT 协议的安全性。具体地，在理想世界中，给定 $\mathcal{F}_{\text{bssPMT}}$ 输出的前提下，模拟器依次调用 ssPEQT 与 batch OPPRF 协议的子模拟器。只要 batch OPPRF 与 ssPEQT 协议安全地实现了理想功能 $\mathcal{F}_{\text{ssPEQT}}$ 和 $\mathcal{F}_{\text{bOPPRF}}$，则模拟器在理想世界中模拟的敌手视图（即 batch OPPRF 与 ssPEQT 协议的子模拟器在理想世界中模拟的敌手视图的联合分布）与敌手在真实世界中的视图（敌手分别在 batch OPPRF 与 ssPEQT 协议的调用过程中视图的联合分布）是计算不可区分的。
+\item \textbf{安全性分析.} 协议 $\Pi_{\text{bssPMT}}$ 的安全性直接继承自底层组件 batch OPPRF 与 ssPEQT 协议的安全性。具体地，在理想世界中，给定 $\mathcal{F}_{\text{bssPMT}}$ 输出的前提下，模拟器依次调用 ssPEQT 与 batch OPPRF 协议的子模拟器。只要 batch OPPRF 与 ssPEQT 协议安全地实现了理想功能 $\mathcal{F}_{\text{ssPEQT}}$ 和 $\mathcal{F}_{\text{bOPPRF}}$，则模拟器在理想世界中模拟的敌手视图（即 batch OPPRF 与 ssPEQT 协议的子模拟器在理想世界中模拟的敌手视图的联合分布）与敌手在真实世界中的视图（敌手分别在 batch OPPRF 与 ssPEQT 协议的调用过程中视图的联合分布）是计算不可区分的。
 \end{trivlist}
 
 \subsection{复杂度分析及对比}

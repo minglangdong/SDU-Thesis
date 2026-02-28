@@ -27,7 +27,7 @@
 
 \begin{enumerate}
     \item \textbf{表示层.} 本章引入了一种全新的任意集合公式表示方式 —— 规范集合谓词公式（Canonical Set Predicate Formula, CSPF）。该表示方式将目标集合公式表示为一类由原子集合谓词（形如 $x \in X_i$ 或 $x \notin X_i$）构成的析取范式，其中每个子公式满足特定的结构，子公式共同表示了目标集合的一个划分，从而将复杂的集合公式计算问题转化为若干个相互独立的子公式计算问题，为并行化与模块化计算提供基础。
-    \item \textbf{原语层.} 本章提出一种可组合的新型密码学原语 —— 谓词零分享（Predicative Zero-Sharing），并在集合运算场景下给出其特化实例 —— 成员零分享（Membership Zero-Sharing）。该原语的核心功能是将指定逻辑谓词在各参与方输入上的真值“不经意地”编码为秘密分享的形式，并支持基于逻辑运算的组合计算。为实现成员零分享的高效构造，本文首先提出谓词零分享的松弛版本（Relaxed Predicative Zero-Sharing）的定义，并设计了相应的组合技术与安全转化技术，从而给出一种自底向上的高效构造范式：从关联于原子命题（或其否定）的松弛谓词零分享出发，逐步构造关联于任意复杂谓词公式、满足标准半诚实安全的谓词零分享协议。基于该范式，本章通过分别针对成员原子集合谓词 $x \in X_i$ 和非成员原子集合谓词 $x \notin X_i$ 给出了成员零分享的松弛版本（Relaxed Membership Zero-Sharing）的高效实例化，最终实现了关联于任意集合谓词公式的标准安全成员零分享协议。该协议是本文提出的 MPSO 统一框架的核心底层组件，其高度的可组合性是本章提出的 MPSO 框架能够支持任意集合公式的核心依赖。
+    \item \textbf{原语层.} 本章提出一种可组合的新型密码学原语 —— 谓词零分享（Predicative Zero-Sharing），并在集合运算场景下给出其特化实例 —— 成员零分享（Membership Zero-Sharing）。该原语的核心功能是将指定逻辑谓词在各参与方输入上的真值“不经意地”编码为秘密分享的形式，并支持基于逻辑运算的组合计算。为实现成员零分享的高效构造，本文首先提出谓词零分享的松弛版本（Relaxed Predicative Zero-Sharing）的定义，并设计了相应的组合技术与转化技术，从而给出一种自底向上的高效构造范式：从关联于原子命题（或其否定）的松弛谓词零分享出发，逐步构造关联于任意复杂谓词公式、满足标准半诚实安全的谓词零分享协议。基于该范式，本章通过分别针对成员原子集合谓词 $x \in X_i$ 和非成员原子集合谓词 $x \notin X_i$ 给出了成员零分享的松弛版本（Relaxed Membership Zero-Sharing）的高效实例化，最终实现了关联于任意集合谓词公式的标准安全成员零分享协议。该协议是本文提出的 MPSO 统一框架的核心底层组件，其高度的可组合性是本章提出的 MPSO 框架能够支持任意集合公式的核心依赖。
     \item \textbf{框架层.} 基于 CSPF 表示法与成员零分享原语，并结合多方秘密分享洗牌协议，本章构建了支持任意集合公式计算的 MPSO 统一框架。该框架的基本思想是将输入集合中所有满足目标集合公式的元素转化为各方持有的秘密分享序列，这一思想赋予了该框架极强的扩展性，使得其能进一步实现任意集合公式结果求势（MPSO-card）及基于电路的通用MPSO（Circuit-MPSO）功能，从而满足更复杂的数据分析需求。
 \end{enumerate}
 
@@ -133,7 +133,7 @@ $$\varphi(x, X_1, \cdots, X_m) = C_1 \lor \cdots \lor C_n$$
     \item \textbf{情况 2：} $C_i = (x \notin X_1) \land \cdots \land (x \notin X_m)$。这与 $C_i$ 表示的集合 $Y_i$ 可由 $X_1, \cdots, X_m$ 通过集合运算得到相矛盾（即元素不可能不属于任何输入集合，却在可构造集合中），因此这种情况不成立。
 \end{itemize}
 
-接下来，将新的 DNF 公式 $\psi$ 转换为表示互不相交集合 $\{Y_1, \cdots, Y_s\}$ 的子公式析取形式：由于 $\psi$ 的析取形式蕴含 $Y_1 \cup \cdots \cup Y_s = Y$，若能证明不相交性，则证明了 $\{Y_1, \cdots, Y_s\}$ 构成 $Y$ 的一个划分。
+接下来，将新的 DNF 公式 $\psi$ 转化为表示互不相交集合 $\{Y_1, \cdots, Y_s\}$ 的子公式析取形式：由于 $\psi$ 的析取形式蕴含 $Y_1 \cup \cdots \cup Y_s = Y$，若能证明不相交性，则证明了 $\{Y_1, \cdots, Y_s\}$ 构成 $Y$ 的一个划分。
 令 $\psi_1(x, X_1, \cdots, X_m) = C_2 \lor \cdots \lor C_s$，则有 $\psi(x, X_1, \cdots, X_m) = C_1 \lor \psi_1(x, X_1, \cdots, X_m)$。我们将此式扩充为 $C_1 \lor ((C_1 \land \neg C_1) \lor \psi_1(x, X_1, \cdots, X_m))$，展开得到 $C_1 \lor (C_1 \land \psi_1(x, X_1, \cdots, X_m)) \lor (\neg C_1 \land \psi_1(x, X_1, \cdots, X_m))$。鉴于 $C_1 \land \psi_1 = 1$ 必然要求 $C_1 = 1$，故 $C_1 \lor (C_1 \land \psi_1) = C_1$，因此：
 $$\psi(x, X_1, \cdots, X_m) = C_1 \lor (\neg C_1 \land \psi_1(x, X_1, \cdots, X_m)).$$
 对所有的 $C_i$ ($1 \le i \le s$) 重复此过程，我们得到：
@@ -185,10 +185,193 @@ $$C'_i = \bigwedge_{j=1}^{i-1} \neg C_j \land (x \in X_j) \land D_i = (x \in X_j
 \caption{理想功能 $\FuncPZS^Q$}\label{fig:func-pzs}
 \end{figure}
 
-\subsection{安全性放松}\label{relaxed-pzs}
+\subsection{安全性松弛}\label{relaxed-pzs}
 
 谓词零分享的提出源于对许多现有 MPC 协议的高度抽象。鉴于该功能的概率性本质，这些协议必须满足定义~\ref{def:prob-secure} 才能安全地计算谓词零分享。该定义蕴含以下结论：当 $Q(x) = 0$ 时，参与方之间分享的随机秘密值独立于任意 $m-1$ 个参与方的联合视图。在这些协议中，一些协议，例如第三章提出的 mss-ROT，其安全性严格遵循标准定义，实现了标准的谓词零分享功能；然而，我们注意到，更广泛的一类协议，例如 ROT 和等值条件随机数生成（Equality-Conditional Randomness Generation, ECRG）~\cite{Jia0ZG24} 实现的是一种类似的功能，其不同之处在于：若 $Q(x) = 0$，则参与方之间分享的均匀随机秘密值并不独立于任意 $m-1$ 个参与方的联合视图。
-下面以 ROT 为例说明 ROT 协议实现了该类松弛版本的谓词零分享（Relaxed Predicative Zero-Sharing）功能（其关联谓词公式为用于测试选择比特是否为 $1$ 的简单谓词：设发送方 $\Sd$ 将其分享份额设置为 $s_1 = -r_0$，其中 $r_0$ 是来自 ROT 的第一条消息；设接收方 $\Rcv$ 将其分享份额设置为 $s_2 = r_e$，即接收到的消息。鉴于 ROT 的功能可以表示为 $-r_0 + r_e = e \cdot (-r_0 + r_1)$，若 $e = 0$，则 $s_1 + s_2 = 0$；否则，$s_1 + s_2 = -r_0 + r_1$，该值是均匀随机的，但依赖于发送方 $\Sd$ 视图中 ROT 的输出消息。
+下面以 ROT 为例说明 ROT 协议实现了该类松弛版本的谓词零分享（Relaxed Predicative Zero-Sharing）功能（其关联谓词公式为用于测试选择比特是否为 $1$ 的简单谓词：设发送方 $\Sd$ 将其分享份额设置为 $s_1 = -r_0$，其中 $r_0$ 是来自 ROT 的第一条消息；设接收方 $\Rcv$ 将其分享份额设置为 $s_2 = r_e$，即接收到的消息。鉴于 ROT 的功能可以表示为 $-r_0 + r_e = e \cdot (-r_0 + r_1)$，若 $e = 0$，则 $s_1 + s_2 = 0$；否则，$s_1 + s_2 = -r_0 + r_1$，该值是均匀随机分布的，但依赖于发送方 $\Sd$ 视图中 ROT 的输出消息。
+
+由于上述协议安全性的松弛难以基于定义~\ref{def:prob-secure} 精准刻画，下面为谓词零分享引入一种等价的安全性定义，该定义由三个核心要求组成：正确性、隐私性和独立性。以下定理不仅给出了该定义的详细描述，并且严格声明了其与标准安全性定义的等价性。
+
+\begin{theorem}\label{security}
+考虑一个概率多项式的 $m$ 元功能 $\Func^f$，其接收各参与方的输入 $\textbf{x} = (x_1, \cdots, x_m)$，并向各参与方输出 $f(\textbf{x})$ 的秘密分享。令 $\Pi$ 为用于计算 $\Func^f$ 的 $m$ 方协议，$s_i$ 和 $s^{\Pi}_i$ 分别用来表示参与方 $P_i$ 在理想世界中从 $\Func^f$ 获得的输出以及在真实世界中实际执行 $\Pi$ 获得的输出（$1 \le i \le m$）。
+若协议 $\Pi$ 满足：
+\begin{itemize}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
+    \item \textbf{正确性.} $\Pi$ 的输出构成 $f(\textbf{x})$ 的秘密分享，即：
+    $$\{s_1, \cdots, s_m\}_{\textbf{x}} \overset{s}{\approx} \{s^{\Pi}_1, \cdots, s^{\Pi}_m\}_{\textbf{x}}$$
+    \item \textbf{隐私性.} 存在一个概率多项式时间的算法 $\mathsf{Sim}$，使得对于任意规模为 $t < m$ 个的参与方子集 $\textbf{P}_{\mathcal{A}} = \{P_{i_1},\cdots,P_{i_t}\}$，满足：
+    \begin{gather*}
+    \{\mathsf{Sim}(\textbf{P}_{\mathcal{A}},\textbf{x}_{\mathcal{A}},\textbf{s}_{\mathcal{A}})\}_{\textbf{x}} \overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x})\}_{\textbf{x}}
+    \end{gather*}
+    \item \textbf{独立性.} 在协议 $\Pi$ 的实际执行过程中，对于任意规模为 $t < m$ 个的参与方子集 $\textbf{P}_{\mathcal{A}} = \{P_{i_1},\cdots,P_{i_t}\}$，$f(\textbf{x})$ 所依赖的随机性独立于敌手的视图 ${\mathsf{View}}_{\mathcal{A}}^\Pi(\textbf{x})$。
+\end{itemize}
+则存在一个概率多项式时间算法 $\mathsf{Sim}$，使得对于任意 $\textbf{P}_{\mathcal{A}} = \{P_{i_1},\cdots,P_{i_t}\}$，满足：
+\begin{gather*}
+    \{\mathsf{Sim}(\textbf{P}_{\mathcal{A}},\textbf{x}_{\mathcal{A}},\textbf{s}_{\mathcal{A}}),s_1, \cdots, s_m\}_{\textbf{x}} \overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x}),s^{\Pi}_1, \cdots, s^{\Pi}_m\}_{\textbf{x}}
+\end{gather*}
+即模拟器在理想世界中模拟的敌手视图和所有参与方从理想功能 $\Func^f$ 获得的输出的联合分布与敌手在真实世界中的视图和实际执行协议 $\Pi$ 获得的输出的联合分布是计算不可区分的。
+\end{theorem}
+
+\begin{proof}
+我们通过对敌手 $\mathcal{A}$ 腐化的参与方数量 $t$ 进行归纳来证明该定理。
+
+\begin{trivlist}
+\item[$-$] \textbf{基础情况：$\mathbf{t = m-1}$}
+
+假设 $\mathcal{A}$ 腐化了 $t = m-1$ 个参与方。记被腐化参与方的集合为 $\textbf{P}_{\mathcal{A}} = \{P_{i_1}, \cdots, P_{i_{m-1}}\}$，则仅剩一名诚实参与方 $P_h$。根据隐私性要求，存在模拟器 $\mathsf{Sim}$ 满足：
+\begin{gather*}
+    \{\mathsf{Sim}(\textbf{P}_{\mathcal{A}},\textbf{x}_{\mathcal{A}},\textbf{s}_{\mathcal{A}})\}_{\textbf{x}} \overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x})\}_{\textbf{x}}
+\end{gather*}
+
+令 $\textbf{r}$ 和 $\textbf{r}^\Pi$ 分别表示理想世界和真实世界中 $f(\textbf{x})$ 依赖的随机性。显然，在理想世界中，$\textbf{r}$ 独立于 $\mathsf{Sim}(\textbf{P}_{\mathcal{A}},\textbf{x}_{\mathcal{A}},\textbf{s}_{\mathcal{A}})$。同时，根据独立性要求，真实世界中的 $\textbf{r}^\Pi$ 独立于 $\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x})$，因此可以得出：
+\begin{gather*}
+    \{\mathsf{Sim}(\textbf{P}_{\mathcal{A}},\textbf{x}_{\mathcal{A}},\textbf{s}_{\mathcal{A}}),\textbf{r}\}_{\textbf{x}} \overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x}),\textbf{r}^\Pi\}_{\textbf{x}}
+\end{gather*}
+由于每个被腐化参与方 $P_i$ 从理想功能获得的输出 $s_{i}$ 和从协议实际执行获得的 $s^\Pi_{i}$均可分别从其在理想世界和真实世界中的视图计算得出（其中 $i \in \{i_1,\cdots,i_{m-1}\}$），因此可将上述不可区分性扩展为：
+\begin{gather*}
+    \{\mathsf{Sim}(\textbf{P}_{\mathcal{A}},\textbf{x}_{\mathcal{A}},\textbf{s}_{\mathcal{A}}),\textbf{s}_{\mathcal{A}}, \textbf{r}\}_{\textbf{x}} \overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x}),\textbf{s}^\Pi_{\mathcal{A}}, \textbf{r}^\Pi\}_{\textbf{x}}
+\end{gather*}
+其中 $\textbf{s}^\Pi_{\mathcal{A}} = (s^\Pi_{i_1}, \cdots, s^\Pi_{i_{m-1}})$。
+
+根据功能定义，诚实参与方 $P_h$ 的输出满足 $s_h = -(\sum_{s_i \in \textbf{s}_{\mathcal{A}}} s_i) + f(\textbf{x})$。由正确性要求可知，$s^\Pi_h = -(\sum_{s^\Pi_i \in \textbf{s}^\Pi_{\mathcal{A}}} s^\Pi_i) + f(\textbf{x})$。将不可区分符号两边的分布分别包含 $s_h$ 和 $s^\Pi_h$：
+\begin{gather*}
+    \{\mathsf{Sim}(\textbf{P}_{\mathcal{A}},\textbf{x}_{\mathcal{A}},\textbf{s}_{\mathcal{A}}),\textbf{s}_{\mathcal{A}},s_h, \textbf{r}\}_{\textbf{x}} \overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x}),\textbf{s}^\Pi_{\mathcal{A}},s^\Pi_h, \textbf{r}^\Pi\}_{\textbf{x}}
+\end{gather*}
+上述不可区分性仍成立，是因为 $s_h$（对应地，$s^\Pi_h$）由 $\textbf{s}_{\mathcal{A}}$（对应地，$\textbf{s}^\Pi_{\mathcal{A}}$）、随机性 $\textbf{r}$（对应地，$\textbf{r}^\Pi$）以及各方输入 $\textbf{x}$ 共同唯一确定。由此可推导出：
+\begin{gather*}
+    \{\mathsf{Sim}(\textbf{P}_{\mathcal{A}},\textbf{x}_{\mathcal{A}},\textbf{s}_{\mathcal{A}}),\textbf{s}_{\mathcal{A}},s_h\}_{\textbf{x}} \overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x}),\textbf{s}^\Pi_{\mathcal{A}},s^\Pi_h\}_{\textbf{x}}
+\end{gather*}
+即当敌手 $\mathcal{A}$ 腐化 $t = m-1$ 个参与方时，协议 $\Pi$ 能够安全地计算 $f$。请注意，此时的独立性要求意味着 $\textbf{r}^\Pi$ 独立于实际执行中任意 $m-1$ 个参与方的联合视图，这将在后续证明中使用。
+
+\item[$-$] \textbf{归纳假设：$\mathbf{t = m-k}$}
+
+假设对于任何腐化 $t = m-k$ 个参与方（$1 \le k < m-1$）的敌手 $\mathcal{A}$，$\Pi$ 均能安全计算 $f$。即存在模拟器 $\mathsf{Sim}$ 满足：
+\begin{gather*}
+    \{\mathsf{Sim}(\{P_1, \cdots, P_m\} \setminus \textbf{P}_\mathcal{H},\{x_{1},\cdots,x_{m}\} \setminus \textbf{x}_\mathcal{H}, \{s_{1},\cdots,s_{m}\} \setminus \textbf{s}_\mathcal{H}), \{s_{1},\cdots,s_{m}\} \setminus \textbf{s}_\mathcal{H}, \textbf{s}_\mathcal{H}\}_{\textbf{x}} \\
+    \overset{c}{\approx} \{\{\mathsf{View}_{1}^\Pi(\textbf{x}),\cdots,\mathsf{View}_{m}^\Pi(\textbf{x})\} \setminus \{\mathsf{View}_{\mathcal{H}}^\Pi(\textbf{x})\}, \{s^\Pi_{1},\cdots,s^\Pi_{m}\} \setminus \textbf{s}^\Pi_{\mathcal{H}}, \textbf{s}^\Pi_{\mathcal{H}}\}_{\textbf{x}}
+\end{gather*}
+其中 $\textbf{P}_\mathcal{H}$ 是诚实参与方集合，$\mathsf{View}_{\mathcal{H}}^\Pi(\textbf{x})$ 表示 $\textbf{P}_\mathcal{H}$ 的联合视图，而 $\textbf{s}_{\mathcal{H}}$ 和 $\textbf{s}^\Pi_{\mathcal{H}}$ 分别是理想世界和真实世界中的对应输出。
+
+显然，在理想世界中，$\textbf{s}_{\mathcal{H}}$ 独立于联合分布 $\{\mathsf{Sim}(\dots),\{s_{1},\dots,s_{m}\} \setminus \textbf{s}_\mathcal{H}\}$。因此，可以得出结论：在真实世界中，对于任意规模为 $k$ 的参与方子集 $\textbf{P}_\mathcal{H} \subset \{P_1, \cdots, P_m\}$，$\textbf{s}^\Pi_{\mathcal{H}}$ 独立于联合分布 $\{\{\mathsf{View}_{i}^\Pi(\textbf{x})\} \setminus \mathsf{View}_{\mathcal{H}}^\Pi(\textbf{x}),\{s^\Pi_{i}\} \setminus \textbf{s}^\Pi_{\mathcal{H}}\}$。
+
+\item[$-$] \textbf{归纳步骤：$\mathbf{t = m-k-1}$}
+
+我们继续证明敌手 $\mathcal{A}$ 腐化 $t = m-k-1$ 个参与方的情况：
+
+令 $\textbf{P}_{\mathcal{H}'}$ 代表 $\{P_1, \cdots, P_m\}$ 中规模为 $k+1$ 的子集。我们将其分解为 $\textbf{P}_{\mathcal{H}'} = \{\textbf{P}_{\mathcal{H}}, P_h\}$，其中 $\textbf{P}_\mathcal{H}$ 包含恰好 $k$ 个参与方，$P_h$ 为剩余的一个参与方。根据隐私性，我们有：
+\begin{equation*}
+    \{\mathsf{Sim}(\textbf{P}_{\mathcal{A}},\textbf{x}_{\mathcal{A}},\textbf{s}_{\mathcal{A}}),\textbf{s}_{\mathcal{A}}\}_{\textbf{x}} \overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x}),\textbf{s}^\Pi_{\mathcal{A}}\}_{\textbf{x}}
+\end{equation*}
+根据正确性，我们同样有 $\{\textbf{s}_{\mathcal{H}}\}_{\textbf{x}} \overset{c}{\approx} \{\textbf{s}^\Pi_{\mathcal{H}}\}_{\textbf{x}}$。
+
+由归纳假设可知，$\textbf{s}_\mathcal{H}$ 独立于联合分布 $\{\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x}),\textbf{s}^\Pi_{\mathcal{A}}\}$。同时，$\textbf{s}_{\mathcal{H}}$ 显然独立于理想世界中的联合分布 $\{\mathsf{Sim}(\textbf{P}_{\mathcal{A}},\textbf{x}_{\mathcal{A}},\textbf{s}_{\mathcal{A}}),\textbf{s}_{\mathcal{A}}\}_{\textbf{x}}$。结合上述条件：
+\begin{equation*}
+    \{\mathsf{Sim}(\textbf{P}_{\mathcal{A}},\textbf{x}_{\mathcal{A}},\textbf{s}_{\mathcal{A}}),\textbf{s}_{\mathcal{A}},\textbf{s}_{\mathcal{H}}\}_{\textbf{x}} \overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x}),\textbf{s}^\Pi_{\mathcal{A}},\textbf{s}^\Pi_{\mathcal{H}}\}_{\textbf{x}}
+\end{equation*}
+
+回顾基础情况中的推导，$\textbf{r}^\Pi$ 独立于实际执行中任意 $m-1$ 个参与方的联合视图，因此 $\textbf{r}^\Pi$ 独立于 $\{\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x}),\mathsf{View}_{\mathcal{H}}^\Pi(\textbf{x})\}$。由于 $\textbf{s}^\Pi_{\mathcal{A}}$ 和 $\textbf{s}^\Pi_{\mathcal{H}}$ 可分别由 $\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x})$ 和 $\mathsf{View}_{\mathcal{H}}^\Pi(\textbf{x})$ 确定，故 $\textbf{r}^\Pi$ 独立于 $\{\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x}),\textbf{s}^\Pi_{\mathcal{A}},\textbf{s}^\Pi_{\mathcal{H}}\}$。此外，理想世界中 $\textbf{r}$ 独立于 $\{\mathsf{Sim}(\textbf{P}_{\mathcal{A}},\textbf{x}_{\mathcal{A}},\textbf{s}_{\mathcal{A}}),\textbf{s}_{\mathcal{A}},\textbf{s}_{\mathcal{H}}\}$，从而可将不可区分性扩展为：
+\begin{equation*}
+    \{\mathsf{Sim}(\textbf{P}_{\mathcal{A}},\textbf{x}_{\mathcal{A}},\textbf{s}_{\mathcal{A}}),\textbf{s}_{\mathcal{A}},\textbf{s}_{\mathcal{H}}, \textbf{r}\}_{\textbf{x}} \overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x}),\textbf{s}^\Pi_{\mathcal{A}},\textbf{s}^\Pi_{\mathcal{H}}, \textbf{r}^\Pi\}_{\textbf{x}}
+\end{equation*}
+
+根据功能定义，参与方 $P_h$ 的输出满足 $s_{h} = -(\sum_{s_i \in \textbf{s}_{\mathcal{A}}} s_i + \sum_{s_i \in \textbf{s}_{\mathcal{H}}} s_i) + f(\textbf{x})$。
+由正确性可知，$s^\Pi_{h} = -(\sum_{s^\Pi_i \in \textbf{s}^\Pi_{\mathcal{A}}} s^\Pi_i + \sum_{s^\Pi_i \in \textbf{s}^\Pi_{\mathcal{H}}} s^\Pi_i) + f(\textbf{x})$。
+最后，通过包含 $s_h$ 和 $s^\Pi_h$ 得到：
+\begin{equation*}
+    \{\mathsf{Sim}(\textbf{P}_{\mathcal{A}},\textbf{x}_{\mathcal{A}},\textbf{s}_{\mathcal{A}}),\textbf{s}_{\mathcal{A}},\textbf{s}_{\mathcal{H}},s_{h},\textbf{r}\}_{\textbf{x}} \overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x}),\textbf{s}^\Pi_{\mathcal{A}},\textbf{s}^\Pi_{\mathcal{H}},s^\Pi_{h},\textbf{r}^\Pi\}_{\textbf{x}}
+\end{equation*}
+该不可区分性成立是因为 $s_h$（对应地，$s^\Pi_h$）由 $\textbf{s}_{\mathcal{A}}$、$\textbf{s}_{\mathcal{H}}$（对应地，$\textbf{s}^\Pi_{\mathcal{A}}$、$\textbf{s}^\Pi_{\mathcal{H}}$）、随机性 $\textbf{r}$（对应地，$\textbf{r}^\Pi$）以及输入 $\textbf{x}$ 共同唯一确定。由此导出：
+\begin{gather*}
+    \{\mathsf{Sim}(\textbf{P}_{\mathcal{A}},\textbf{x}_{\mathcal{A}},\textbf{s}_{\mathcal{A}}),\textbf{s}_{\mathcal{A}},s_h\}_{\textbf{x}} \overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x}),\textbf{s}^\Pi_{\mathcal{A}},s^\Pi_h\}_{\textbf{x}}
+\end{gather*}
+即在敌手 $\mathcal{A}$ 腐化 $t = m-k-1$ 个参与方的情况下，$\Pi$ 能够安全地计算 $f$。归纳步骤完成。
+\end{trivlist}
+\end{proof}
+
+谓词零分享功能 $\FuncPZS^Q$ 是 $\Func^f$ 的一个特例，其中
+$$f(\textbf{x}) =
+\begin{cases}
+  0 & \text{若 } Q(\textbf{x}) = 1 \\
+  s & \text{若 } Q(\textbf{x}) = 0
+\end{cases}$$
+且 $s$ 是一个随机值。可知，$s$ 是 $f$ 所依赖的随机性，将其在协议实际执行中的值记为 $s^\Pi$。在谓词零分享这一特例下，独立性要求具体为：若 $Q(\textbf{x}) = 0$，则在协议 $\Pi$ 的执行过程中，秘密值 $s^{\Pi} = s^{\Pi}_1 + \cdots + s^{\Pi}_m$ 的分布独立于 $\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x})$。综上，谓词零分享协议的正确性和独立性要求共同保证了：若 $Q(\textbf{x}) = 0$，则各参与方执行协议 $\Pi$ 获得的输出构成的秘密分享中的秘密值 $s^{\Pi}$ 是均匀随机分布的，且独立于任意 $t \le m-1$ 个参与方的联合视图。
+
+\begin{remark}
+后文中将使用上述给出的等价的安全性定义 —— 通过分别证明满足正确性、隐私性和独立性，来证明本工作中所有谓词零分享协议的安全性。在该安全性定义下，我们将仅满足正确性和隐私性要求的谓词零分享协议称为\textbf{松弛谓词零分享}，并将与谓词公式 $Q$ 相关联的松弛谓词零分享功能记作 $\FuncrPZS^Q$。
+\end{remark}
+
+\subsection{从松弛到标准的转化技术}\label{transform-pzs}
+
+本节给出一种将松弛谓词零分享转化为关联相同谓词公式的满足标准半诚实安全的谓词零分享的高效方法：
+假设所有参与方已调用松弛谓词零分享协议 $\ProtorPZS^Q$ 获得了一组秘密分享 $[r] = (r_1, \cdots, r_m)$，其目标是生成一组满足标准谓词零分享安全性定义的秘密分享 $[s] = (s_1, \cdots, s_m)$。为此，参与方只需在离线阶段准备一组随机值的秘密分享 $[b]$（由每个参与方 $P_i$ 采样一个均匀随机的分享份额 $b_i$），并在在线阶段协作执行一次安全乘法计算 $[s] = [r] \cdot [b]$。
+
+\begin{theorem} \label{theorem:bssPMT}
+在 $\FuncrPZS^Q$ 和安全乘法的混合模型下，上述协议安全地实现了功能 $\FuncPZS^Q$。
+\end{theorem}
+
+\begin{trivlist}
+\item \textbf{正确性与独立性。} 设有限域大小 $\lvert \mathbb{F} \rvert \ge 2^\sigma$，由松弛谓词零分享协议 $\ProtorPZS^Q$ 的正确性可知：
+\begin{itemize}[itemsep=2pt,topsep=5pt,parsep=0pt,leftmargin=10pt]
+    \item 若 $Q(\textbf{x}) = 1$，$r = 0$，则 $s = 0$。
+    \item 若 $Q(\textbf{x}) = 0$，$r$ 是均匀随机分布的。用 $E$ 表示事件秘密值 $s$ 是均匀随机且独立于任意 $t \le m-1$ 个参与方的联合视图。用 $E_0$ 和 $E_1$ 分别表示事件 $r = 0$ 和 $r \ne 0$。由于 $b$ 是均匀随机且独立分布的，我们有事件 $E$ 发生的概率为 $Pr[E] = Pr[E \vert E_0] \cdot Pr[E_0] + Pr[E \vert E_1] \cdot Pr[E_1] = 0 \cdot Pr[E_0] + 1 \cdot Pr[E_1] = Pr[E_1] = 1 - Pr[E_0] = 1 - \frac{1}{\lvert \mathbb{F} \rvert} \ge 1- 2^{-\sigma}$。
+\end{itemize}
+\item \textbf{隐私性。} 该协议的隐私性直接继承自底层原语松弛谓词零分享和安全乘法计算协议的隐私性。具体地，在理想世界中，给定协议输出的前提下，模拟器依次调用松弛谓词零分享与安全乘法计算协议的子模拟器。只要松弛谓词零分享与安全乘法计算协议安全地实现了各自的理想功能，则模拟器在理想世界中模拟的敌手视图（即两个子模拟器在理想世界中模拟的敌手视图的联合分布）与敌手在真实世界中的视图（敌手分别在两个子协议的调用过程中视图的联合分布）是计算不可区分的。
+\end{trivlist}
+
+鉴于松弛谓词零分享输出的秘密分享中的均匀随机秘密值依赖于某些 $t \le m-1$ 个参与方的联合视图，在调用谓词零分享后对这些秘密值进行重构时，若这 $t$ 个参与方发生共谋，则可能会泄露信息。该转化技术通过消除这种依赖性来防止此类泄露。这一步骤对于确保我们的 MPSO 框架在抵御任意共谋攻击时的安全性至关重要。该转化技术可以利用 Beaver 三元组 \cite{Beaver-CRYPTO-1991} 对在线阶段进行如下优化：
+
+首先回顾 Beaver 三元组技术。一个 Beaver 三元组由三个秘密分享 $([a], [b], [c])$ 组成，其中 $[a]$ 和 $[b]$ 是随机的秘密分享，且满足 $c = a \cdot b$。通常情况下，Beaver 三元组用于在在线阶段将一次乘法运算规约为两次重构过程；而在此处，由于乘数 $b$ 本身是随机的，Beaver 三元组可用于在在线阶段将一次乘法运算规约为仅一次重构过程。具体而言：
+\begin{gather*}
+s = r \cdot b = (r+a-a) \cdot b = (r+a) \cdot b - a \cdot b
+\end{gather*}
+因此我们可以计算：
+\begin{gather*}
+[s] = (r+a) \cdot [b] - [a \cdot b] = (r+a) \cdot [b] - [c]
+\end{gather*}
+上述等式表明，一旦 $u = r + a$ 公开，我们就可以在本地计算 $[s]$。因此，生成 $[s]$ 的任务便简化为重构 $[u] = [r] + [a]$。令每个参与方 $P_i$ 在本地计算其分享份额 $u_i = r_i + a_i$ 并将 $u_i$ 发送给 Leader 节点 $P_1$，随后 $P_1$ 计算 $u = u_1 + \cdots + u_m$ 并将其向所有参与方公开。由此可见，该转化技术仅消耗一个在离线阶段生成的 Beaver 三元组；在在线阶段，Leader 节点的通信开销为 $2 (m-1) \log_2\lvert \mathbb{F} \rvert$，每个 Client 节点的通信开销为 $2 \log_2\lvert \mathbb{F} \rvert$。
+
+上述优化后的转化技术采用星型通信拓扑，这使其能够集成到后续将介绍的 MPSO 协议中而不改变其原有拓扑结构 —— 从而在保证其标准半诚实安全性的同时，实现优越的复杂度性能（参见第~\ref{sec:mpsi} 节和第~\ref{sec:mpsu} 节）。
+
+\subsection{从简单到复合的组合技术}\label{compound-pzs}
+
+根据所关联的谓词公式 $Q$ 的类型，可将谓词零分享协议分为两类：若 $Q$ 是一个简单谓词，则称之为简单谓词零分享（Simple Predicative Zero-Sharing）；若 $Q$ 是一个复合谓词，即 $Q$ 由 $q>1$ 个文字（原子命题或其否定）和逻辑联结词 $\land$ 与 $\lor$ 构成，其中每个文字 $Q_i$ 是一个简单谓词或其否定 ($1 \le i \le q$)，则称对应的谓词零分享为复合谓词零分享（Compound Predicative Zero-Sharing）。本节将介绍将简单谓词零分享协议组合成复合谓词零分享协议的高效方法 —— 对于任何复合谓词 $Q$，只要为其中每个文字 $Q_i$ 构造对应的松弛版本的简单谓词零分享协议，就可以构造与 $Q$ 相关联的满足标准半诚实安全的复合谓词零分享协议。
+
+总的来说，构造与 $Q$ 相关联的的复合谓词零分享协议可分为三个阶段：首先，参与方为每个文字 $Q_i$ 执行对应的松弛简单谓词零分享协议。对于仅涉及参与方子集的文字，未参与的参与方将其缺失的分享份额设置为 $0$；其次，参与方参照由所有文字通过逻辑与 $\mathsf{AND}$、逻辑或 $\mathsf{OR}$ 操作符组合成公式 $Q$ 的计算过程，逐步对持有的秘密分享进行协同处理，将其组合成一个满足与 $Q$ 相关联的松弛版本的复合谓词零分享定义的输出秘密分享。其中，在每一步结束时，参与方都会获得一个与当前计算的中间公式相对应的秘密分享；最后，参与方将松弛复合谓词零分享转化为足标准半诚实安全的复合谓词零分享。完整的构造过程详见图~\ref{fig:proto-cpzs}。
+
+\begin{figure}[!hbtp]
+\begin{framed}
+\begin{minipage}[center]{\textwidth}
+\begin{trivlist}
+\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots P_m$，其输入为 $\textbf{x} = (x_1, \cdots, x_m)$。有限域 $\mathbb{F}$。一个由 $q$ 个文字 $Q_1,\cdots,Q_q$ ($q \ge 1$) 和逻辑联结词 $\mathsf{AND}$ 和 $\mathsf{OR}$ 构成的简单/复合谓词 $Q$。离线阶段生成的 Beaver 三元组 $([a], [b], [c])$。
+\item \textbf{协议：}
+\begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
+\item \textbf{简单谓词分享阶段。} 参与方为每个文字 $Q_i$ 调用 $\FuncrPZS^{Q_i}$ ($1 \le i \le q$)。若 $Q_i$ 未涉及所有参与方，则未参与的参与方将对应 $Q_i$ 的分享份额设置为 $0$。由此，每个 $Q_i$ 在参与方之间都有一个对应的秘密分享。
+\item \textbf{模拟公式计算阶段。} 若 $q>1$，参与方按照操作符的优先级，逐步模拟 $Q$ 的计算。在其中的每一步中，参与方模拟两个谓词 $Q'_i$ 和 $Q'_j$ 通过逻辑操作符连接成一个谓词公式 $Q'$ 的计算 —— 参与方已经从前一步获得了与 $Q'_i$ 和 $Q'_j$ 对应的秘密分享，目标是生成一组满足与 $Q'$ 相关联的松弛谓词零分享输出的秘密分享。具体的操作取决于所计算的操作符类型：
+\begin{itemize}
+\item $\mathsf{AND}$：假设参与方持有分别与 $Q'_i$ 和 $Q'_j$ 对应的两个秘密分享 $[r_i]$ 和 $[r_j]$。为了计算 $Q'$ 的松弛谓词零分享（其中 $Q'(\textbf{x}) = Q'_i(\textbf{x}) \land Q'_j(\textbf{x})$），参与方在本地将两个秘密分享对应的份额相加，得到秘密分享 $[r_i + r_j]$。
+\item $\mathsf{OR}$：假设参与方持有分别与 $Q'_i$ 和 $Q'_j$ 对应的两个秘密分享 $[r_i]$ 和 $[r_j]$。为了计算 $Q'$ 的松弛谓词零分享（其中 $Q'(\textbf{x}) = Q'_i(\textbf{x}) \lor Q'_j(\textbf{x})$），参与方执行一次安全乘法计算，得到 $[r_i \cdot r_j] = [r_i] \cdot [r_j]$。
+\end{itemize}
+在每一步结束后，参与方将 $Q'$ 视为一个新的文字，并重复上述过程，直到 $Q$ 中仅剩一个文字。与最终文字对应的秘密分享 $[r]$ 即为与 $Q$ 相关联的松弛谓词零分享协议的输出秘密分享。
+\item \textbf{从松弛到标准的转化。} 所有参与方利用 Beaver 三元组执行一次安全乘法计算 $[s] = [r] \cdot [b]$ 来计算 $[s]$（参见第 \ref{transform-pzs} 节）。
+\end{enumerate}
+\end{trivlist}
+\end{minipage}
+\end{framed}
+\caption{谓词零分享协议 $\ProtoPZS^Q$}\label{fig:proto-cpzs}
+\end{figure}
+
+\begin{theorem}\label{theorem:cpzs}
+在 $(\FuncrPZS^{Q_1},\cdots, \FuncrPZS^{Q_q})$-混合模型下，协议 $\ProtoPZS^Q$ 在任意半诚实敌手腐化不超过 $t < m$ 个参与方的情况下，安全地实现了功能 $\FuncPZS^Q$。
+\end{theorem}
+
+\begin{trivlist}
+\item \textbf{正确性与独立性。} 在模拟公式计算阶段的每一步中：
+\begin{itemize}[itemsep=2pt,topsep=5pt,parsep=0pt,leftmargin=10pt]
+    \item 若 $Q'(\textbf{x}) = Q'_i(\textbf{x}) \land Q'_j(\textbf{x})$，参与方计算 $[r_i + r_j] = [r_i] + [r_j]$。若 $Q'(\textbf{x}) = 1$，即 $Q'_i(\textbf{x}) = 1$ 且 $Q'_j(\textbf{x}) = 1$，根据 $\FuncrPZS^{Q'_i}$ 和 $\FuncrPZS^{Q'_j}$ 的功能可知 $r_i = 0$ 且 $r_j = 0$，因此 $r_i + r_j = 0$；否则，$Q'_i(\textbf{x}) = 0$ 或 $Q'_j(\textbf{x}) = 0$，根据 $\FuncrPZS^{Q'_i}$ 和 $\FuncrPZS^{Q'_j}$ 的功能 $r_i$ 和 $r_j$ 中至少有一个是随机值，故 $r_i + r_j$ 也是随机值。
+    \item 若 $Q'(\textbf{x}) = Q'_i(\textbf{x}) \lor Q'_j(\textbf{x})$，参与方计算 $[r_i \cdot r_j] = [r_i] \cdot [r_j]$。若 $Q'(\textbf{x}) = 1$，即 $Q'_i(\textbf{x}) = 1$ 或 $Q'_j(\textbf{x}) = 1$，根据 $\FuncrPZS^{Q'_i}$ 和 $\FuncrPZS^{Q'_j}$ 的功能 $r_i = 0$ 或 $r_j = 0$，因此 $r_i \cdot r_j = 0$；否则，$Q'_i(\textbf{x}) = 0$ 且 $Q'_j(\textbf{x}) = 0$，则 $r_i$ 和 $r_j$ 均为随机值。用 $E^{i,j}$ 表示事件 $r_i \cdot r_j$ 是随机值。用 $E_0^{i}$ 表示事件 $r_i = 0$，$E_1^{i}$ 表示事件 $r_i \ne 0$。我们有事件 $E^{i,j}$ 发生的概率为 $Pr[E^{i,j}] = Pr[E^{i,j} \vert E_0^{i}] \cdot Pr[E_0^{i}] + Pr[E \vert E_1^{i}] \cdot Pr[E_1^{i}] = 0 \cdot Pr[E_0^{i}] + 1 \cdot Pr[E_1^{i}] = Pr[E_1^{i}] = 1- Pr[E_0^{i}]$。为了将正确性误差限制在 $2^{-\sigma}$ 以内，要求任何 $E_0^{i}$ 发生的概率是可忽略的。通过联合界（Union Bound），$Pr[\bigvee_i E_0^{i}] \le \sum_{i} Pr[E_0^{i}] = \frac{\lvert \mathsf{OR} \rvert}{\lvert \mathbb{F} \rvert}$。因此，需设置有限域大小 $\lvert \mathbb{F} \rvert \ge \lvert \mathsf{OR} \rvert \cdot 2^\sigma$，其中 $\lvert \mathsf{OR} \rvert$ 是 $Q$ 中 $\mathsf{OR}$ 操作符的数量。
+\end{itemize}
+上面模拟公式计算阶段中每一步模拟 $\mathsf{AND}$ 和 $\mathsf{OR}$ 操作符计算的正确性，保证了该阶段实现与 $Q$ 相关联的松弛谓词零分享协议的正确性。根据第~\ref{transform-pzs} 节中的正确性和独立性分析，最终协议满足与 $Q$ 相关联的标准谓词零分享的正确性和独立性要求。
+\item \textbf{隐私性。} 谓词零分享的隐私性易于验证：由于所有交互均发生在对构建模块（即所有松弛简单谓词零分享协议、安全乘法计算及转化技术）的调用内部，因此给定理想功能的输出，模拟器只需以反向链式的方式调用这些构建模块的子模拟器。最终，只要所有松弛简单谓词零分享协议、安全乘法计算和转化技术的隐私性成立，那么敌手的视图在理想世界和真实世界中就是不可区分的。
+\end{trivlist}
 
 \section{成员零分享}
 \esection{Membership Zero-Sharing}
