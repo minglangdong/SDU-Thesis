@@ -518,10 +518,10 @@ $Q_i$ 的 $n$ 组秘密分享向量记作 $[\textbf{r}_i] = (\textbf{r}_{i,1},\c
         \textbf{4.} 每个参与方 $P_k$ ($1 \le k \le m$) 将 $\textbf{u}_k$ 输入到 $\FuncMS$，$\FuncMS$ 输出给 $P_k$ 随机置换后的分享份额 $\textbf{u}_{k}'$。\\
         \textbf{5.} $P_j$ ($1 < j \le m$) 将 $\textbf{u}_j'$ 发送给 $P_1$。$P_1$ 统计重构结果 $\sum_{1 \le j \le m} \textbf{u}_j'$ 中 0 的数量，将其作为 $Y$ 的基数并输出。
 
-\item \textbf{电路 MPSO（方法 1）：}
+\item \textbf{ Circuit-MPSO（方法 1）：}
         \textbf{3.} 所有参与方调用电路为 $C_{s,B,l}^1$ 的 $m$ 方通用 MPC 协议。对于 $1 \le i \le s, 1 \le k \le m$，$P_k$ 将分享份额 $s_{i,k,1},\cdots,s_{i,k,B}$ 输入到第 $i$ 部分电路；此外，$P_j$（与步骤 2 中的 $j$ 对应）输入 $\mathcal{C}_j^1,\cdots,\mathcal{C}_j^B$ 中的元素。
 
-\item \textbf{电路 MPSO（方法 2）：}
+\item \textbf{ Circuit-MPSO（方法 2）：}
         \textbf{3.} 对于 $1 \le i \le s, 1 \le b \le B$，$P_j$（与步骤 2 中的 $j$ 对应）检查 $\mathcal{C}_j^b$：若非空，$P_j$ 计算 $s'_{i,j,b} = \mathsf{code}(s_{i,j,b}) \oplus (x \Vert 0^{l'})$，其中 $x$ 为桶中元素；若为空，$P_j$ 随机采样 $s'_{i,j,b} \gets \{0,1\}^{l+l'}$。\\
         \textbf{4.} 所有参与方调用电路为 $C_{N,l'}^2$ 的 $m$ 方通用 MPC 协议。对于 $1 \le i \le s, 1 \le b \le B, 1 \le k \le m$，$P_k$ 将 $s'_{i,k,b}$ 作为其第 $((i-1)B+b)$ 个输入。
 \end{trivlist}
@@ -537,7 +537,7 @@ $Q_i$ 的 $n$ 组秘密分享向量记作 $[\textbf{r}_i] = (\textbf{r}_{i,1},\c
 \begin{trivlist}
 \item \textbf{正确性.} 协议的正确性源于定理~\ref{theorem:set2} 及定义~\ref{def:cspf} 中 CSPF 的性质，以及批量成员零分享的正确性。为确保批量成员零分享的正确性，有限域大小需满足 $\lvert \mathbb{F} \rvert \ge \lvert \mathsf{OR} \rvert \cdot B \cdot 2^\sigma$，其中 $\lvert \mathsf{OR} \rvert$ 是所有子公式中 $\mathsf{OR}$ 操作的总数。
 
-设 $Y_i$ 为 $Q_i$ 表示的集合。在 MPSO 和电路 MPSO（方法 2）中，评估每个 $Q_i$ 后，参与方持有 $\lvert Y_i \rvert$ 个 $Y_i$ 元素的秘密分享和 $B-\lvert Y_i \rvert$ 个随机值的分享。由于 $\{Y_1, \cdots, Y_s\}$ 是 $Y$ 的一个划分，各方总计持有 $\lvert Y \rvert$ 个 $Y$ 元素的分享和 $sB-\lvert Y \rvert$ 个随机分享。$P_1$ 或电路通过检查末尾 $l'$ 位是否为全零来识别元素。若随机值与 $0^{l'}$ 碰撞，则产生虚假阳性。总错误概率上限为 $sB \cdot 2^{-l'}$，为使其可忽略，设置 $l' \ge \sigma + \log s + \log B$。在 MPSO-card 和电路 MPSO（方法 1）中，各方持有 $\lvert Y \rvert$ 个 0 的分享。为将虚假阳性概率限制在 $2^{-\sigma}$ 内，设置 $\lvert \mathbb{F} \rvert \ge sB \cdot 2^\sigma$。
+设 $Y_i$ 为 $Q_i$ 表示的集合。在 MPSO 和 Circuit-MPSO 协议（方法 2）中，对于每个 $Q_i$，参与方持有 $\lvert Y_i \rvert$ 个 $Y_i$ 元素的秘密分享和 $B-\lvert Y_i \rvert$ 个随机值的秘密分享。由于 $\{Y_1, \cdots, Y_s\}$ 是 $Y$ 的一个划分，各方总计持有 $\lvert Y \rvert$ 个 $Y$ 元素的秘密分享和 $sB-\lvert Y \rvert$ 个随机值的秘密分享。$P_1$ 或电路通过检查末尾 $l'$ 位是否为全零来识别元素。若随机值与 $0^{l'}$ 碰撞，则产生假阳性。总错误概率上限为 $sB \cdot 2^{-l'}$，为使其可忽略，设置 $l' \ge \sigma + \log s + \log B$。在 MPSO-card 和 Circuit-MPSO（方法 1）中，各方持有 $\lvert Y \rvert$ 个 0 的秘密分享。为将假阳性概率限制在 $2^{-\sigma}$ 内，设置 $\lvert \mathbb{F} \rvert \ge sB \cdot 2^\sigma$。
 
 \item \textbf{安全性.} 与之前对谓词零分享的隐私性证明类似，除最后重构阶段外的所有交互均在对构建模块（批量成员零分享和多方秘密分享洗牌协议）的调用内部完成，因此给定输出 $Y$，模拟器只需以反向链式的方式调用构建模块的子模拟器。模拟的核心难点在于当 $P_1$ 被腐化时如何模拟重构消息。模拟器从理想功能获得 $Y$ 后，将 $Y$ 中元素编码并生成 $\lvert Y \rvert$ 个秘密分享，随后采样 $sB - \lvert Y \rvert$ 个随机秘密分享并进行随机置换。根据成员零分享的独立性要求，输出分享的秘密独立于任何 $t \le m-1$ 方的联合视图。此外，洗牌功能确保共谋方无法获知置换顺序，因此模拟视图与真实执行不可区分。完整的安全性证明如下：
 
@@ -550,7 +550,7 @@ $Q_i$ 的 $n$ 组秘密分享向量记作 $[\textbf{r}_i] = (\textbf{r}_{i,1},\c
 \item \textbf{情况 $P_1 \in \textbf{P}_{\mathcal{A}}$：} 腐化方诚实调用 $\textbf{Q}_{\mathcal{A}}$ 相关协议后，持有秘密集 $Y_{\mathcal{A}}$（拼接全零串）及随机秘密集 $R_{\mathcal{A}}$。设 $Y_{\mathcal{H}} = Y \setminus Y_{\mathcal{A}}$，模拟器采样补全所需的随机值集 $R_{\mathcal{H}}$。最后随机置换并重新分享 $Y \cup R_{\mathcal{H}} \cup R_{\mathcal{A}}$。
 \end{itemize}
 
-在 $P_1 \notin \textbf{P}_{\mathcal{A}}$ 情况下，$P_c$ 收到的分享与真实执行中的分布（由诚实方保证的独立均匀分布）一致。在 $P_1 \in \textbf{P}_{\mathcal{A}}$ 情况下，利用批量成员零分享的独立性要求以及洗牌协议的理想特性，可以证明真实视图中涉及诚实方的分享也是均匀分布且独立的，因此模拟视图与真实执行计算不可区分。MPSO-card 及电路 MPSO 的安全性证明同理，区别仅在于模拟器在 $P_1$ 腐化时使用 0 代替具体元素。
+在 $P_1 \notin \textbf{P}_{\mathcal{A}}$ 情况下，$P_c$ 收到的分享与真实执行中的分布（由诚实方保证的独立均匀分布）一致。在 $P_1 \in \textbf{P}_{\mathcal{A}}$ 情况下，利用批量成员零分享的独立性要求以及洗牌协议的理想特性，可以证明真实视图中涉及诚实方的分享也是均匀分布且独立的，因此模拟视图与真实执行计算不可区分。MPSO-card 及 Circuit-MPSO 的安全性证明同理，区别仅在于模拟器在 $P_1$ 腐化时使用 0 代替具体元素。
 \end{trivlist}
 
 \subsection{复杂度分析}
