@@ -84,7 +84,7 @@ $$x \in Y \iff \varphi(x, X_1, \cdots, X_m) = 1.$$
 \begin{definition}[局部性]\label{def:local}
 若集合谓词公式 $\varphi(x, X_1, \cdots, X_m)$ 可以写成如下形式：
 $$\varphi(x, X_1, \cdots, X_m) = (x \in X_i) \land \psi(x, X_1, \cdots, X_{i-1}, X_{i+1}, \cdots, X_m),$$
-其中 $\psi(x, X_1, \cdots, X_{i-1}, X_{i+1}, \cdots, X_m)$ 不包含关于 $X_i$ 的原子命题，则称 $\varphi$ 相对于 $X_i$ 是局部的（local to $X_i$）或称其为 $X_i$-局部的（$X_i$-local）集合谓词公式，同时，称 $\psi$ 为 $\varphi$ 相对于 $X_i$ 的集合剩余公式（set residual formula）。
+其中 $\psi(x, X_1, \cdots, X_{i-1}, X_{i+1}, \cdots, X_m)$ 不包含关于 $X_i$ 的原子命题，则称 $\varphi$ 相对于 $X_i$ 是局部的（local to $X_i$）或称其为 $X_i$-局部的（$X_i$-local）集合谓词公式，同时，称 $\psi$ 为 $\varphi$ 的 $X_i$-局部剩余公式（residual formula）。
 \end{definition}
 
 \begin{corollary}
@@ -455,8 +455,106 @@ $Q_i$ 的 $n$ 组秘密分享向量记作 $[\textbf{r}_i] = (\textbf{r}_{i,1},\c
 \item \textbf{隐私性。} 成员零分享的隐私性易于验证：所有交互均发生在两个松弛批量成员零分享协议的调用内部，这些协议可进一步分解为三个基础模块—— batch OPPRF、batch ssPMT 和 ROT。因此，给定理想功能的输出，模拟器只需以反向推导的方式调用这些基础模块的子模拟器。只要 batch OPPRF、 batch ssPMT 和 ROT 协议是安全的，敌手的视图在理想世界和真实世界中是不可区分的，从而满足隐私性定义。
 \end{trivlist}
 
-\section{框架构造及安全性证明}
-\esection{Framework Construction and Security Proof}
+\section{实现通用功能及其扩展的 MPSO 框架}
+\esection{MPSO Framework with Generic MPSO and Extended Functionalities}
+
+\subsection{技术路线概述}
+
+本章提出的 MPSO 框架可分为两个阶段：第一阶段基于任何可构造集合 $Y$ 的 CSPF 表示 $\psi(x, X_1, \cdots, X_m)$，目标是各方获得与 $Y$ 的一个划分相对应的秘密分享。回顾 $\psi = Q_1 \lor \cdots \lor Q_s$，对于每个子公式 $Q_i$（$1 \le i \le s$），
+设 $X_{i_1},\cdots,X_{i_q}$（$1 \le q \le m$）为 $Q_i$ 中所有原子命题涉及的集合，并用 $X_j$ ($j \in \{{i_1},\cdots,{i_q}\}$) 表示 $Q_i$ 相对于其满足局部性的集合。即：$$Q_i(x,X_{i_1},\cdots,X_{i_q}) = (x \in X_j) \land Q'_i(x,X_{i_1},\cdots,X_{j-1},X_{j+1},\cdots,X_{i_q})$$ 其中 $Q'_i$ 是 $Q_i$ 的 $X_j$-局部剩余公式。设 $Y_i$ 为由 $Q_i$ 表示的集合，则 $Q'_i$ 本质上是针对 $X_j$ 中元素关于 $Y_i$ 的成员测试集合谓词公式。我们先给出第一阶段的初步构造：对于每个 $Q_i$，$P_{i_1},\cdots,P_{i_q}$ 调用 $n$ 个与 $Q'_i$ 相关联的成员零分享实例。在每个实例中，$P_j$ 作为 $P_{\mathsf{pivot}}$ 输入 $X_j$ 中的一个元素。对于每个 $x \in X_j$，如果 $Q'_i = 1$，参与方收到 0 的秘密分享，否则收到随机值的秘密分享。$P_j$ 将 $x$ 加到其对应的分享份额上，使得对于每个 $x \in X_j$，如果 $Q_i = 1$（即 $Q'_i = 1$），各方收到 $x$ 的秘密分享，否则还是收到随机值的秘密分享。
+
+在上述初步构造中，针对 $X_j$ 的成员测试需要在大小为 $n$ 的相同输入集合上，重复执行 $n$ 次与 $Q'_i$ 相关联的成员零分享。因此，每个实例的均摊开销相对于 $n$ 的复杂度是 $O(n)$。为了实现 $O(1)$ 的均摊开销，利用哈希分桶（Hashing-to-bins）技术来优化该过程，具体而言：令 $P_j$ 通过布谷鸟哈希预处理 $X_j$，其他参与方通过简单哈希预处理各自的集合。该预处理过程使得 $P_j$ 的每个元素 $x \in X_j$ 仅需与其他参与方拥有的具有相同索引的桶进行比较，同时保持成员测试的正确性。因此，在每个成员零分享实例中，当 $P_j$ 作为 $P_{\mathsf{pivot}}$ 输入其布谷鸟哈希桶的单个元素时，其他参与方只需输入具有相同索引的简单哈希桶中所有元素组成的集合，该集合是输入集合的子集而非整个集合。在 $n$ 次成员零分享调用中，每个输入集合的参与方输入到 $n$ 个成员零分享实例中的集合大小总和等于其简单哈希表的大小，相对于 $n$ 的复杂度是 $O(n)$，因此每个实例的摊销开销被降到 $O(1)$。优化后的第一阶段具体构造如下。
+
+对于每个 $Q_i$，$P_j$ 使用哈希函数 $h_1, h_2, h_3$ 通过布谷鸟哈希将元素分配到 $B = O(n)$ 个桶中，使得每个桶 $\mathcal{C}_j^b$ ($1 \le b \le B$) 最多包含一个元素。同时，每个 $P_{j'}$ ($j' \in \{{i_1},\cdots,{i_q}\}\setminus \{j\}$) 将其每个元素 $y \in X_{j'}$ 分配到桶 $\mathcal{T}_{j'}^{h_1(y)}, \mathcal{T}_{j'}^{h_2(y)}, \mathcal{T}_{j'}^{h_3(y)}$ 中。如果 $P_j$ 将元素 $x \in X_j$ 映射到 $\mathcal{C}_j^b$ 中，则 $b \in \{h_1(x),h_2(x),h_3(x)\}$。如果 $P_{j'}$ 也持有 $x$，则 $x$ 必定也被映射到 $\mathcal{T}_{j'}^b$。这使得除了 $X_j$ 以外的其他参与方能够将其输入集合相对于 $X_j$ 在布谷鸟哈希桶里的排列对齐，从而保证对于 $\mathcal{C}_j^b$ 中的每个 $x$，$x \in X_j'$ 当且仅当 $x$ 在 $\mathcal{T}_{j'}^b$ 中。由此可推导出：$$Q'_i(x,X_{i_1},\cdots,X_{j-1},X_{j+1},\cdots,X_{i_q}) = Q'_i(x,\mathcal{T}_{i_1}^b,\cdots,\mathcal{T}_{j-1}^b,\mathcal{T}_{j+1}^b,\cdots,\mathcal{T}_{i_q}^b).$$ 根据上述关系，让 $P_{i_1},\cdots,P_{i_q}$ 调用与 $Q'_i$ 相关联的批量成员零分享，其中 $P_j$ 作为 $P_{\mathsf{pivot}}$ 输入 $\mathcal{C}_j^1, \cdots, \mathcal{C}_j^B$，每个 $P_{j'}$ 输入 $\mathcal{T}_{j'}^1, \cdots, \mathcal{T}_{j'}^B$。协议结束后，他们收到 $B$ 组秘密分享，使得如果每个桶 $C_j^b$ 中的元素 $x$ 满足 $Q_i(x,X_{i_1},\cdots,X_{i_q}) = 1$（即 $x \in Y_i$），参与方收到 0 的秘密分享，否则收到随机值的秘密分享。最后，$P_j$ 将 $x$ 拼接上全零字符串（用于区分元素与随机值），然后将该值加到自己的第 $b$ 个分享份额上，从而满足：如果 $x \in Y_i$，参与方持有 $x$ 的秘密分享。
+
+鉴于 $\{Y_1, \cdots, Y_s\}$ 构成 $Y$ 的一个划分，如果参与方对所有 $Q_1, \cdots, Q_s$ 执行上述过程，他们将持有 $Y$ 中所有元素的秘密分享（每个元素的秘密分享出现一次，其中混杂着不在 $Y$ 中的元素及重复元素对应的随机秘密分享），这些秘密分享按 $Y_1, \cdots, Y_s$ 的主序排列。在每个 $Y_i$ 内部，对应 $Y_i$ 中元素的秘密分享按 $P_j$ 的布谷鸟哈希位置的次序排列，该顺序取决于整个集合 $X_j$。如果参与方执行上述过程但不执行最后 $P_j$ 将元素加入分享的步骤，各方将在该元素对应的位置持有 0 的秘密分享。是否执行最后的追加元素步骤由 MPSO 框架的目标功能决定，该框架可实现的功能可分为三类：
+
+\noindent\textbf{MPSO.} 为了实现该功能，参与方必须向 $P_1$ 重构 $Y$ 中的所有元素，因此他们必须执行所有的追加元素步骤来对元素进行秘密分享。然而，直接重构秘密分享会导致两类信息泄露：1) 重构出的元素的主序揭示了每个元素所属的子集 $Y_i$。2) 重构出的元素的次序会泄露 $X_j$ 的信息。因此，所有参与方在重构阶段前需调用多方秘密分享洗牌协议，以打乱所有秘密分享的顺序并重新分享所有秘密。在重构阶段后，$P_1$ 识别出所有重构秘密中拼接有全零字符串的值，截取出其中的元素值并输出。
+
+\noindent\textbf{MPSO-card.} 为了实现该功能，参与方必须在不泄露实际元素的情况下重构秘密以获取基数。为此，参与方跳过所有的追加元素步骤，使得对于 $Y$ 中的每个元素，参与方持有 0 的秘密分享；而对于不在 $Y$ 中的元素或重复元素，参与方持有随机秘密分享。如上所述，这些秘密分享也按照相同的顺序排列，因此直接重构会导致与实现 MPSO 构造中相同的信息泄露。所以，参与方同样需要在重构阶段前调用多方秘密分享洗牌协议。随后，他们向 $P_1$ 重构秘密，然后由 $P_1$ 统计所有重构秘密中 0 的数量作为 $Y$ 的基数并输出。
+
+\noindent\textbf{Circuit-MPSO.} 实现 Circuit-MPSO 功能有两种方法：
+\begin{itemize}[itemsep=2pt,topsep=5pt,parsep=0pt,leftmargin=10pt]
+  \item \textbf{方法 1：} 参与方跳过所有的追加元素步骤。他们将所有秘密分享连同其对应位置的布谷鸟哈希桶中的元素按顺序输入到一个通用 MPC 协议中。该通用 MPC 协议实现如下电路：用于从所有秘密中识别出 0，将所有等于 0 的秘密对应位置的元素组成集合 $Y$，最后计算 $Y$ 上的任意函数。
+  \item \textbf{方法 2：} 参与方执行所有的追加元素步骤。他们将秘密分享输入到一个通用 MPC 协议中。该通用 MPC 协议实现如下电路：首先通过是否拼接有全零字符串区分元素与随机值，然后截取出所有的元素值组成集合 $Y$，最后计算 $Y$ 上的任意函数。
+\end{itemize}
+
+\subsection{框架构造及安全性证明}
+
+令 $C_{s,B,l}^1$ 和 $C_{N,l'}^2$ 为两个电路：
+\begin{itemize}[itemsep=2pt,topsep=5pt,parsep=0pt,leftmargin=10pt]
+\item $C_{s,B,l}^1$ 具有 $sB(m\log_2\lvert \mathbb{F} \rvert+ l)$ 条输入线，分为 $s$ 个部分，每部分有 $B(m\log_2\lvert \mathbb{F} \rvert + l)$ 条输入线，其中每 $B$ 个。在第 $i$ 个部分 ($1 \le i \le s$) 中，第 $k$ 组 的 $B$ 个在 $\mathbb{F}$ 上的输入与参与方 $P_k$ ($1 \le k \le m$) 相关联，将该组中的第 $b$ 个输入 ($1 \le b \le B$) 记为 $u_{i,k,b} \in \mathbb{F}$；最后 $B$ 个长度为 $l$ 的输入与特定参与方 $P_j$ ($1 \le j \le m$) 相关联，记其中的第 $b$ 个输入 ($1 \le b \le B$) 为 $z_{i,b} \in \{0,1\}^l$。该电路首先实现下面功能：如果 $u_{i,1,b} + \cdots + u_{i,m,b} = 0$，则产生比特 $w_{i,b} = 1$，否则为 0（针对 $1 \le i \le s, 1 \le b \le B$）。然后，该电路计算并输出 $f(Z)$，其中 $Z = \{z_{i,b} \vert w_{i,b} = 1\}_{1 \le i \le s, 1 \le b \le B}$，$f$ 是要在可构造集合 $Y$ 上计算的函数。
+\item $C_{N,l'}^2$ 具有 $m$ 组，每组 $N$ 个在 $\mathbb{F}$ 上的输入。第 $k$ 组与 $P_k$ ($1 \le k \le m$) 相关联，其中第 $i$ 个输入记为 $z_{k,i}$ ($1 \le i \le N$)。电路计算并输出 $f(Z)$，其中 $Z = \{z_i \vert z_{1,i} + \cdots + z_{m,i} = z_i \Vert 0^{l'}\}_{1 \le i \le N}$，$f$ 是要在 $Y$ 上计算的函数。
+\end{itemize}
+
+实现计算 $Y$ 的通用 MPSO 功能及其扩展的 MPSO-card 和 Circuit-MPSO 功能的具体协议构造见图~\ref{fig:proto-MPSO}。
+
+\begin{figure}[!hbtp]
+\begin{framed}
+\begin{minipage}[center]{\textwidth}
+\begin{trivlist}
+\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots, P_m$。集合大小 $n$。元素长度 $l$。全零字符串长度 $l'$。有限域 $\mathbb{F}$。编码函数 $\mathsf{code}:\mathbb{F} \to \{0,1\}^{l+l'}$。可构造集合 $Y$ 的 CSPF 表示 $\psi(x,X_1,\cdots,X_m)$。布谷鸟哈希参数：哈希函数 $h_1, h_2, h_3$ 及桶数量 $B$。
+
+\item \textbf{输入：} 每个参与方 $P_i$ 持有私有集合 $X_i = \{x_i^1,\cdots, x_i^n\} \subseteq \{0,1\}^l$。
+
+1. \textbf{哈希分桶阶段.} 对于 $1 \le i \le m $，$P_i$ 执行布谷鸟哈希分桶 $\mathcal{C}_i^1, \cdots, \mathcal{C}_i^B \gets \Cuckoo_{h_1,h_2,h_3}^B(X_i)$ 以及简单哈希分桶 $\mathcal{T}_i^1, \cdots, \mathcal{T}_i^B \gets \Simple_{h_1,h_2,h_3}^B(X_i)$。
+
+2. \textbf{成员零分享阶段.} 令 $\psi = Q_1 \lor \cdots \lor Q_s$。对于 $\psi$ 中的第 $i$ 个子公式 $Q_i(x,X_{i_1},\cdots,X_{i_q})$ ($1 \le i \le s$)：
+\begin{enumerate}
+    \item 若 $q = 1$（设 $i_1 = j$），则 $Q_i(x,X_j) = (x \in X_j)$。对于 $1 \le b \le B$，若 $\mathcal{C}_j^b$ 非空，$P_j$ 设置 $s_{i,j,b} = 0$，否则 $P_j$ 随机选取 $s_{i,j,b}$。$P_{j'}$ ($j' \neq j$) 设置 $s_{i,j',b} = 0$。
+    \item 若 $q > 1$，设 $Q_i$ 相对于 $X_j$ 是局部的，并且对应的 $X_j$-局部剩余公式为 $Q'_i$。所有输入集合涉及在 $Q_i$ 内的参与方调用 $\FuncbMZS^{Q'_i}$，其中 $P_j$ 作为 $P_{\mathsf{pivot}}$ 输入 $\mathcal{C}_j^1, \cdots, \mathcal{C}_j^B$，其余参与方 $P_{j'}$ ($j' \in \{{i_1},\cdots,{i_q}\} \setminus \{j\}$) 输入 $\mathcal{T}_{j'}^1, \cdots, \mathcal{T}_{j'}^B$。在协议执行结束后，每个涉及的参与方 $P_{i'}$ ($i' \in \{{i_1},\cdots,{i_q}\}$) 收到向量 $\textbf{s}_{i,i'}=(s_{i,i',1},\cdots,s_{i,i',B})$，其中每个分量作为自己对应的分享份额。其余未涉及的参与方 $P_k$ ($k \in \{1,\cdots,m\} \setminus \{{i_1},\cdots,{i_q}\}$) 对于每个 $1 \le b \le B$ 设置对应的分享份额 $s_{i,k,b} = 0$。
+\end{enumerate}
+
+参与方的后续动作取决于具体的目标功能：
+
+\item \textbf{MPSO：}
+    \textbf{3.} 对于 $1 \le i \le s, 1 \le b \le B$，$P_j$（与步骤 2 中的 $j$ 对应）检查 $\mathcal{C}_j^b$：若非空，$P_j$ 计算 $s'_{i,j,b} = \mathsf{code}(s_{i,j,b}) \oplus (x \Vert 0^{l'})$，其中 $x$ 为桶中元素；若为空，$P_j$ 随机采样 $s'_{i,j,b} \gets \{0,1\}^{l+l'}$。\\
+    \textbf{4.} 每个参与方 $P_k$ ($1 \le k \le m$) 构造向量 $\textbf{u}_k \in (\{0,1\}^{l+l'})^{sB}$，其中 对于$1 \le i \le s, 1 \le b \le B$，$u_{k,(i-1)B+b} = s'_{i,k,b}$。\\
+    \textbf{5.} 每个参与方 $P_k$ ($1 \le k \le m$) 将 $\textbf{u}_k$ 输入到 $\FuncMS$，$\FuncMS$ 输出给 $P_k$ 随机置换后其的分享份额 $\textbf{u}_{k}'$。\\
+    \textbf{6.} $P_j$ ($1 < j \le m$) 将 $\textbf{u}_j'$ 发给 $P_1$。$P_1$ 计算 $\textbf{u}' = \sum \textbf{u}_j'$，识别出所有满足 $y \Vert 0^{l'}$ 形式的分量，截取 $y$ 组成 $Y$ 并输出。
+
+\item \textbf{MPSO-card：}
+        \textbf{3.} 每个参与方 $P_k$ ($1 \le k \le m$) 构造向量 $\textbf{u}_k \in \mathbb{F}^{sB}$，其中对于 $1 \le i \le s, 1 \le b \le B$，$u_{k,(i-1)B+b} = s_{i,k,b}$。\\
+        \textbf{4.} 每个参与方 $P_k$ ($1 \le k \le m$) 将 $\textbf{u}_k$ 输入到 $\FuncMS$，$\FuncMS$ 输出给 $P_k$ 随机置换后的分享份额 $\textbf{u}_{k}'$。\\
+        \textbf{5.} $P_j$ ($1 < j \le m$) 将 $\textbf{u}_j'$ 发送给 $P_1$。$P_1$ 统计重构结果 $\sum_{1 \le j \le m} \textbf{u}_j'$ 中 0 的数量，将其作为 $Y$ 的基数并输出。
+
+\item \textbf{电路 MPSO（方法 1）：}
+        \textbf{3.} 所有参与方调用电路为 $C_{s,B,l}^1$ 的 $m$ 方通用 MPC 协议。对于 $1 \le i \le s, 1 \le k \le m$，$P_k$ 将分享份额 $s_{i,k,1},\cdots,s_{i,k,B}$ 输入到第 $i$ 部分电路；此外，$P_j$（与步骤 2 中的 $j$ 对应）输入 $\mathcal{C}_j^1,\cdots,\mathcal{C}_j^B$ 中的元素。
+
+\item \textbf{电路 MPSO（方法 2）：}
+        \textbf{3.} 对于 $1 \le i \le s, 1 \le b \le B$，$P_j$（与步骤 2 中的 $j$ 对应）检查 $\mathcal{C}_j^b$：若非空，$P_j$ 计算 $s'_{i,j,b} = \mathsf{code}(s_{i,j,b}) \oplus (x \Vert 0^{l'})$，其中 $x$ 为桶中元素；若为空，$P_j$ 随机采样 $s'_{i,j,b} \gets \{0,1\}^{l+l'}$。\\
+        \textbf{4.} 所有参与方调用电路为 $C_{N,l'}^2$ 的 $m$ 方通用 MPC 协议。对于 $1 \le i \le s, 1 \le b \le B, 1 \le k \le m$，$P_k$ 将 $s'_{i,k,b}$ 作为其第 $((i-1)B+b)$ 个输入。
+\end{trivlist}
+\end{minipage}
+\end{framed}
+\caption{MPSO / MPSO-card / Circuit-MPSO 协议}\label{fig:proto-MPSO}
+\end{figure}
+
+\begin{theorem}\label{theorem:mpso}
+在 $(\FuncbMZS^Q, \FuncMS)$-混合模型下，图~\ref{fig:proto-MPSO} 中的 MPSO、MPSO-card 和 Circuit-MPSO 协议在抵御腐化 $t < m$ 个参与方的半诚实敌手时是安全的。
+\end{theorem}
+
+\begin{trivlist}
+\item \textbf{正确性.} 协议的正确性源于定理~\ref{theorem:set2} 及定义~\ref{def:cspf} 中 CSPF 的性质，以及批量成员零分享的正确性。为确保批量成员零分享的正确性，有限域大小需满足 $\lvert \mathbb{F} \rvert \ge \lvert \mathsf{OR} \rvert \cdot B \cdot 2^\sigma$，其中 $\lvert \mathsf{OR} \rvert$ 是所有子公式中 $\mathsf{OR}$ 操作的总数。
+
+设 $Y_i$ 为 $Q_i$ 表示的集合。在 MPSO 和电路 MPSO（方法 2）中，评估每个 $Q_i$ 后，参与方持有 $\lvert Y_i \rvert$ 个 $Y_i$ 元素的秘密分享和 $B-\lvert Y_i \rvert$ 个随机值的分享。由于 $\{Y_1, \cdots, Y_s\}$ 是 $Y$ 的一个划分，各方总计持有 $\lvert Y \rvert$ 个 $Y$ 元素的分享和 $sB-\lvert Y \rvert$ 个随机分享。$P_1$ 或电路通过检查末尾 $l'$ 位是否为全零来识别元素。若随机值与 $0^{l'}$ 碰撞，则产生虚假阳性。总错误概率上限为 $sB \cdot 2^{-l'}$，为使其可忽略，设置 $l' \ge \sigma + \log s + \log B$。在 MPSO-card 和电路 MPSO（方法 1）中，各方持有 $\lvert Y \rvert$ 个 0 的分享。为将虚假阳性概率限制在 $2^{-\sigma}$ 内，设置 $\lvert \mathbb{F} \rvert \ge sB \cdot 2^\sigma$。
+
+\item \textbf{安全性.} 与之前对谓词零分享的隐私性证明类似，除最后重构阶段外的所有交互均在对构建模块（批量成员零分享和多方秘密分享洗牌协议）的调用内部完成，因此给定输出 $Y$，模拟器只需以反向链式的方式调用构建模块的子模拟器。模拟的核心难点在于当 $P_1$ 被腐化时如何模拟重构消息。模拟器从理想功能获得 $Y$ 后，将 $Y$ 中元素编码并生成 $\lvert Y \rvert$ 个秘密分享，随后采样 $sB - \lvert Y \rvert$ 个随机秘密分享并进行随机置换。根据成员零分享的独立性要求，输出分享的秘密独立于任何 $t \le m-1$ 方的联合视图。此外，洗牌功能确保共谋方无法获知置换顺序，因此模拟视图与真实执行不可区分。完整的安全性证明如下：
+
+设 $\textbf{P}_{\mathcal{A}}$ 为被控方集合。在 MPSO 协议中，模拟器接收 $P_c \in \textbf{P}_{\mathcal{A}}$ 的输入 $X_c$；若 $P_1 \in \textbf{P}_{\mathcal{A}}$，则接收结果 $Y$。$P_c$ 的视图包含输入、来自 $\FuncbMZS^{Q'_i}$ 的分享 $\textbf{s}_{i, c}$、来自 $\FuncMS$ 的洗牌份额 $\textbf{u}_{c}'$，以及重构消息 $\textbf{u}_j'$。
+
+设 $\textbf{Q}_{\mathcal{A}}$ 为未涉及诚实方的子公式集合，$\textbf{Q}_{\mathcal{H}}$ 为涉及至少一个诚实方的集合。模拟器按如下方式模拟：
+\begin{itemize}
+\item 对于 $Q_h \in \textbf{Q}_{\mathcal{H}}$，模拟来自 $\FuncbMZS^{Q'_h}$ 的均匀随机秘密分享。
+\item \textbf{情况 $P_1 \notin \textbf{P}_{\mathcal{A}}$：} 从 $\FuncMS$ 中为 $P_c$ 采样均匀随机分享 $\textbf{u}_{c}'$。
+\item \textbf{情况 $P_1 \in \textbf{P}_{\mathcal{A}}$：} 腐化方诚实调用 $\textbf{Q}_{\mathcal{A}}$ 相关协议后，持有秘密集 $Y_{\mathcal{A}}$（拼接全零串）及随机秘密集 $R_{\mathcal{A}}$。设 $Y_{\mathcal{H}} = Y \setminus Y_{\mathcal{A}}$，模拟器采样补全所需的随机值集 $R_{\mathcal{H}}$。最后随机置换并重新分享 $Y \cup R_{\mathcal{H}} \cup R_{\mathcal{A}}$。
+\end{itemize}
+
+在 $P_1 \notin \textbf{P}_{\mathcal{A}}$ 情况下，$P_c$ 收到的分享与真实执行中的分布（由诚实方保证的独立均匀分布）一致。在 $P_1 \in \textbf{P}_{\mathcal{A}}$ 情况下，利用批量成员零分享的独立性要求以及洗牌协议的理想特性，可以证明真实视图中涉及诚实方的分享也是均匀分布且独立的，因此模拟视图与真实执行计算不可区分。MPSO-card 及电路 MPSO 的安全性证明同理，区别仅在于模拟器在 $P_1$ 腐化时使用 0 代替具体元素。
+\end{trivlist}
+
+\subsection{复杂度分析}
+
 
 % \section{典型实例化}
 % \esection{Typical Instantiations}
