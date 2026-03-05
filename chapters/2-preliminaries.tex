@@ -3,9 +3,210 @@
 
 \section{符号说明}
 \esection{Notations}
+令 $m$ 表示参与方的数量。
+本文使用 $P_i$（$1 \le i \le m$）表示各参与方，$X_i$ 表示其持有的集合，其中每个集合包含 $n$ 个 $l$ 比特元素。
+用 $[x] = (x_1,\cdots,x_m)$ 表示在 $m$ 个参与方之间的加法秘密分享（additive secret-sharing），即每个 $P_i$ 持有一个分享份额 $x_i$，满足 $x_1 + \cdots + x_m = x$。
+符号 $\Vert$ 表示两个字符串的拼接。
+$\lambda$ 和 $\sigma$ 分别表示计算安全参数和统计安全参数。
+符号 $\overset{s}{\approx}$ 和 $\overset{c}{\approx}$ 分别表示两个分布在统计上不可区分和计算上不可区分。
+对于向量 $\textbf{a}$，$a_i$ 表示其第 $i$ 个分量，$\pi(\textbf{a}) = (a_{\pi(1)}, \cdots, a_{\pi(n)})$ 表示对向量元素按照 $\pi$ 进行置换，其中 $\pi$ 是 $n$ 个元素上的一个置换。
+记号 $\textbf{a} \oplus \textbf{b}$ 表示按分量异或，即 $(a_1 \oplus b_1, \cdots, a_n \oplus b_n)$。
 
 \section{安全模型}
 \esection{Security Model}
 
+本文考虑\textbf{半诚实（Semi-honest）}且\textbf{静态（Static）}的敌手模型。敌手 $\mathcal{A}$ 可以腐化任意 $t < m$ 个参与方的子集。半诚实敌手（也称为“诚实但好奇”的敌手）会严格按照协议规定执行协议步骤，但在协议执行过程中会记录其视图，并试图从视图中推断出其他诚实参与方的私有输入信息。
+
+令 $f = (f_1, \cdots, f_m)$ 为一个概率多项式时间（probabilistic polynomial-time, PPT）的 $m$ 元功能函数（functionality），$\Pi$ 是一个用于计算 $f$ 的 $m$ 方协议。在协议 $\Pi$ 执行过程中，参与方 $P_i$ ($1 \le i \le m$) 的视图记为 $\mathsf{View}_i^\Pi(\textbf{x})$，其中 $\textbf{x} = (x_1, \dots, x_m)$ 为所有参与方的输入。协议结束时 $P_i$ 的输出记为 $\mathsf{Output}_i^\Pi(\textbf{x})$。所有参与方的联合输出记为 $\mathsf{Output}^\Pi(\textbf{x}) = (\mathsf{Output}_1^\Pi(\textbf{x}), \dots, \mathsf{Output}_m^\Pi(\textbf{x}))$。为了刻画协议的安全性，本文采用基于模拟的（simulation-based）的定义~\cite{Goldreich-FoC2,Canetti01}：
+
+\begin{definition}[半诚实安全]\label{def:prob-secure}
+若存在一个 PPT 算法 $\mathsf{Sim}$，使得对于任意被腐化的参与方集合 $\textbf{P}_{\mathcal{A}} = \{P_{i_1},\cdots,P_{i_t}\} \subset \{P_1,\cdots,P_m\}$，以下两个分布簇在计算上不可区分：
+\begin{gather*}
+\{\mathsf{Sim}(\textbf{P}_{\mathcal{A}},\textbf{x}_{\mathcal{A}},f_{\mathcal{A}}(\textbf{x})),f(\textbf{x})\}_{\textbf{x}} \overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x}),\mathsf{Output}^\Pi(\textbf{x})\}_{\textbf{x}},
+\end{gather*}
+则称协议 $\Pi$ 在敌手 $\mathcal{A}$ 存在的情况下安全地计算了功能 $f$。
+\end{definition}
+
+其中，$\textbf{x}_{\mathcal{A}} = (x_{i_1}, \dots, x_{i_t})$ 表示被腐化方的输入，$f_{\mathcal{A}} = (f_{i_1}, \dots, f_{i_t})$ 表示被腐化方的输出，$\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x}) = (\mathsf{View}_{i_1}^\Pi(\textbf{x}), \dots, \mathsf{View}_{i_t}^\Pi(\textbf{x}))$ 表示敌手的联合视图。
+
+\begin{trivlist}
+\item \textbf{确定性功能的简化定义：} 当功能 $f$ 是确定性（deterministic）函数时，上述定义可以简化为仅比较模拟器模拟的敌手视图和敌手在真实协议执行中的视图的分布（无需考虑联合输出分布）。具体而言，安全性定义包含以下两个要求：
+\begin{itemize}
+    \item \textbf{正确性（Correctness）}：存在一个可忽略函数 $\mathsf{negl}$，使得对于任意输入 $\textbf{x}$，满足：
+    \begin{gather*}
+         \Pr[\mathsf{Output}^\Pi(\textbf{x}) = f(\textbf{x})] \ge 1 - \mathsf{negl}(\sigma).
+    \end{gather*}
+    \item \textbf{隐私性（Privacy）}：存在一个 PPT 算法 $\mathsf{Sim}$，使得对于任意 $\textbf{P}_{\mathcal{A}} \subset \{P_1, \dots, P_m\}$，满足：
+    \begin{gather*}
+        \{\mathsf{Sim}(\textbf{P}_{\mathcal{A}}, \textbf{x}_{\mathcal{A}}, f_{\mathcal{A}}(\textbf{x}))\}_{\textbf{x}} \overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^\Pi(\textbf{x})\}_{\textbf{x}}.
+    \end{gather*}
+\end{itemize}
+\end{trivlist}
+
+\section{多方隐私集合运算}
+\esection{Multi-party Private Set Operations}
+
+多方隐私集合运算（Multi-party Private Set Operations, MPSO）是多方安全计算（Multi-Party Computation, MPC）的一个特例。图 \ref{fig:func-mpso} 形式化定义了本文涉及的 MPSO 中的典型理想功能，包括计算参与方私有集合上的交集、交集基数、带基数的交集求和、并集以及并集基数。
+
+\begin{figure}[!hbtp]
+\begin{framed}
+\begin{minipage}[center]{\textwidth}
+\begin{trivlist}
+\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots, P_m$，其中 $P_1$ 为 Leader。输入集合大小为 $n$。集合元素的比特长度为 $l$。
+\item \textbf{功能：} 收到来自 $P_i$ 的输入 $X_i = \{x_i^1,\cdots, x_i^n\} \subseteq \{0,1\}^l$ 和 $V_i = \{v_i^1,\cdots, v_i^n\}$（假设存在一个映射函数 $\mathsf{payload}_i()$ 将每个元素映射到其关联载荷），
+\begin{itemize}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
+    \item \textbf{MPSI.} 向 $P_1$ 输出交集 $\bigcap_{i=1}^m X_i$。
+    \item \textbf{MPSI-card.} 向 $P_1$ 输出交集基数 $\lvert \bigcap_{i=1}^m X_i \rvert$。
+    \item \textbf{MPSI-card-sum.} 对于 $1 \le i \le m$，向每个 $P_i$ 输出交集基数 $\lvert \bigcap_{i=1}^m X_i \rvert$，并向 $P_1$ 输出交集中负载之和
+    $\sum_{x \in \bigcap_{i=1}^m X_i, 1 \le j \le m} \mathsf{payload}_j(x)$。
+    \item \textbf{MPSU.} 向 $P_1$ 输出并集 $\bigcup_{i=1}^m X_i$。
+    \item \textbf{MPSU-card.} 向 $P_1$ 输出并集基数 $\lvert \bigcup_{i=1}^m X_i \rvert$。
+\end{itemize}
+\end{trivlist}
+\end{minipage}
+\end{framed}
+\caption{MPSO 中的典型功能}\label{fig:func-mpso}
+\end{figure}
+
 \section{基本组件}
 \esection{Basic Components}
+
+本节将介绍构建本文协议所需的底层密码学原语。
+
+\subsection{随机不经意传输}
+
+不经意传输（Oblivious Transfer, OT） \cite{Rabin05} 是 MPC 中的基础原语。本文主要使用二选一随机不经意传输（1-out-of-2 Random OT, ROT），其理想功能 $\mathcal{F}_{\mathsf{ROT}}$ 如图 \ref{fig:func-rot} 所示。在具体实现中，我们采用 SoftSpokenOT \cite{Roy22} 协议来实例化 ROT。
+
+\begin{figure}[!hbtp]
+\begin{framed}
+\begin{minipage}[center]{\textwidth}
+\begin{trivlist}
+\item \textbf{参数：} 发送方 $\Sd$。接收方 $\Rcv$。有限域 $\mathbb{F}$。
+\item \textbf{功能：} 从 $\Rcv$ 接收输入 $e \in \{0,1\}$，采样 $r_0, r_1 \gets \mathbb{F}$。向 $\Sd$ 输出 $(r_0, r_1)$，向 $\Rcv$ 输出 $r_e$。
+\end{trivlist}
+\end{minipage}
+\end{framed}
+\caption{二选一随机不经意传输的理想功能 $\FuncROT$}\label{fig:func-rot}
+\end{figure}
+
+\subsection{Batch Oblivious Programmable Pseudorandom Function}\label{sec:bopprf}
+
+不经意伪随机函数（Oblivious Pseudorandom Function, OPRF）~\cite{FIPR-TCC-2005,CM-CRYPTO-2020,RS-EUROCRYPT-2021} 是 PSO 领域的核心原语。Kolesnikov 等人~\cite{KKRT-CCS-2016} 引入了批量不经意伪随机函数（batch oblivious pseudorandom function, batch OPRF），其提供了一批 OPRF 实例。在第 $i$ 个实例中，发送方 $\Sd$ 获得一个 PRF 密钥 $k_i$，而接收方 $\Rcv$ 输入 $x_i$ 并获得 $\PRF(k_i, x_i)$。
+
+不经意可编程伪随机函数（Oblivious Programmable Pseudorandom Function, OPPRF）~\cite{KMPRT-CCS-2017,PSTY-EUROCRYPT-2019,CGS22,RS-EUROCRYPT-2021,RR-CCS-2022} 是 OPRF 的扩展，其允许发送方 $\Sd$ 首先生成一个均匀随机密钥 $k$，并根据 $k$ 和给定的键值对集合生成一个“提示值” $\mathsf{hint}$（提示生成算法记为 $\mathsf{hint} \gets \mathsf{Hint}(k, K, V)$，其中 $K$ 为键集合，$V$ 为值集合）。利用 $\mathsf{hint}$ 对 PRF $F$ 进行编程，使得 $F$ 对于特定输入（$K$ 中的键）输出特定的均匀值（$V$ 中的值），而对其他输入则输出伪随机值。这种在特定输入集上输出编程值的的 PRF 被称为可编程 PRF（Programmable PRF, PPRF）~\cite{PSTY-EUROCRYPT-2019}。接收方 $\Rcv$ 利用其输入和给定的 $\mathsf{hint}$ 计算 OPPRF，但他无法区分自己获得的是编程后的输出还是伪随机值。批量版本的 OPPRF（batch OPPRF）的理想功能 $\mathcal{F}_{\mathsf{bOPPRF}}$ 如图 \ref{fig:func-bopprf} 所示。
+
+\begin{figure}[!hbtp]
+\begin{framed}
+\begin{minipage}[c]{\textwidth}
+\begin{trivlist}
+\item \textbf{参数：} 发送方 $\mathsf{S}$，接收方 $\mathsf{R}$。批量大小 $B$。键比特长度 $l$，值比特长度 $\gamma$。PPRF $F: \{0,1\}^* \times \{0,1\}^* \times \{0,1\}^l \to \{0,1\}^{\gamma}$。
+\item \textbf{发送方输入：} $\Sd$ 输入 $B$ 个键值对集合，包括：
+\begin{itemize}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
+\item 不相交的键集合 $\textbf{K} = (K_1, \dots, K_B)$。
+\item 值集合 $\textbf{V} = (V_1, \dots, V_B)$，其中 $\lvert K_i \rvert = \lvert V_i \rvert, 1 \le i \le B$。
+\end{itemize}
+\item \textbf{接收方输入：} $\Rcv$ 输入 $B$ 个查询 $\textbf{x} \subseteq (\{0,1\}^l)^B$。
+\item \textbf{功能：} 在接收到来自 $\mathsf{S}$ 的 $\textbf{K}, \textbf{V}$ 和来自 $\mathsf{R}$ 的 $\textbf{x}$ 后：
+\item \textbf{功能：} 在从 $\Sd$ 收到 $\textbf{K}$ 与 $\textbf{V}$，并从 $\Rcv$ 收到 $\textbf{x}$ 后，
+\begin{itemize}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
+\item 生成均匀密钥 $\textbf{k} = (k_1, \cdots, k_B)$，并计算 {$\mathsf{hint} \gets \Hint(\textbf{k}, \textbf{K}, \textbf{V})$}，满足 $F(k_i, {\mathsf{hint}}, K_i(j)) = V_i(j)$，其中 $1 \le i \le B, 1 \le j \le \lvert K_i \rvert$；
+\item 定义 $f_i = F(k_i, {\mathsf{hint}}, x_i)$，$1 \le i \le B$；
+\item 将 $\textbf{k}$ 发送给 $\Sd$，并将 $\textbf{f} = (f_1, \cdots, f_B)$ 以及 {$\mathsf{hint}$} 发送给 $\Rcv$。
+\end{itemize}
+\end{trivlist}
+\end{minipage}
+\end{framed}
+\caption{批量不经意可编程伪随机函数的理想功能 $\mathcal{F}_{\mathsf{bOPPRF}}$}\label{fig:func-bopprf}
+\end{figure}
+
+\subsection{秘密分享隐私相等性测试}
+\esection{Secret-Shared Private Equality Test}
+\label{sec:sspeqt}
+
+秘密分享隐私等值测试（Secret-Shared Private Equality Test, ssPEQT）~\cite{PSTY-EUROCRYPT-2019,CGS22} 是一个两方协议，其中发送方 $\Sd$ 和接收方 $\Rcv$ 各输入一个元素。若双方输入元素相同，则他们获得 1 的秘密分享，否则获得 0 的秘密分享。图 \ref{fig:func-sspeqt} 定义了该理想功能。
+
+\begin{figure}[!hbtp]
+\begin{framed}
+\begin{minipage}[c]{\textwidth}
+\begin{trivlist}
+\item \textbf{参数：} 两个参与方 $P_1, P_2$。输入比特长度 $\gamma$。
+\item \textbf{功能：} 收到来自 $P_1$ 的输入 $x$ 和来自 $P_2$ 的输入 $y$ 后，采样两个随机比特 $a, b$，使得若 $x = y$，则 $a \oplus b = 1$；否则 $a \oplus b = 0$。向 $P_1$ 输出 $a$，向 $P_2$ 输出 $b$。
+\end{trivlist}
+\end{minipage}
+\end{framed}
+\caption{秘密分享隐私相等性测试的理想功能 $\FuncssPEQT$}\label{fig:func-sspeqt}
+\end{figure}
+
+\subsection{多方秘密分享洗牌}
+\esection{Multi-Party Secret-Shared Shuffle}
+\label{sec:ms}
+
+多方秘密分享洗牌是一个 $m$ 方协议，其通过随机置换所有参与方的分享向量并刷新所有分享值，来确保该置换对于任意 $m-1$ 个参与方的共谋都是保密的。该功能 $\FuncMS$ 在图 \ref{fig:func-ms} 中给出。Eskandarian 等人~\cite{EB22} 提出了一种在线高效的协议，参与方在离线阶段生成分享相关性（share correlations），使得 Leader 的在线复杂度与 $n$ 和 $m$ 呈线性关系，而 Client 的在线复杂度与 $n$ 呈线性关系且独立于 $m$。
+
+\begin{figure}[!hbtp]
+\begin{framed}
+\begin{minipage}[c]{\textwidth}
+\begin{trivlist}
+\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots, P_m$。向量维度 $n$。元素长度 $l$。
+\item \textbf{功能：} 收到来自每个 $P_i$ 的输入 $\textbf{x}_i = {(x_i^1, \cdots, x_i^n)}$ 后，采样一个随机置换 $\pi : [n] \to [n]$。对于 $1 \le i \le m$，采样 $\textbf{x}_{i}' \gets (\{0,1\}^l)^n$，满足 $\bigoplus_{i=1}^m \textbf{x}_{i}' = \pi(\bigoplus_{i=1}^m \textbf{x}_i)$。向 $P_i$ 输出 $\textbf{x}_{i}'$。
+\end{trivlist}
+\end{minipage}
+\end{framed}
+\caption{多方秘密分享洗牌的理想功能 $\FuncMS$}\label{fig:func-ms}
+\end{figure}
+
+\subsection{哈希分桶}
+\esection{Hashing to Bins}
+
+哈希分桶（Hashing to Bins）技术~\cite{PSZ-USENIX-2014,PSZ-USENIX-2015} 被广泛用于 PSO 中，以确保不同参与方持有的相同元素被分配到具有相同索引的桶（bin）中。这种对齐是通过简单哈希（Simple Hashing）和布谷鸟哈希（Cuckoo Hashing）~\cite{PR04} 对输入集合进行预处理来实现的。
+
+本文用以下符号表示简单哈希：
+\begin{gather*}
+\mathcal{T}^1, \cdots, \mathcal{T}^B \gets \Simple_{h_1,h_2,h_3}^B(X)
+\end{gather*}
+该表达式表示使用哈希函数 $h_1, h_2, h_3: \{0, 1\}^* \to \{1, \cdots, B\}$ 将集合 $X$ 中的元素哈希到 $B$ 个桶中。输出为简单哈希表 $\mathcal{T}^1, \cdots, \mathcal{T}^B$，其中对于任意 $x \in X$，满足 $\mathcal{T}^{h_i(x)} \supseteq \{x \Vert i \vert i= 1, 2, 3\}$\footnote{附加哈希函数的索引 $i$ 有助于处理如 $h_1(x) = h_2(x) = i$ 这样的边缘情况，这些情况发生的概率是不可忽略的。}。
+
+本文用以下符号表示布谷鸟哈希：
+\begin{gather*}
+\mathcal{C}^1, \cdots, \mathcal{C}^B \gets \Cuckoo_{h_1,h_2,h_3}^B(X)
+\end{gather*}
+该表达式表示使用哈希函数 $h_1, h_2, h_3$ 将集合 $X$ 中的元素哈希到 $B$ 个桶中。输出为布谷鸟哈希表 $\mathcal{C}^1, \cdots, \mathcal{C}^B$，其中对于任意 $x \in X$，存在唯一的 $i \in \{1, 2, 3\}$ 使得 $\mathcal{C}^{h_i(x)} = \{x \Vert i\}$。
+
+\subsection{多密钥重随机化公钥加密}
+\esection{Multi-Key Rerandomizable Public-Key Encryption}
+\label{sec:mkr-pke}
+
+Gao 等人~\cite{GNT-eprint-2023} 引入了多密钥重随机化公钥加密（Multi-Key Rerandomizable Public-Key Encryption, MKR-PKE）的概念，这是 PKE 的一种变体，具有若干额外的属性。令 $\mathcal{SK}$ 表示私钥空间（在运算 $+$ 下构成阿贝尔群），$\mathcal{PK}$ 表示公钥空间（在运算 $\cdot$ 下构成阿贝尔群）。$\mathcal{M}$ 表示明文空间，$\mathcal{C}$ 表示密文空间。MKR-PKE 是一个 PPT 算法组 $(\Gen, \Enc, \ParDec, \Dec, \ReRand)$，满足：
+\begin{itemize}
+\item 密钥生成算法 $\Gen$：输入安全参数 $1^\lambda$，输出一对密钥 $(pk, sk) \in \mathcal{PK} \times \mathcal{SK}$。
+\item 加密算法 $\Enc$：输入公钥 $pk \in \mathcal{PK}$ 和明文消息 $x \in \mathcal{M}$，输出密文 $\ct \in \mathcal{C}$。
+\item 部分解密算法 $\ParDec$：输入私钥分片 $sk \in \mathcal{SK}$ 和密文 $\ct \in \mathcal{C}$，输出另一密文 $\ct' \in \mathcal{C}$。
+\item 解密算法 $\Dec$：输入私钥 $sk \in \mathcal{SK}$ 和密文 $\ct \in \mathcal{C}$，输出消息 $x \in \mathcal{M}$ 或错误符号 $\perp$。
+\item 重随机化算法 $\ReRand$：输入公钥 $pk \in \mathcal{PK}$ 和密文 $\ct \in \mathcal{C}$，输出另一密文 $\ct' \in \mathcal{C}$。
+\end{itemize}
+
+MKR-PKE 是一个满足选择明文攻击下不可区分性（indistinguishability under chosen-plaintext attack, IND-CPA）的安全性定义的 PKE 方案，并具备以下额外性质：
+
+\begin{trivlist}
+\item \textbf{可部分解密性（Partially Decryptable）.} 对于任意两对密钥 $(sk_1, pk_1) \gets \Gen(1^\lambda), (sk_2, pk_2) \gets \Gen(1^\lambda)$ 和任意 $x \in \mathcal{M}$，满足：
+\begin{gather*}
+\ParDec(sk_1, \Enc(pk_1 \cdot pk_2,x)) \overset{s}{\approx} \Enc(pk_2,x)
+\end{gather*}
+
+\item \textbf{可重随机化性（Rerandomizable）.} 对于任意 $pk \in \mathcal{PK}$ 和任意 $x \in \mathcal{M}$，满足：
+$$\ReRand(pk,\Enc(pk,x)) \overset{s}{\approx} \Enc(pk,x)$$
+\end{trivlist}
+
+Gao 等人~\cite{GNT-eprint-2023} 利用基于椭圆曲线（Elliptic Curve, EC）的 ElGamal 加密~\cite{ElGamal-IEEE-IT-1985} 实例化了满足 IND-CPA 安全性的 MKR-PKE。具体的 EC MKR-PKE 构造如下：
+
+\begin{itemize}
+\item 密钥生成算法 $\Gen$：输入安全参数 $1^\lambda$，生成 $(\mathbb{G},g,q)$，其中 $\mathbb{G}$ 是循环群，$g$ 是生成元，$q$ 是阶。输出 $sk$ 和 $pk = g^{sk}$。
+\item 随机化加密算法 $\Enc$：输入公钥 $pk$ 和明文消息 $x \in \mathbb{G}$，采样 $r \gets \mathbb{Z}_q$，输出 $\ct = (\ct_1, \ct_2) = (g^r, x \cdot pk^r)$。
+\item 部分解密算法 $\ParDec$：输入私钥分片 $sk$ 和密文 $\ct = (\ct_1, \ct_2)$，输出 $\ct' = (\ct_1, \ct_2 \cdot \ct_1^{-sk})$。
+\item 解密算法 $\Dec$：输入私钥 $sk$ 和密文 $\ct = (\ct_1, \ct_2)$，输出 $x = \ct_2 \cdot \ct_1^{-sk}$。
+\item 重随机化算法 $\ReRand$：输入 $pk$ 和密文 $\ct = (\ct_1, \ct_2)$，采样 $r' \gets \mathbb{Z}_q$，输出 $\ct' = (\ct_1 \cdot g^{r'}, \ct_2 \cdot pk^{r'})$。
+\end{itemize}
+
+% \begin{remark} 
+% 据我们所知，很少有椭圆曲线支持在比特字符串和 EC 点之间进行高效的编码和解码。因此，EC MKR-PKE 的明文空间通常限制为 EC 点，以保证可重随机化属性。
+% \end{remark}

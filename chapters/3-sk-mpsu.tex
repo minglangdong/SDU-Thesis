@@ -53,7 +53,7 @@ LG 协议利用两个核心组件来实现第一阶段：
 与 mq-ssPMT 相比，batch ssPMT 能够测试元素在多个不同集合中的成员关系，而非单一共同集合。两者的关系类似于 batch OPRF \cite{KKRT-CCS-2016} 与多点 OPRF \cite{PRTY-CRYPTO-2019} 之间的关系。这种“批量化”的特性允许更高效的构造，并能够通过结合哈希分桶（Hashing-to-bins）技术，在 MPSU 场景下完全替代 mq-ssPMT，具体构造如下：
 接收方 $\Rcv$ 利用布谷鸟哈希（Cuckoo Hashing）将输入向量 $\textbf{y}$ 中的元素分配至 $B$ 个桶中，布谷鸟哈希可以确保每个桶至多一个元素；发送方 $\Sd$ 则利用简单哈希（Simple Hashing）将输入集合 $X$ 中的元素分配至对应的所有桶中。随后，双方调用包含 $B$ 个ssPMT 实例的 batch ssPMT 协议。哈希分桶技术保证了只有当 $\Rcv$ 的第 $j$ 桶中的元素 $y_i \in X$，该元素才会存在于 $\Sd$ 的第 $j$ 个桶中所有元素组成的集合 $X_j$ 中，从而双方在调用 batch ssPMT 后才能获得 1 的分享。然而，由于该构造最终输出的秘密分享的顺序取决于 $\Rcv$使用布谷鸟哈希存放 $\textbf{y}$ 中各元素的位置，而该位置依赖于 $\textbf{y}$ 中所有元素，直接重构可能会泄露 $\Rcv$ 的输入向量中的元素信息。本文的关键洞察在于：第二阶段使用的多方秘密分享置换不仅消除了重构顺序与差集的之前对应关系，同时也消除了其与哈希位置的依赖。因此，上述基于哈希分桶和 batch ssPMT 的构造可以无缝嵌入现有的基于秘密分享的 MPSU 框架以取代 mq-ssPMT，而不会引入额外信息泄露。
 
-相比于依赖通用两方计算（2PC）的 mq-ssPMT，本文的 batch ssPMT 基于两个轻量级的组件构建：批量不经意可编程伪随机函数（batch oblivious programmable pseudorandom function, batch OPPRF）和秘密分享等值测试（secret-shared private equality test, ssPEQT）。其中，batch OPPRF 可通过 向量不经意线性求值（textbftor Oblivious Linear Evaluation, VOLE） 获得极其高效的实例化，而 ssPEQT 虽然需利用通用 2PC 实现，但因其仅涉及规模较小的电路，计算和通信开销小，并不会成为性能瓶颈。因此，该构造显著减少了协议对通用 2PC 的依赖，从而大幅提升了协议的整体性能。
+相比于依赖通用两方计算（2PC）的 mq-ssPMT，本文的 batch ssPMT 基于两个轻量级的组件构建：批量不经意可编程伪随机函数（batch oblivious programmable pseudorandom function, batch OPPRF）和秘密分享隐私等值测试（secret-shared private equality test, ssPEQT）。其中，batch OPPRF 可通过 向量不经意线性求值（textbftor Oblivious Linear Evaluation, VOLE） 获得极其高效的实例化，而 ssPEQT 虽然需利用通用 2PC 实现，但因其仅涉及规模较小的电路，计算和通信开销小，并不会成为性能瓶颈。因此，该构造显著减少了协议对通用 2PC 的依赖，从而大幅提升了协议的整体性能。
 
 \subsection{基于 batch ssPMT 和 mss-ROT 的 SK-MPSU 协议} \label{sec:sk-overview}
 \esubsection{SK-MPSU from batch ssPMT and mss-ROT}
@@ -100,7 +100,7 @@ LG 协议利用两个核心组件来实现第一阶段：
 \subsection{协议构造与安全性证明}
 \esubsection{Protocol Construction and Security Proof}
 
-本节基于批量不经意可编程伪随机函数（batch OPPRF）和秘密分享等值测试（ssPEQT）给出 batch ssPMT 协议的高效构造，具体协议 $\Pi_{\text{bssPMT}}$ 如图 \ref{fig:proto-bssPMT} 所示。 
+本节基于批量不经意可编程伪随机函数（batch OPPRF）和秘密分享隐私等值测试（ssPEQT）给出 batch ssPMT 协议的高效构造，具体协议 $\Pi_{\text{bssPMT}}$ 如图 \ref{fig:proto-bssPMT} 所示。 
 
 \begin{figure}[!hbtp]
 \centering
