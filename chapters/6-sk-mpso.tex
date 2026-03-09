@@ -194,7 +194,7 @@ MPSI-card-sum 协议通过利用 6.2 节中“带载荷的批量全成员零分�
 \begin{framed}
 \begin{minipage}[center]{\textwidth}
 \begin{trivlist}
-\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots, P_m$。集合大小 $n$。元素长度 $l$。有限域 $\mathbb{F}$。布谷鸟哈希参数：哈希函数 $h_1, h_2, h_3$ 及桶数量 $B$。
+\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots, P_m$。集合大小 $n$。元素长度 $l$。有限域 $\mathbb{F}$。布谷鸟哈希参数：哈希函数 $h_1, h_2, h_3$ 及桶数 $B$。
 \item \textbf{输入：} 每个参与方 $P_i$ 拥有输入集合 $X_i = \{x_i^1,\cdots, x_i^n\} \subseteq \{0,1\}^l$ 及载荷集合 $V_i = \{v_i^1,\cdots, v_i^n\}$，并具有从元素到关联载荷的映射函数 $\mathsf{payload}_i()$。
 
 \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=15pt]
@@ -230,7 +230,7 @@ MPSI-card-sum 协议通过利用 6.2 节中“带载荷的批量全成员零分�
 \begin{framed}
 \begin{minipage}[center]{\textwidth}
 \begin{trivlist}
-\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots, P_m$。集合大小 $n$。元素长度 $l$。全零字符串长度 $l'$。有限域 $\mathbb{F}$。编码函数 $\mathsf{code}:\mathbb{F} \to \{0,1\}^{l+l'}$。布谷鸟哈希参数：哈希函数 $h_1, h_2, h_3$ 及桶数量 $B$。
+\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots, P_m$。集合大小 $n$。元素长度 $l$。全零字符串长度 $l'$。有限域 $\mathbb{F}$。编码函数 $\mathsf{code}:\mathbb{F} \to \{0,1\}^{l+l'}$。布谷鸟哈希参数：哈希函数 $h_1, h_2, h_3$ 及桶数 $B$。
 \item \textbf{输入：} 每个参与方 $P_i$ 持有输入集合 $X_i = \{x_i^1,\cdots, x_i^n\} \subseteq \{0,1\}^l$。
 
 \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=15pt]
@@ -243,7 +243,7 @@ MPSI-card-sum 协议通过利用 6.2 节中“带载荷的批量全成员零分�
     \textbf{MPSU.} 
     \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=15pt] \addtocounter{enumi}{2}
         \item 对于 $1 < j \le m$ 和 $1 \le b \le B$，若 $\mathcal{C}_j^b$ 不是空桶，$P_j$ 计算 $s_{j,j,b} = \mathsf{code}(s_{j,j,b}) \oplus (x \Vert 0^{l'})$，其中 $x$ 是 $\mathcal{C}_j^b$ 中的元素；否则 $P_j$ 随机采样 $s_{j,j,b} \gets \{0,1\}^{l+l'}$。
-        \item 对于 $1 \le i \le m$，$P_i$ 构造一个扩展向量 $\textbf{u}_i \in (\{0,1\}^{l+l'})^{(m-1)B}$，规则如下：对于 $\max(2,i) \le j \le m$ 和 $1 \le b \le B$，$u_{i,(j-2)B+b} = s_{j,i,b}$。将其余位置设为 $0$。
+        \item 对于 $1 \le i \le m$，$P_i$ 构造向量 $\textbf{u}_i \in (\{0,1\}^{l+l'})^{(m-1)B}$，规则如下：对于 $\max(2,i) \le j \le m$ 和 $1 \le b \le B$，$u_{i,(j-2)B+b} = s_{j,i,b}$。将其余位置设为 $0$。
         \item 对于 $1 \le i \le m$，$P_i$ 将 $\textbf{u}_i$ 输入到 $\mathcal{F}_{\mathsf{shuffle}}$ 中，接收打乱后的份额 $\textbf{u}_{i}'$。
         \item 对于 $1 < j \le m$，$P_j$ 将 $\textbf{u}_j'$ 发送给 $P_1$。$P_1$ 计算重构向量 $\textbf{u}' = \sum_{1 < j \le m} \textbf{u}_j'$ 并初始化 $Y = \emptyset$。对于 $1 \le b \le (m-1)B$，如果 $u_b'$ 满足 $y \Vert 0^{l'}$ 的格式（其中 $y \in \{0,1\}^l$），$P_1$ 将 $y$ 加入集合 $Y = Y \cup \{y\}$。最终输出 $Y \cup X_1$。
     \end{enumerate}
@@ -259,7 +259,7 @@ MPSI-card-sum 协议通过利用 6.2 节中“带载荷的批量全成员零分�
     \textbf{Circuit-MPSU (采用通用电路方案).}
     \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=15pt] \addtocounter{enumi}{2}
         \item 对于 $1 < j \le m$ 和 $1 \le b \le B$，若 $\mathcal{C}_j^b$ 不是空桶，$P_j$ 计算 $s_{j,j,b} = \mathsf{code}(s_{j,j,b}) \oplus (x \Vert 0^{l'})$，其中 $x$ 是 $\mathcal{C}_j^b$ 中的元素；否则 $P_j$ 随机采样 $s_{j,j,b} \gets \{0,1\}^{l+l'}$。
-        \item 对于 $1 \le i \le m$，$P_i$ 构造扩展向量 $\textbf{u}_i \in (\{0,1\}^{l+l'})^{(m-1)B}$，规则同上，其余位置设为 $0$。
+        \item 对于 $1 \le i \le m$，$P_i$ 构造向量 $\textbf{u}_i \in (\{0,1\}^{l+l'})^{(m-1)B}$，规则同上，其余位置设为 $0$。
         \item 所有参与方调用包含电路 $C_{(m-1)B,l'}^2$ 的 $m$ 方通用 MPC。对于 $1 \le i \le m, 1 \le k \le (m-1)B$，$P_i$ 将 $u_{i,k}$ 输入到电路中进行联合计算。
     \end{enumerate}
 \end{trivlist}
