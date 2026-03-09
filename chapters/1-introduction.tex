@@ -132,7 +132,7 @@ Kissner 和 Song \cite{KS-CRYPTO-2005} 在 MPSO 发展的早期阶段就尝试�
 	本文深入分析了现有唯一的基于对称密钥技术的 MPSU 协议 \cite{LG-ASIACRYPT-2023}，并针对其核心组件 —— 多查询秘密分享隐私成员测试（multi-query secret-shared private membership test, mq-ssPMT）协议，抽象出一种全新的原语 —— 批量秘密分享隐私成员测试（batch secret-shared private membership test, batch ssPMT）。相比于 mq-ssPMT 的实例化严重依赖于昂贵的通用 MPC 技术所导致的性能瓶颈，本文提出的 batch ssPMT 能够仅利用轻量级密码学组件进行高效实例化。通过结合哈希分桶（hashing-to-bins）技术，该原语能够在不引入任何额外信息泄露的前提下，完全替代现有基于对称密钥技术的 MPSU 框架中的 mq-ssPMT 组件。该原语不仅构成了本文两个 MPSU 协议的核心构建模块，其高效的构造也是协议实际性能获得显著提升的关键所在。此外，该原语在本文后续构建的 MPSO 框架中也发挥着关键作用，被用于高效构造其核心共性子协议 —— 成员零分享（Membership Zero-Sharing）协议，从而为任意集合公式的计算提供了底层支撑。
 
     \item \textbf{首个标准半诚实模型下基于对称密钥的 MPSU 协议.} 
-    本文将随机不经意传输（Random Oblivious Transfer, ROT）的概念推广至多方场景，定义并构造了多方秘密分享随机不经意传输（multi-party secret-shared ROT, mss-ROT）原语。基于 batch ssPMT 和 mss-ROT，本文提出了首个在标准半诚实模型下证明安全且基于对称密钥技术的 MPSU 协议。该协议不仅成功消除了现有基于对称密钥的方案对非合谋假设的依赖，显著增强了安全性，还表现出更加优异的具体性能。 特别是在局域网（LAN）环境下，其在线阶段的运行效率比 SOTA 协议 \cite{LG-ASIACRYPT-2023} 提升了 $3.9 \sim 10.0$ 倍，整体运行效率提升了 $1.2 \sim 7.8$ 倍。
+    本文将随机不经意传输（Random Oblivious Transfer, ROT）的概念推广至多方场景，定义并构造了多方秘密分享随机不经意传输（multi-party secret-shared ROT, mss-ROT）原语。基于 batch ssPMT 和 mss-ROT，本文提出了首个在标准半诚实模型下证明安全且基于对称密钥技术的 MPSU 协议。该协议不仅成功消除了现有基于对称密钥的方案对非合谋假设的依赖，显著增强了安全性，还表现出更加优异的具体性能。 特别是在局域网（LAN）环境下，其在线阶段的运行效率比最先进的（State-of-the-Art, SOTA）协议 \cite{LG-ASIACRYPT-2023} 提升了 $3.9 \sim 10.0$ 倍，整体运行效率提升了 $1.2 \sim 7.8$ 倍。
 
     \item \textbf{首个具有线性复杂度的 MPSU 协议.} 
     基于 batch ssPMT 和多密钥重随机化公钥加密（Multi-Key Rerandomizable Public-Key Encryption, MKR-PKE） \cite{GNT-eprint-2023}，本文提出了首个同时实现线性计算复杂度和线性通信复杂度的 MPSU 协议。得益于其优越的渐进复杂度，该协议极大地降低了通信开销。实验数据显示，相比于 SOTA 协议 \cite{LG-ASIACRYPT-2023}，该协议的总通信量降低了 $3.0 \sim 36.5$ 倍，使其在带宽受限的广域网（WAN）环境下具有显著的应用优势。
@@ -161,9 +161,9 @@ Kissner 和 Song \cite{KS-CRYPTO-2005} 在 MPSO 发展的早期阶段就尝试�
 除了上述对 MPSO 框架的研究本身做出的理论贡献外，通过对该框架进行实例化，本文在 MPSO 的各个具体子领域亦取得了突破性进展，解决了一系列长期存在的开放性问题。具体贡献点如下：
 
 \begin{itemize}
-    \item \textbf{多方隐私集合求交.} 基于本文框架实例化的 MPSI 协议是首个在标准半诚实模型下实现\textbf{最优渐进复杂度}（即达到与不考虑隐私的明文传输方案相同量级的复杂度 —— Leader 的计算与通信复杂度为 $O(mn)$，Client 的计算与通信复杂度为 $O(n)$）基于对称密钥技术的 MPSI 构造。此前达到该复杂度的协议 \cite{KMPRT-CCS-2017} 仅在增强半诚实模型（Augmented Semi-Honest）下安全，本文填补了这一空白。同时，该协议也是目前在线效率最高的 MPSI 协议，在 LAN / WAN 环境下比 SOTA 协议 \cite{WuYC24} 快 $2.4 \sim 5.2$ / $1.1 \sim 2.6$ 倍。
+    \item \textbf{多方隐私集合求交.} 基于本文框架实例化的 MPSI 协议是首个在标准半诚实模型下实现\textbf{最优渐进复杂度}（即达到与不考虑隐私的明文传输方案相同量级的复杂度 —— Leader 的计算与通信复杂度为 $O(mn)$，Client 的计算与通信复杂度为 $O(n)$）的基于对称密钥技术的 MPSI 构造。此前达到该复杂度的协议 \cite{KMPRT-CCS-2017} 仅在增强半诚实模型（Augmented Semi-Honest）下安全，本文填补了这一空白。同时，该协议也是目前在线效率最高的 MPSI 协议，在 LAN / WAN 环境下比 SOTA 协议 \cite{WuYC24} 快 $2.4 \sim 5.2$ / $1.1 \sim 2.6$ 倍。
     
-    \item \textbf{多方隐私交集计算.} 基于本文框架实例化的 MPSI-card 和 MPSI-card-sum 协议是首个在标准半诚实模型下实现\textbf{最优渐进复杂度}的 MPSI-card 和 MPSI-card-sum 协议。其中， MPSI-card 协议也是目前在线阶段最高效的同类协议，其在线通信量比 SOTA \cite{ChenDGB22} 降低了 $14.0 \sim 20.3$ 倍； MPSI-card-sum 协议是目前唯一一个给出了具体实现的同类协议，实验表明其计算与通信开销仅约为前述 MPSI 协议的两倍。此外，基于本框架实例化的 Circuit-MPSI 协议是首个在\textbf{不诚实大多数（Dishonest Majority）}设定下安全的Circuit-MPSI 协议，突破了以往工作仅限于诚实大多数（Honest Majority）安全的局限。
+    \item \textbf{多方隐私交集计算.} 基于本文框架实例化的 MPSI-card 和 MPSI-card-sum 协议是首个在标准半诚实模型下实现\textbf{最优渐进复杂度}的 MPSI-card 和 MPSI-card-sum 协议。其中， MPSI-card 协议也是目前在线阶段最高效的同类协议，其在线通信量比 SOTA \cite{ChenDGB22} 降低了 $14.0 \sim 20.3$ 倍； MPSI-card-sum 协议是目前唯一一个给出了具体实现的同类协议，实验表明其计算与通信开销仅约为前述 MPSI 协议的两倍。此外，基于本框架实例化的 Circuit-MPSI 协议是首个在\textbf{不诚实大多数（Dishonest Majority）}设定下安全的Circuit-MPSI 构造，突破了以往工作仅限于诚实大多数（Honest Majority）安全的局限。
     
     \item \textbf{多方隐私集合求并.} 基于本文框架实例化的 MPSU 协议是标准半诚实模型下基于对称密钥的另一高效 MPSU 方案。尽管其实际计算性能略逊于本文第三章提出的 MPSU 协议，但其在理论上实现了\textbf{更优的渐进复杂度}，并且其在线通信开销降低了 $1.8$ 倍，因此在带宽受限网络中具有更强的竞争力。
     

@@ -376,8 +376,6 @@ s = r \cdot b = (r+a-a) \cdot b = (r+a) \cdot b - a \cdot b
 \section{成员零分享}
 \esection{Membership Zero-Sharing}
 
-\section{成员零分享（Membership Zero-Sharing）}
-
 谓词零分享刻画了一类 MPC 协议的统一抽象。只有指定相关联的谓词公式，谓词零分享才可被实例化为具体协议。为了在 MPSO 语境下实例化谓词零分享，本节引入了一类更具体的 MPC 协议 —— 成员零分享（Membership Zero-Sharing），作为谓词零分享的一个子集，每个成员零分享协议都与一个集合谓词公式相关联，并构成后续 MPSO 框架的技术核心。
 
 本节的目标是为任意一阶集合谓词公式构造完整的成员零分享协议。从宏观来看，我们的构造遵循图~\ref{fig:proto-cpzs} 中给出的构建谓词零分享的技术路线。要构造具体协议，我们还需要实例化其中的松弛谓词零分享组件 —— 更具体地，在本章集合谓词公式的语境下，松弛成员零分享。鉴于任何集合谓词公式仅由两类文字组成 —— 集合成员谓词 $x \in Y$ 及其否定 $x \notin Y$，因此问题可归约为在两方场景下分别构造与这两个简单谓词相关联的松弛成员零分享协议。
@@ -588,7 +586,7 @@ Circuit-MPSO（方案2）的安全性证明相同。协议的安全性证明与�
 
 \subsection{复杂度分析}
 
-图~\ref{fig:proto-MPSO} 中的计算和通信复杂度均由所计算的可构造集合 $Y$ 的 CPF 表示 $\psi(x, X_1, \cdots, X_m)$ 形式决定，其中 $\psi = Q_1 \lor \cdots \lor Q_s$。
+图~\ref{fig:proto-MPSO} 中的计算和通信复杂度均由所计算的可构造集合 $Y$ 的 CPSF 表示 $\psi(x, X_1, \cdots, X_m)$ 形式决定，其中 $\psi = Q_1 \lor \cdots \lor Q_s$。
 
 在成员零分享阶段，每个参与方 $P_j$ 的计算复杂度包括两部分：
 (1) $O(\sum_{1 \le i \le s}(i_q \cdot \lvert \mathsf{AND}_i + \mathsf{OR}_i \rvert \cdot n))$，其中 $Q_i$ 相对于 $X_j$ 是局部的（我们用 $Q'_i$ 表示 $Q_i$ 的 $X_j$-局部剩余公式），$i_q$ 是文字的数量，$\lvert \mathsf{AND}_i + \mathsf{OR}_i \rvert$ 是 $Q'_i$ 中 $\mathsf{AND}$ 和 $\mathsf{OR}$ 操作的总数；
