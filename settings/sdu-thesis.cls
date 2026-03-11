@@ -231,7 +231,7 @@
 \newcommand{\content}{
 	\maketableofcontents
 	% English TOC
-	\tableofengcontents
+	% \tableofengcontents
 	\cleartochapter
 }
 % ---- 中文目录 ----

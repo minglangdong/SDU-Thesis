@@ -71,7 +71,7 @@
 				%\Mcs{培~~养~~方~~式} & \Mcc{\the\Approach}    \\[-.8mm]\cline{2-2}\\[-4mm]
 				\Mcs{专~~业~~名~~称} & \Mcc{\the\Cmajor}      \\[-.8mm]\cline{2-2}\\[-4mm]
 				\Mcs{指~~导~~教~~师} & \Mcc{\the\Csuperver}   \\[-.8mm]\cline{2-2}\\[-4mm]
-				\Mcs{合~~作~~导~~师} & \Mcc{\the\Ccosuperver} \\[-.8mm]\cline{2-2}
+				
 			\end{tabular}
 		}
 		\par \vskip 20mm \relax

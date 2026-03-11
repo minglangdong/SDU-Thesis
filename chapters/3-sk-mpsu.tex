@@ -94,7 +94,7 @@ LG 协议利用两个核心组件来实现第一阶段：
     最后，将 $\textbf{e}_S = (e_S^1, \dots, e_S^B)$ 发送给 $\Sd$，将 $\textbf{e}_R = (e_R^1, \dots, e_R^B)$ 发送给 $\Rcv$。
 \end{trivlist}
 \end{framed}
-\caption{理想功能 $\mathcal{F}_{\text{bssPMT}}$}\label{fig:func-bssPMT}
+\caption{批量秘密分享隐私成员测试的理想功能 $\mathcal{F}_{\text{bssPMT}}$}\label{fig:func-bssPMT}
 \end{figure}
 
 \subsection{协议构造与安全性证明}
@@ -115,7 +115,7 @@ LG 协议利用两个核心组件来实现第一阶段：
     \item \textbf{执行 ssPEQT：} 双方调用 $B$ 个独立的 $\mathcal{F}_{\text{ssPEQT}}$ 实例。在第 $i$ 个实例中，$\Sd$ 输入 $s_i$，$\Rcv$ 输入 $t_i$。最终，双方分别获得比特 $e_S^i, e_R^i \in \{0,1\}$。
 \end{enumerate}
 \end{framed}
-\caption{协议 $\Pi_{\text{bssPMT}}$}\label{fig:proto-bssPMT}
+\caption{批量秘密分享隐私成员测试协议 $\Pi_{\text{bssPMT}}$}\label{fig:proto-bssPMT}
 \end{figure}
 
 \begin{theorem} \label{theorem:bssPMT}
@@ -206,7 +206,7 @@ Liu 和 Gao 将 \cite{ZCLZL-USENIX-2023} 中基于对称密钥加密（SKE）的
     \end{itemize}
 \end{trivlist}
 \end{framed}
-\caption{理想功能 $\FuncmssROT$}\label{fig:func-mssrot}
+\caption{多方秘密分享随机不经意传输的理想功能 $\FuncmssROT$}\label{fig:func-mssrot}
 \end{figure}
 
 \subsection{协议构造与安全性证明}
@@ -227,7 +227,7 @@ Liu 和 Gao 将 \cite{ZCLZL-USENIX-2023} 中基于对称密钥加密（SKE）的
     \item 每个 $P_i$（$1 \le i \le m$）输出 $r_i$ 的最终值。
 \end{enumerate}
 \end{framed}
-\caption{协议 $\ProtomssROT$}\label{fig:proto-mssrot}
+\caption{多方秘密分享随机不经意传输协议 $\ProtomssROT$}\label{fig:proto-mssrot}
 \end{figure}
 
 \begin{theorem}\label{theorem:mssrot}
@@ -327,7 +327,7 @@ $P_m$ 的视图由输入的掩码分享 $\Delta_m$、$\FuncROT$ 的输出 $(r_{m
 \end{trivlist}
 \end{minipage}
 \end{framed}
-\caption{本章的 SK-MPSU 协议 $\ProtoMPSUTwo$}\label{fig:proto-mpsu2}
+\caption{SK-MPSU 协议 $\ProtoMPSUTwo$}\label{fig:proto-mpsu2}
 \end{figure}
 
 \begin{theorem} \label{theorem:ske}
@@ -403,7 +403,7 @@ $P_m$ 的视图由输入的掩码分享 $\Delta_m$、$\FuncROT$ 的输出 $(r_{m
 \end{trivlist}
 
 \subsection{与 LG 协议的对比}~\label{sec:compare-lg}
-表 \ref{tab:compare-ske} 中展示了 LG 协议与本章提出的 SK-MPSU 协议在离线阶段和在线阶段中各参与方理论计算与通信复杂度的对比。
+表 \ref{tab:compare-ske} 中展示了 LG 协议与本章提出的 SK-MPSU 协议在离线阶段和在线阶段中各参与方理论计算与通信复杂度的对比，其中 $n$ 为集合大小，$m$ 为参与方数量。$\lambda$ 和 $\sigma$ 分别表示计算和统计安全参数，且 $\lambda = 128, \sigma = 40$。$T$ 表示 SKE 解密电路中的 AND 门数量，$T \approx 600$。$l$ 表示输入元素的比特长度。$\gamma$ 为 OPPRF 的输出长度。$\gamma'$ 为 SKE 密文比特长度，且 $\gamma' \approx \gamma$。$t$ 为对偶 LPN 中的噪声权重，$t \approx 128$。
 
 \begin{table*}
 \centering
@@ -421,7 +421,7 @@ $P_m$ 的视图由输入的掩码分享 $\Delta_m$、$\FuncROT$ 的输出 $(r_{m
 本文 SK-MPSU & \multicolumn{2}{c|}{$(\gamma + m) m n \log n$} & \multicolumn{2}{c|}{$m^2 n$} & \multicolumn{2}{c|}{$\lambda m^2 n \log n$} & $\gamma m n + l m^2 n$ & $(\gamma + l+ m) m n$ \\
 \hline
 \end{tabular}}
-\caption{LG 协议与本文 SK-MPSU 协议在离线和在线阶段的渐近通信（比特）与计算开销对比。其中 $n$ 为集合大小，$m$ 为参与方数量。$\lambda$ 和 $\sigma$ 分别表示计算和统计安全参数，且 $\lambda = 128, \sigma = 40$。$T$ 表示 SKE 解密电路中的 AND 门数量，$T \approx 600$。$l$ 表示输入元素的比特长度。$\gamma$ 为 OPPRF 的输出长度。$\gamma'$ 为 SKE 密文比特长度，且 $\gamma' \approx \gamma$。$t$ 为对偶 LPN 中的噪声权重，$t \approx 128$。}\label{tab:compare-ske}
+\caption{LG 协议与 SK-MPSU 协议在离线和在线阶段的理论计算与通信复杂度对比}\label{tab:compare-ske}
 \end{table*}
 
 % \section{实现与性能分析}

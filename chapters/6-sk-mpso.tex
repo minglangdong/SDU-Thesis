@@ -183,7 +183,7 @@ MPSI、MPSI-card 以及 Circuit-MPSI 的完整优化协议描述在图 \ref{fig:
     \end{enumerate}
 \end{minipage}
 \end{framed}
-\caption{MPSI / MPSI-card / Circuit-MPSI 优化协议}\label{fig:proto-mpsi}
+\caption{MPSI / MPSI-card / Circuit-MPSI 协议}\label{fig:proto-mpsi}
 \end{figure} 
 
 \subsection{多方隐私交集求势与和} 
@@ -208,7 +208,7 @@ MPSI-card-sum 协议通过利用 6.2 节中“带载荷的批量全成员零分�
 \end{trivlist}
 \end{minipage}
 \end{framed}
-\caption{MPSI-card-sum 优化协议}\label{fig:proto-mpsi-sum}
+\caption{MPSI-card-sum 协议}\label{fig:proto-mpsi-sum}
 \end{figure}
 
 \section{多方隐私集合求并与并集计算} 
@@ -265,14 +265,286 @@ MPSI-card-sum 协议通过利用 6.2 节中“带载荷的批量全成员零分�
 \end{trivlist}
 \end{minipage}
 \end{framed}
-\caption{MPSU / MPSU-card / Circuit-MPSU 优化协议}\label{fig:proto-mpsu}
+\caption{MPSU / MPSU-card / Circuit-MPSU 协议}\label{fig:proto-mpsu}
 \end{figure}
 
 \section{各类协议的复杂度分析与对比}
-\esection{Implementations and Comprehensive Performance Evaluation}
+\esection{Theoretical Analysis and Comparison}
+
+\subsection{MPSI 及其变体的复杂度分析}
+\esubsection{Complexity of Our MPSI and Its Variants}
+
+在以下的渐近复杂度分析中，我们仅考虑对集合大小 $n$ 和参与方数量 $m$ 的依赖，忽略安全参数的影响。
+
+在图 \ref{fig:proto-mpsi} 中，各参与方（$P_1$ 作为 $P_\mathsf{pivot}$）调用批量大小为 $B = O(n)$ 的批量全成员零分享协议。在该阶段，Leader $P_1$ 的计算和通信复杂度均为 $O(mn)$，而每个 Client $P_j$ ($1 < j \le m$) 的计算和通信复杂度均为 $O(n)$。
+在 MPSI 与 Circuit-MPSI 中，每个 $P_j$ 直接将其分享份额发送给 $P_1$，因此，$P_1$ 的总计算和通信复杂度为 $O(mn)$，而每个 $P_j$ 的总计算和通信复杂度为 $O(n)$。
+在 MPSI-card 中，参与方在直接重构前调用了多方秘密分享洗牌协议。我们采用文献 \cite{EB22} 中的多方秘密分享洗牌协议并指定 $P_1$ 作为 Leader。在该阶段，$P_1$ 的计算和通信复杂度为 $O(mn)$，而每个 $P_j$ 的计算和通信复杂度为 $O(n)$。综上所述，MPSI-card 的总体计算和通信复杂度与 MPSI / Circuit-MPSI 完全相同。
+
+在图 \ref{fig:proto-mpsi-sum} 中，各参与方调用批量大小为 $B = O(n)$ 的带载荷的批量全成员零分享协议。在该阶段，$P_1$ 的计算和通信复杂度为 $O(mn)$，而每个 $P_j$ ($1 < j \le m$) 的计算和通信复杂度为 $O(n)$。随后，参与方调用两次多方秘密分享洗牌协议，$P_j$ 向 $P_1$ 重构基数部分，并且 $P_1$ 广播针对洗牌后载荷的指示向量。总体而言，MPSI-card-sum 的计算和通信复杂度同样与 MPSI / MPSI-card / Circuit-MPSI 保持一致。
+
+值得注意的是，在不考虑隐私安全的朴素（Naive）解决方案中，各 Client 直接将其输入集合发送给 Leader，由 Leader 在本地计算结果。在该方案中，Leader 的计算和通信复杂度为 $O(mn)$，每个 Client 的计算和通信复杂度为 $O(n)$。因此，我们的 MPSI / MPSI-card / Circuit-MPSI / MPSI-card-sum 构造在确保安全性的同时，成功实现了与朴素方案相匹配的**最优复杂度**。
+
+\subsection{MPSU 及其变体的复杂度分析}
+
+在以下的渐近复杂度分析中，我们同样仅考虑对 $n$ 和 $m$ 的依赖，省略安全参数。
+
+在图 \ref{fig:proto-mpsu} 中，对于 $1 < j \le m$，参与方 $P_1, \cdots, P_j$（其中 $P_j$ 作为 $P_\mathsf{pivot}$）调用批量大小为 $B = O(n)$ 的批量全非成员零分享协议。每个 $P_j$ 共参与 $m-j+1$ 次批量全非成员零分享协议的调用，并在第一次调用中担任 $P_\mathsf{pivot}$。$P_1$ 参与 $m-1$ 次调用，但从不担任 $P_\mathsf{pivot}$。在该阶段，每个参与方的计算和通信复杂度均为 $O(mn)$。此后，各参与方持有 $(m-1)B$ 个秘密分享。
+接着，他们将这 $(m-1)B = O(mn)$ 个分享份额输入到多方秘密分享洗牌协议（以 $P_1$ 为 Leader）中，最后每个 $P_j$ 将洗牌后的份额发送给 $P_1$。因此，在该步骤中，$P_1$ 的计算和通信复杂度为 $O(m^2n)$，而每个 $P_j$ 的计算和通信复杂度为 $O(mn)$。
+综合来看，Leader $P_1$ 的总体计算和通信复杂度为 $O(m^2n)$，而每个 Client $P_j$ 的总体计算和通信复杂度为 $O(mn)$。
+
+我们的 MPSU 协议遵循了基于秘密分享的 MPSU 范式，其中 Leader 的最优计算和通信复杂度为 $O(m^2 n)$，每个 Client 的最优计算和通信复杂度为 $O(m n)$。这一最优复杂度边界是由该范式下“在 $m$ 个参与方之间对 $O(mn)$ 个元素进行秘密分享”的核心设计所决定的，因为必不可少的重构步骤本身就需要达到这一复杂度。因此，我们的 MPSU 构造成功达到了该 MPSU 范式下的**最优计算和通信复杂度**。
+
+\subsection{与现有工作的理论对比}
+\esubsection{Comparison with Prior Works}
+
+表 \ref{tab:mpsi-comparisons} 和表 \ref{tab:mpsi-offline-comparisons} 分别展示了各种 MPSI 协议在在线阶段与离线阶段的理论计算与通信复杂度对比，其中 $n$ 为集合大小，$m$ 为参与方数量，$t$ 为共谋参与方数量。$U$ 为元素定义域。``PK'' 表示基于公钥操作的协议，``SK'' 表示基于 OT 和对称密钥操作的协议。$\lambda, \sigma$ 分别为计算和统计安全参数。``增强半诚实/恶意''表示该恶意协议隐含了增强半诚实安全性，但在标准半诚实模型下不安全。文献 \cite{BNOP-AsiaCCS-2022} 是目前唯一区分了离线和在线阶段的现有 MPSI 工作，因此我们省略了其他无离线阶段的方案。不同的 Beaver 三元组生成方式导致了本文协议具有不同的离线复杂度：``BGV'' 表示各方使用带有分布式解密的加法同态加密（AHE）生成 Beaver 三元组，其中 AHE 采用 BGV 加密实例化；``OT'' 表示各方利用两两 OT 交互（使用 SoftSpokenOT 实例化）生成 Beaver 三元组。为简化表达，我们省略了部分小常数（如密文膨胀常数和域大小位数）。
+
+表 \ref{tab:mpcsi-comparisons} 和表 \ref{tab:mpcsi-offline-comparisons} 分别展示了相关的 MPSI-card / MPSI-card-sum 协议与本文协议在在线阶段与离线阶段的理论对比，其中 $n$ 为集合大小，$m$ 为参与方数量，$t$ 为共谋参与方数量。``SK'' 表示基于 OT 和对称密钥操作的协议。$\lambda, \sigma$ 分别为计算和统计安全参数。Beaver 三元组与秘密分享相关性（Share correlation）生成方式的不同组合导致了文献 \cite{ChenDGB22} 和本文协议在离线阶段具有不同的复杂度。``BGV + BGV'' 表示这两者均使用带有分布式解密的加法同态加密（基于 BGV 实例化）生成。``BGV + ST'' 表示三元组使用同态加密生成，而分享相关性通过运行两两交互的分享转换（Share Translation）协议生成。``OT + BGV/ST'' 表示三元组使用两两的 SoftSpokenOT 交互生成（在此情况下，采用不同的分享相关性生成方式复杂度相同）。
+
+表 \ref{tab:mpsu-comparisons} 和表 \ref{tab:mpsu-offline-comparisons} 分别展示了相关的 MPSU 协议与本文协议在在线阶段与离线阶段的理论对比，其中 $n$ 为集合大小，$m$ 为参与方数量，$l$ 为元素的长度。``PK'' 表示基于公钥操作的协议。``SK'' 表示基于 OT 和对称密钥操作的协议。$\lambda, \sigma$ 分别为计算和统计安全参数。文献 \cite{GaoNT24} 中的协议无离线阶段。不同 Beaver 三元组与分享相关性生成方式的组合对应了本文协议的不同离线复杂度。符号释义与表 \ref{tab:mpcsi-offline-comparisons} 相同。
+
+\begin{table}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|cc|cc|c|c|}
+\hline
+\multirow{2}{*}{\textbf{协议}} & \multicolumn{2}{c|}{\textbf{计算复杂度}} & \multicolumn{2}{c|}{\textbf{通信复杂度}} & \multirow{2}{*}{\textbf{安全性}} & \multirow{2}{*}{\textbf{底层操作}} \\ \cline{2-5}
+ & \multicolumn{1}{c|}{Leader} & Client & \multicolumn{1}{c|}{Leader} & Client &  &  \\ \hline
+ \cite{FreedmanNP04} & \multicolumn{1}{c|}{$O(m^2 n^2)$} & $O(m^2 n^2)$ & \multicolumn{1}{c|}{$O(m^2 n^2 \lambda)$} & $O(m^2 n^2 \lambda)$ & 标准半诚实 & PK \\ \hline
+\cite{KS-CRYPTO-2005} & \multicolumn{1}{c|}{$O(m t n^2)$} & $O(m t n^2)$ & \multicolumn{1}{c|}{$O(m t n \log \lvert U \rvert \lambda)$} & $O(m t n \log \lvert U \rvert \lambda)$ & 标准半诚实 & PK \\ \hline
+\cite{PKC-HazayV17} & \multicolumn{1}{c|}{$O(m n^2)$} & $O(n)$ & \multicolumn{1}{c|}{$O(m n \lambda)$} & $O(n \lambda)$ & 标准半诚实 & PK \\ \hline
+\multirow{2}{*}{\cite{KMPRT-CCS-2017}} & \multicolumn{1}{c|}{\multirow{2}{*}{$O(m n)$}} & $O(n)$ & \multicolumn{1}{c|}{\multirow{2}{*}{$O(m n (\lambda + \sigma + \log n))$}} & $O(n (\lambda + \sigma + \log n))$ & 增强半诚实 & SK \\ \cline{3-3} \cline{5-7} 
+ & \multicolumn{1}{c|}{} & $O(t n)$ & \multicolumn{1}{c|}{} & $O(t n (\lambda + \sigma + \log n))$ & 标准半诚实 & SK \\ \hline
+\multirow{2}{*}{\cite{InbarOP18}} & \multicolumn{2}{c|}{\multirow{2}{*}{$O(m n)$}} & \multicolumn{1}{c|}{\multirow{2}{*}{$O(m n)$}} & $O(\log (m) n \sigma^2)$ & 增强半诚实 & SK \\ \cline{5-7}
+ & \multicolumn{2}{c|}{} & \multicolumn{1}{c|}{} & $O(m n \sigma^2)$ & 标准半诚实 & SK \\ \hline
+\cite{GhoshN19} & \multicolumn{1}{c|}{$O(m n \log n)$} & $O(n \log n)$ & \multicolumn{2}{c|}{$O((m^2 + m n) \lambda)$} & 恶意 & SK \\ \hline
+~\cite{BNOP-AsiaCCS-2022} & \multicolumn{2}{c|}{$O(m n)$} & \multicolumn{1}{c|}{$O(m n \lambda (\log (n \lambda)+\lambda))$} & $O(n \lambda (\log (n \lambda)+\lambda))$ & 增强半诚实/恶意 & SK \\ \hline
+~\cite{NTY-CCS-2021} & \multicolumn{1}{c|}{$O(m n)$} & $O(t n)$ & \multicolumn{1}{c|}{$O(m n (\lambda + \sigma + \log n)$} & $O(n (\lambda + \sigma + \log n)$ & 增强半诚实/恶意 & SK \\ \hline
+\cite{WuYC24} & \multicolumn{1}{c|}{$O(m n)$} & $O(t n)$ & \multicolumn{1}{c|}{$O(m n (\lambda + \sigma + \log n))$} & $O(t n (\lambda + \sigma + \log n))$ & 标准半诚实 & SK \\ \hline
+本文 MPSI & \multicolumn{1}{c|}{$O(m n)$} & $O(n)$ & \multicolumn{1}{c|}{$O(m n (\sigma + \log n))$} & $O(n (\sigma + \log n))$ & 标准半诚实 & SK \\ \hline
+\end{tabular}}
+\caption{半诚实模型下 MPSI 协议的渐近在线通信与计算复杂度}
+\label{tab:mpsi-comparisons}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|cc|cc|c|c|}
+\hline
+\multirow{2}{*}{\textbf{协议}} & \multicolumn{2}{c|}{\textbf{计算复杂度}} & \multicolumn{2}{c|}{\textbf{通信复杂度}} & \multirow{2}{*}{\textbf{安全性}} & \multirow{2}{*}{\makecell{\textbf{Beaver 三元组} \\ \textbf{生成方式}}} \\ \cline{2-5}
+ & \multicolumn{1}{c|}{Leader} & Client & \multicolumn{1}{c|}{Leader} & Client & & \\ \hline
+~\cite{BNOP-AsiaCCS-2022} & \multicolumn{2}{c|}{$O(m n)$} & \multicolumn{1}{c|}{$O(m n \lambda^2 + m n \lambda (\log (n \lambda)+\lambda))$} & $O(m \lambda + n \lambda (\log (n \lambda)+\lambda))$ & 增强半诚实/恶意 & $-$ \\ \hline
+\multirow{2}{*}{本文 MPSI} & \multicolumn{1}{c|}{$O(m n)$} & $O(n)$ & \multicolumn{1}{c|}{$O(m n (\lambda + \sigma + \log n))$} & $O(n (\lambda + \sigma + \log n))$ & 标准半诚实 & BGV \\ \cline{2-7}
+ & \multicolumn{2}{c|}{$O(m n (\sigma + \log n))$} & \multicolumn{2}{c|}{$O(m n (\sigma + \log n) \lambda)$} & 标准半诚实 & OT \\ \hline
+\end{tabular}}
+\caption{半诚实模型下 MPSI 协议的渐近离线通信与计算复杂度}
+\label{tab:mpsi-offline-comparisons}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|cc|cc|c|c|}
+\hline
+\multirow{2}{*}{\textbf{协议}} & \multicolumn{2}{c|}{\textbf{计算复杂度}} & \multicolumn{2}{c|}{\textbf{通信复杂度}} & \multirow{2}{*}{\textbf{安全性}} & \multirow{2}{*}{\textbf{底层操作}} \\ \cline{2-5}
+ & \multicolumn{1}{c|}{Leader} & Client & \multicolumn{1}{c|}{Leader} & Client &  &  \\ \hline
+\cite{ChenDGB22} & \multicolumn{1}{c|}{$O((m - t) n + t n \log n)$} & $O(t n)$ & \multicolumn{1}{c|}{$O(((m - t) n + t n \log n) (\lambda + \sigma + \log n))$} & $O(t n (\lambda + \sigma + \log n))$ & 标准半诚实 & SK \\ \hline
+本文协议 & \multicolumn{1}{c|}{$O(m n)$} & $O(n)$ & \multicolumn{1}{c|}{$O(m n (\sigma + \log n))$} & $O(n (\sigma + \log n))$ & 标准半诚实 & SK \\ \hline
+\end{tabular}}
+\caption{半诚实模型下 MPSI-card / MPSI-card-sum 协议的渐近在线通信与计算复杂度}
+\label{tab:mpcsi-comparisons}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|cc|cc|c|c|}
+\hline
+\multirow{2}{*}{\textbf{协议}} & \multicolumn{2}{c|}{\textbf{计算复杂度}} & \multicolumn{2}{c|}{\textbf{通信复杂度}} & \multirow{2}{*}{\textbf{安全性}} & \multirow{2}{*}{\makecell{\textbf{Beaver 三元组 +} \\ \textbf{分享相关性生成}}} \\ \cline{2-5}
+ & \multicolumn{1}{c|}{Leader} & Client & \multicolumn{1}{c|}{Leader} & Client & & \\ \hline
+\multirow{3}{*}{~\cite{ChenDGB22}} & \multicolumn{2}{c|}{$O(m n)$} & \multicolumn{2}{c|}{$O(m n (\sigma + \log n))$} & 标准半诚实 & BGV + BGV \\ \cline{2-7}
+& \multicolumn{2}{c|}{$O(m n \log n)$} & \multicolumn{2}{c|}{$O(m n (\sigma + \lambda \log n))$} & 标准半诚实 & BGV + ST \\ \cline{2-7}
+ & \multicolumn{2}{c|}{$O(m n (\sigma + \log n))$} & \multicolumn{2}{c|}{$O(m n (\sigma + \log n) \lambda)$} & 标准半诚实 & OT + BGV/ST \\ \hline
+\multirow{3}{*}{本文协议} & \multicolumn{1}{c|}{$O(m n)$} & $O(n)$ & \multicolumn{1}{c|}{$O(m n (\lambda + \sigma + \log n))$} & $O(n (\lambda + \sigma + \log n))$ & 标准半诚实 & BGV + BGV \\ \cline{2-7}
+& \multicolumn{2}{c|}{$O(m n \log n)$} & \multicolumn{2}{c|}{$O(m n (\sigma + \lambda \log n))$} & 标准半诚实 & BGV + ST \\ \cline{2-7}
+ & \multicolumn{2}{c|}{\hspace{2em} $O(m n (\sigma + \log n))$ \hspace{2em}} & \multicolumn{2}{c|}{$O(m n (\sigma + \log n) \lambda)$} &\hspace{2em} 标准半诚实 \hspace{2em} & OT + BGV/ST \\ \hline
+\end{tabular}}
+\caption{半诚实模型下 MPSI-card / MPSI-card-sum 协议的渐近离线通信与计算复杂度}
+\label{tab:mpcsi-offline-comparisons}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|cc|cc|c|c|}
+\hline
+\multirow{2}{*}{\textbf{协议}} & \multicolumn{2}{c|}{\textbf{计算复杂度}} & \multicolumn{2}{c|}{\textbf{通信复杂度}} & \multirow{2}{*}{\textbf{安全性}} & \multirow{2}{*}{\textbf{底层操作}} \\ \cline{2-5}
+ & \multicolumn{1}{c|}{Leader} & Client & \multicolumn{1}{c|}{Leader} & Client &  &  \\ \hline
+ \cite{GaoNT24} & \multicolumn{2}{c|}{$O(m n (\log n / \log \log n))$} & \multicolumn{2}{c|}{$\lambda m n (\log n / \log \log n)$} & 标准半诚实 & PK \\ \hline
+\cite{DongCZB24} & \multicolumn{2}{c|}{$O(m^2 n)$} & \multicolumn{1}{c|}{$O(m^2 n (l + \sigma + \log m+ \log n))$} & $O(m n (l + \sigma + \log m+ \log n) + m^2 n)$ & 标准半诚实 & SK \\ \hline
+本文 MPSU & \multicolumn{1}{c|}{$O(m^2 n)$} & $O(m n)$ & \multicolumn{1}{c|}{$O(m^2 n (l + \sigma + \log m+ \log n))$} & $O(m n (l + \sigma + \log m+ \log n))$ & 标准半诚实 & SK \\ \hline
+\end{tabular}}
+\caption{半诚实模型下 MPSU 协议的渐近在线通信与计算复杂度}
+\label{tab:mpsu-comparisons}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|cc|cc|c|}
+\hline
+\multirow{2}{*}{\textbf{协议}} & \multicolumn{2}{c|}{\textbf{计算复杂度}} & \multicolumn{2}{c|}{\textbf{通信复杂度}} & \multirow{2}{*}{\makecell{\textbf{Beaver 三元组 +} \\ \textbf{分享相关性生成}}} \\ \cline{2-5}
+ & \multicolumn{1}{c|}{Leader} & Client & \multicolumn{1}{c|}{Leader} & Client & \\ \hline
+\multirow{2}{*}{\cite{DongCZB24}} & \multicolumn{2}{c|}{$O(m^2 n + m n (l + \sigma + \log m+ \log n))$} & \multicolumn{2}{c|}{$O(m n (l + \sigma + \log m+ \log n) (m + \lambda))$} & $- + BGV$ \\ \cline{2-6}
+ & \multicolumn{2}{c|}{$O(m^2 n (\log m+ \log n) + m n (l + \sigma))$} & \multicolumn{2}{c|}{$O(m^2 n \lambda (\log m+ \log n) + m n (l + \sigma) (m + \lambda))$} & $- + ST$ \\ \hline
+\multirow{3}{*}{本文 MPSU} & \multicolumn{1}{c|}{$O(m^2 n)$} & $O(m n)$ & \multicolumn{1}{c|}{$O(m n (l + \sigma + \log m+ \log n) (m + \lambda))$} & $O(m n \lambda (l + \sigma + \log m+ \log n))$ & BGV + BGV \\ \cline{2-6}
+& \multicolumn{2}{c|}{$O(m^2 n (\log m + \log n))$} & \multicolumn{1}{c|}{$O(m^2 n \lambda (\log m+ \log n) + m n (l + \sigma) (m + \lambda))$} & $O(m^2 n \lambda (\log m+ \log n) + m n \lambda (l + \sigma))$ & BGV + ST \\ \cline{2-6}
+ & \multicolumn{2}{c|}{$O(m^2 n (l + \sigma + \log m+ \log n))$} & \multicolumn{2}{c|}{$O(m^2 n (l + \sigma + \log m+ \log n) \lambda)$} & OT + BGV/ ST \\ \hline
+\end{tabular}}
+\caption{半诚实模型下 MPSU 协议的渐近离线通信与计算复杂度}
+\label{tab:mpsu-offline-comparisons}
+\end{table}
 
 \section{各类协议的实现与综合性能评估}
 \esection{Implementations and Comprehensive Performance Evaluation}
+
+\subsection{实现细节与参数设置}
+
+本文采用 C++ 语言实现了本文框架中的各实例化协议。其中，每个参与方分配 $m-1$ 个工作线程，以便同时与其他所有参与方发起并发交互。
+在底层密码学原语的构建上，我们参考了文献 \cite{BuiC23} 的方法，利用向量不经意线性求值（VOLE）与不经意键值存储（OKVS） \cite{PRTY20,GPRTY-CRYPTO-2021,RR-CCS-2022,BPSY-USENIX-2023} 来实例化批量 OPPRF；遵循文献 \cite{DongCZB24} 的策略，通过结合批量 OPPRF 与秘密分享等值测试（ssPEQT）来实例化批量 ssPMT。
+具体地，我们在系统实现中调用了以下开源密码学库：
+\begin{itemize}[itemsep=2pt,topsep=5pt,parsep=0pt,leftmargin=10pt]
+\item \textbf{VOLE}：采用 \textsf{libOTe} \cite{libOTe} 库中提供的 VOLE 实现，并通过 Expand-Convolute codes \cite{RRT23} 来实例化其编码族。
+\item \textbf{OKVS 与 GMW}：我们使用了文献 \cite{RR-CCS-2022} 中提出的优化版 OKVS 构造（考虑到文献 \cite{BPSY-USENIX-2023} 提出的新型 OKVS 结构在小规模数据集 $n < 2^{10}$ 时参数适配性尚不明确，故作此选择），并直接复用了 \cite{lib-volepsi} 中提供的 OKVS 代码实现。此外，我们同样基于 \cite{lib-volepsi} 中封装的 GMW 实现来构建 ssPEQT 模块。
+\item \textbf{ROT}：采用 \textsf{libOTe} 库中封装的 SoftSpokenOT \cite{Roy22} 原语来实现随机不经意传输功能。
+\item \textbf{其他支持库}：我们在项目中使用 \textsf{cryptoTools} \cite{lib-cryptoTools} 库完成各类哈希运算与伪随机数生成（PRNG）调用；同时采用 \textsf{Coproto} \cite{lib-coproto} 库来构建并管理网络层通信。
+\end{itemize}
+
+为了平衡系统的性能表现与安全性保障，我们将计算安全参数设定为 $\lambda = 128$，统计安全参数设定为 $\sigma = 40$。除此之外，核心模块的具体参数配置如下：
+
+\begin{trivlist}
+\item \textbf{布谷鸟哈希（Cuckoo Hashing）参数.} 为了确保批量 ssPMT 组件能够实现线性的通信复杂度，我们引入了无 stash 的布谷鸟哈希机制 \cite{PSTY-EUROCRYPT-2019}。为了将哈希失败的概率（即元素既无法存入哈希表又无 stash 缓存的冲突事件）严格控制在 $2^{-40}$ 以下，我们针对 3-hash 方案设定了 $B = 1.27n$ 的桶数比例。
+
+\item \textbf{OKVS 参数.} 我们采用了文献 \cite{RR-CCS-2022} 中推荐的配置，即权重 $w = 3$、簇大小（cluster size）为 $2^{14}$ 的方案体系。在这一配置下，OKVS 的膨胀率（即 OKVS 容量除以编码元素总数）为 $1.28$。
+
+\item \textbf{ROT 参数.} 在调用 SoftSpokenOT 时，我们将其有限域位数（field bits）设定为 $5$，以此在计算开销与通信开销之间取得最佳平衡。
+
+\item \textbf{OPPRF 的输出长度.} 根据文献 \cite{DongCZB24} 的证明，为确保批量 ssPMT 协议的正确执行，OPPRF 的最小输出长度应满足 $\sigma + \log_2 T + \log_2 B$，其中 $T$ 表示批量 ssPMT 实例的调用总次数。在本文的 MPSU 协议中，调用总次数 $T = (m^2 - m) / 2$。由此可推断，本文 MPSU 协议中 OPPRF 输出长度的理论下界应设定为 $\sigma + \log_2((m^2 - m) / 2) + \log_2 (1.27n)$。
+
+\item \textbf{有限域大小与全零字符串的长度.} 有限域的规模与全零字符串的长度共同决定了本文各项协议中虚假碰撞（Spurious Collision）的发生概率。
+根据第 5.5 节中关于框架的正确性分析，对于 MPSI、MPSI-card 以及 MPSI-card-sum 协议而言，有限域规模只需满足 $\lvert \mathbb{F} \rvert \ge B \cdot 2^\sigma = 1.27n \cdot 2^\sigma$，即可将全局虚假碰撞概率约束在 $2^{-\sigma}$ 内。
+而对于 MPSU 协议，其有限域需要同时满足两个条件：$\lvert \mathbb{F} \rvert \ge B \cdot 2^\sigma$ 并且 $\mathbb{F}$ 中元素的比特长度需等于 $l+l'$。鉴于全零字符串的长度要求为 $l' \ge \sigma + \log (m-1) +\log B$，这进一步要求 MPSU 中的有限域大小需满足 $\lvert \mathbb{F} \rvert \ge 2^l + (m-1)B \cdot 2^\sigma$。
+基于上述约束，在实际实验中，我们为 MPSI、MPSI-card 及 MPSI-card-sum 协议配置了 GF(64) 域，而为 MPSU 协议配置了 GF(128) 域（此时全零字符串 $l'$ 设定为 64 比特）。
+\end{trivlist}
+
+\subsection{实验环境与对比方案}
+
+在多方安全计算（MPC）领域，协议的通用性往往是以牺牲其实用性为代价的。例如，相较于专门设计的专用 MPC 协议，通用 MPC 协议的运行速度通常要慢上数个数量级。然而引人注目的是，本文提出的 MPSO 框架成功打破了这一长期存在的性能瓶颈。
+通过对框架的典型实例（包括 MPSI、MPSI-card、MPSI-card-sum 以及 MPSU）进行具体实现，全部代码已开源于以下链接：\url{https://github.com/real-world-cryptography/MPSO}。本文充分证明了：该框架在保留对任意集合公式进行计算的完全通用性的同时，其实际在线性能达到了甚至超越了现有的最先进（State-of-the-Art, SOTA）专用协议。
+
+为了符合实际应用场景，本文遵循了文献 \cite{ZCLZL-USENIX-2023,LG-ASIACRYPT-2023} 中的常用设定，即假设 Beaver 三元组在离线阶段预先计算完毕并存储在本地。因此，我们的评估将主要聚焦于框架及各对比协议的**在线性能**。为了保证对比的公平性，我们选择了当前标准半诚实模型下各自子领域中最先进的专用协议进行基准测试（Benchmark）：
+
+\begin{itemize}[itemsep=2pt,topsep=5pt,parsep=0pt,leftmargin=10pt]
+    \item \textbf{最先进的 MPSI \cite{WuYC24}}：该工作提出了 O-Ring 和 K-Star 两个协议，并提供了开源实现 \cite{libOring}。鉴于 K-Star 协议在总通信开销相同的情况下运行速度快于 O-Ring，我们在实验中选择 K-Star 进行对比。我们将腐化阈值设定为 $t = m-1$，在扣除随机向量不经意线性求值（VOLE）生成的离线开销后，测量并报告其在线性能。对于文献 \cite{WuYC24} 和本文的 MPSI 协议，我们在表 \ref{tab:mpsi} 中报告了 Leader 的运行时间以及所有参与方的总通信开销。
+    \item \textbf{最先进的 MPSI-card \cite{ChenDGB22}}：由于该工作未提供开源代码，我们直接引用其论文中的在线阶段实验结果。原论文实验在搭载 Intel i7-12700H 2.30GHz CPU 和 28GB 内存的环境下运行。我们在表 \ref{tab:mpsi-card} 中列出了文献 \cite{ChenDGB22} 和本文 MPSI-card 协议的 Leader 运行时间与通信开销。
+    \item \textbf{最先进的 MPSU \cite{DongCZB24}}：该工作提供了两个 MPSU 协议的开源实现 \cite{libMPSU}。考虑到基于对称密钥的方案具有更好的在线性能，我们选择其对称密钥版本进行对比。在 MPSU 基准测试中，我们设定元素长度为 64 比特，并在表 \ref{tab:mpsu} 中记录 Leader 的在线运行时间和所有参与方的总通信开销。
+\end{itemize}
+
+据我们所知，目前学术界尚无针对 MPSI-card-sum 协议的代码实现与实验数据。本文提供了首个开源实现，并在与 MPSI-card 相同的测试设定下，于表 \ref{tab:mpsi-card-sum} 中报告了其实验数据。
+
+我们在一台配备 Intel(R) Xeon(R) 2.70GHz CPU（32 个物理核心）和 128 GB 内存的云虚拟机上进行所有实验测试。在局域网（LAN）设定中，我们将带宽配置为 10 Gbps，往返时间（RTT）延迟设定为 0.1 ms。在广域网（WAN）设定中，我们测试了 400 Mbps 和 50 Mbps 两种网络带宽环境，两者的 RTT 延迟均设定为 80 ms。
+在所有协议的运行过程中，每个参与方均持有相等规模的输入集合，并利用 $m-1$ 个线程同时与其他参与方进行并发交互。
+
+\subsection{实验结果与分析}
+
+实验结果如表 \ref{tab:mpsi} 至 \ref{tab:mpsu}中所示，其中 $m$ 为参与方数量，$m$ 个输入集合的大小均相等。文献 \cite{ChenDGB22} 的数据因无可用代码直接引自原论文，表 \ref{tab:mpsi-card}中含有 $-$ 的单元格表示原论文未报告该数据。表 \ref{tab:mpsu}中含有 $-$ 的单元格表示内存耗尽的测试项。最佳结果以加粗标出。实验结果表明：
+
+\begin{itemize}[itemsep=2pt,topsep=5pt,parsep=0pt,leftmargin=10pt]
+\item \textbf{本文的 MPSI 及其变体在所有测试场景下的在线性能均显著优于现有的 SOTA 方案。} 具体而言，与现有的 SOTA MPSI \cite{WuYC24} 相比，本文的 MPSI 协议在 LAN 环境下实现了 $2.4 \sim 5.2 \times$ 的速度提升，在 400 Mbps 和 50 Mbps 的 WAN 环境下分别实现了 $1.1 \sim 2.0 \times$ 和 $1.1 \sim 2.6 \times$ 的加速。
+与文献 \cite{ChenDGB22} 报告的实验数据相比，本文的 MPSI-card 协议在 LAN 环境下甚至实现了惊人的 $18.0 \sim 63.4 \times$ 加速。在通信开销方面，随着参与方数量 $m$ 的增加，本文 MPSI 的性能优势愈发显著，最大可实现 $2.6 \times$ 的通信量缩减；而本文的 MPSI-card 相比 \cite{ChenDGB22} 更实现了高达 $14.0 \sim 20.3\times$ 的通信开销降低。此外，本文提出的 MPSI-card-sum 协议在实现更加丰富数据分析功能的同时，其计算和通信开销仅约为本文 MPSI 的两倍。
+
+\item \textbf{本文的 MPSU 展现出与 SOTA \cite{DongCZB24} 相当的在线运行时间，但在所有测试情况下均保持最低的通信开销。} 值得注意的是，在 WAN 网络环境下，随着参与方数量 $m$ 的增长，本文的 MPSU 协议展现出更强的扩展竞争力，最终成功反超 \cite{DongCZB24}，实现最高 $1.7\times$ 的加速比。由于广域网（WAN）环境更能真实反映跨机构 MPSU 应用的网络条件，本文提出的协议在现实世界的系统部署中无疑具备更强的实际应用优势。
+\end{itemize}
+
+\begin{table*}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|ccccccccccccccc|ccccc|}
+\hline
+\multirow{3}{*}{$m$} & \multirow{3}{*}{协议} & \multicolumn{15}{c|}{时间 (秒)} & \multicolumn{5}{c|}{\multirow{2}{*}{通信量 (MB)}} \\ \cline{3-17}
+ &  & \multicolumn{5}{c|}{LAN} & \multicolumn{5}{c|}{400Mbps}  & \multicolumn{5}{c|}{50Mbps} & \multicolumn{5}{c|}{} \\ \cline{3-22} 
+ &  & \multicolumn{1}{c|}{$2^{12}$} & \multicolumn{1}{c|}{$2^{14}$} & \multicolumn{1}{c|}{$2^{16}$} & \multicolumn{1}{c|}{$2^{18}$} & \multicolumn{1}{c|}{$2^{20}$} & \multicolumn{1}{c|}{$2^{12}$} & \multicolumn{1}{c|}{$2^{14}$} & \multicolumn{1}{c|}{$2^{16}$} & \multicolumn{1}{c|}{$2^{18}$} & \multicolumn{1}{c|}{$2^{20}$} & \multicolumn{1}{c|}{$2^{12}$} & \multicolumn{1}{c|}{$2^{14}$} & \multicolumn{1}{c|}{$2^{16}$} & \multicolumn{1}{c|}{$2^{18}$} & \multicolumn{1}{c|}{$2^{20}$} & \multicolumn{1}{c|}{$2^{12}$} & \multicolumn{1}{c|}{$2^{14}$} & \multicolumn{1}{c|}{$2^{16}$} & \multicolumn{1}{c|}{$2^{18}$} & $2^{20}$ \\ \hline
+ & \cite{WuYC24} & \multicolumn{1}{c|}{0.48} & \multicolumn{1}{c|}{0.168} & \multicolumn{1}{c|}{0.822} & \multicolumn{1}{c|}{4.227} & \multicolumn{1}{c|}{19.18} & \multicolumn{1}{c|}{2.863} & \multicolumn{1}{c|}{3.309} & \multicolumn{1}{c|}{4.232} & \multicolumn{1}{c|}{7.759} & \multicolumn{1}{c|}{27.32} & \multicolumn{1}{c|}{3.155} & \multicolumn{1}{c|}{3.544} & \multicolumn{1}{c|}{5.149} & \multicolumn{1}{c|}{11.57} & \multicolumn{1}{c|}{42.38}  & \multicolumn{1}{c|}{\textbf{0.423}} & \multicolumn{1}{c|}{\textbf{1.681}} & \multicolumn{1}{c|}{\textbf{6.344}} & \multicolumn{1}{c|}{\textbf{26.72}} & \textbf{110.0} \\ \cline{2-22} 
+\multirow{-2}{*}{3} & 本文协议 & \multicolumn{1}{c|}{\textbf{0.013}} & \multicolumn{1}{c|}{\textbf{0.047}} & \multicolumn{1}{c|}{\textbf{0.227}} & \multicolumn{1}{c|}{\textbf{1.533}} & \multicolumn{1}{c|}{\textbf{7.945}} & \multicolumn{1}{c|}{\textbf{1.540}} & \multicolumn{1}{c|}{\textbf{2.070}} & \multicolumn{1}{c|}{\textbf{2.912}} & \multicolumn{1}{c|}{\textbf{5.136}} & \multicolumn{1}{c|}{\textbf{16.42}} &  \multicolumn{1}{c|}{\textbf{1.576}} & \multicolumn{1}{c|}{\textbf{2.231}} & \multicolumn{1}{c|}{\textbf{3.983}} & \multicolumn{1}{c|}{\textbf{10.43}} & \multicolumn{1}{c|}{\textbf{38.63}} & \multicolumn{1}{c|}{0.641} & \multicolumn{1}{c|}{2.551} & \multicolumn{1}{c|}{10.20} & \multicolumn{1}{c|}{40.91} & 164.2 \\ \hline
+ & \cite{WuYC24} & \multicolumn{1}{c|}{0.054} & \multicolumn{1}{c|}{0.181} & \multicolumn{1}{c|}{0.854} & \multicolumn{1}{c|}{4.306} & \multicolumn{1}{c|}{20.09} & \multicolumn{1}{c|}{3.137} & \multicolumn{1}{c|}{3.537} & \multicolumn{1}{c|}{4.528} & \multicolumn{1}{c|}{8.529} & \multicolumn{1}{c|}{30.47} & \multicolumn{1}{c|}{3.158} & \multicolumn{1}{c|}{4.024} & \multicolumn{1}{c|}{6.495} & \multicolumn{1}{c|}{15.90} & \multicolumn{1}{c|}{61.41} & \multicolumn{1}{c|}{\textbf{0.896}} & \multicolumn{1}{c|}{\textbf{3.557}} & \multicolumn{1}{c|}{\textbf{13.42}} & \multicolumn{1}{c|}{\textbf{56.11}} & \textbf{231.1} \\ \cline{2-22} 
+\multirow{-2}{*}{4} & 本文协议 & \multicolumn{1}{c|}{\textbf{0.015}} & \multicolumn{1}{c|}{\textbf{0.051}} & \multicolumn{1}{c|}{\textbf{0.242}} & \multicolumn{1}{c|}{\textbf{1.632}} & \multicolumn{1}{c|}{\textbf{8.133}} & \multicolumn{1}{c|}{\textbf{1.944}} & \multicolumn{1}{c|}{\textbf{2.476}} & \multicolumn{1}{c|}{\textbf{3.339}} & \multicolumn{1}{c|}{\textbf{6.345}} & \multicolumn{1}{c|}{\textbf{19.23}} & \multicolumn{1}{c|}{\textbf{1.984}} & \multicolumn{1}{c|}{\textbf{2.729}} & \multicolumn{1}{c|}{\textbf{4.848}} & \multicolumn{1}{c|}{\textbf{14.04}} & \multicolumn{1}{c|}{\textbf{51.31}} & \multicolumn{1}{c|}{0.961} & \multicolumn{1}{c|}{3.826} & \multicolumn{1}{c|}{15.31} & \multicolumn{1}{c|}{61.36} & 246.2 \\ \hline
+ & \cite{WuYC24} & \multicolumn{1}{c|}{0.072} & \multicolumn{1}{c|}{0.201} & \multicolumn{1}{c|}{0.948} & \multicolumn{1}{c|}{4.611} & \multicolumn{1}{c|}{21.36} & \multicolumn{1}{c|}{3.038} & \multicolumn{1}{c|}{3.733} & \multicolumn{1}{c|}{4.969} & \multicolumn{1}{c|}{9.031} & \multicolumn{1}{c|}{34.16} & \multicolumn{1}{c|}{3.587} & \multicolumn{1}{c|}{4.430} & \multicolumn{1}{c|}{8.443} & \multicolumn{1}{c|}{23.53} & \multicolumn{1}{c|}{90.40} & \multicolumn{1}{c|}{1.542} & \multicolumn{1}{c|}{6.124} & \multicolumn{1}{c|}{23.10} & \multicolumn{1}{c|}{96.23} & 396.3 \\ \cline{2-22} 
+\multirow{-2}{*}{5} & 本文协议 & \multicolumn{1}{c|}{\textbf{0.016}} & \multicolumn{1}{c|}{\textbf{0.053}} & \multicolumn{1}{c|}{\textbf{0.260}} & \multicolumn{1}{c|}{\textbf{1.724}} & \multicolumn{1}{c|}{\textbf{8.255}} & \multicolumn{1}{c|}{\textbf{2.348}} & \multicolumn{1}{c|}{\textbf{2.889}} & \multicolumn{1}{c|}{\textbf{3.770}} & \multicolumn{1}{c|}{\textbf{6.789}} & \multicolumn{1}{c|}{\textbf{22.04}} & \multicolumn{1}{c|}{\textbf{2.424}} & \multicolumn{1}{c|}{\textbf{3.144}} & \multicolumn{1}{c|}{\textbf{5.930}} & \multicolumn{1}{c|}{\textbf{16.98}} & \multicolumn{1}{c|}{\textbf{64.59}} & \multicolumn{1}{c|}{\textbf{1.282}} & \multicolumn{1}{c|}{\textbf{5.102}} & \multicolumn{1}{c|}{\textbf{20.41}} & \multicolumn{1}{c|}{\textbf{81.81}} & \textbf{328.3} \\ \hline
+ & \cite{WuYC24} & \multicolumn{1}{c|}{0.136} & \multicolumn{1}{c|}{0.373} & \multicolumn{1}{c|}{1.479} & \multicolumn{1}{c|}{6.812} & \multicolumn{1}{c|}{30.89} & \multicolumn{1}{c|}{4.681} & \multicolumn{1}{c|}{5.536} & \multicolumn{1}{c|}{7.178} & \multicolumn{1}{c|}{16.84} & \multicolumn{1}{c|}{65.14} & \multicolumn{1}{c|}{6.928} & \multicolumn{1}{c|}{10.87} & \multicolumn{1}{c|}{25.10} & \multicolumn{1}{c|}{87.19} & \multicolumn{1}{c|}{346.5} & \multicolumn{1}{c|}{7.375} & \multicolumn{1}{c|}{29.30} & \multicolumn{1}{c|}{110.5} & \multicolumn{1}{c|}{456.9} & 1883 \\ \cline{2-22} 
+\multirow{-2}{*}{10} & 本文协议 & \multicolumn{1}{c|}{\textbf{0.026}} & \multicolumn{1}{c|}{\textbf{0.075}} & \multicolumn{1}{c|}{\textbf{0.354}} & \multicolumn{1}{c|}{\textbf{1.910}} & \multicolumn{1}{c|}{\textbf{8.898}} & \multicolumn{1}{c|}{\textbf{4.363}} & \multicolumn{1}{c|}{\textbf{4.915}} & \multicolumn{1}{c|}{\textbf{5.769}} & \multicolumn{1}{c|}{\textbf{9.423}} & \multicolumn{1}{c|}{\textbf{33.38}} & \multicolumn{1}{c|}{\textbf{4.496}} & \multicolumn{1}{c|}{\textbf{5.766}} & \multicolumn{1}{c|}{\textbf{11.01}} & \multicolumn{1}{c|}{\textbf{34.13}} & \multicolumn{1}{c|}{\textbf{133.3}} & \multicolumn{1}{c|}{\textbf{2.884}} & \multicolumn{1}{c|}{\textbf{11.48}} & \multicolumn{1}{c|}{\textbf{45.92}} & \multicolumn{1}{c|}{\textbf{184.1}} & \textbf{738.7} \\ \hline
+\end{tabular}}
+\caption{各 MPSI 协议的运行时间与通信开销}
+\label{tab:mpsi}
+\end{table*}
+
+\begin{table*}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|ccccccccccccccc|ccccc|}
+\hline
+\multirow{3}{*}{$m$} & \multirow{3}{*}{协议} & \multicolumn{15}{c|}{时间 (秒)} & \multicolumn{5}{c|}{\multirow{2}{*}{通信量 (MB)}} \\ \cline{3-17}
+ &  & \multicolumn{5}{c|}{LAN} & \multicolumn{5}{c|}{400Mbps} & \multicolumn{5}{c|}{50Mbps} & \multicolumn{5}{c|}{} \\ \cline{3-22} 
+ &  & \multicolumn{1}{c|}{$2^{12}$} & \multicolumn{1}{c|}{$2^{14}$} & \multicolumn{1}{c|}{$2^{16}$} & \multicolumn{1}{c|}{$2^{18}$} & \multicolumn{1}{c|}{$2^{20}$} & \multicolumn{1}{c|}{$2^{12}$} & \multicolumn{1}{c|}{$2^{14}$} & \multicolumn{1}{c|}{$2^{16}$} & \multicolumn{1}{c|}{$2^{18}$} & \multicolumn{1}{c|}{$2^{20}$} & \multicolumn{1}{c|}{$2^{12}$} & \multicolumn{1}{c|}{$2^{14}$} & \multicolumn{1}{c|}{$2^{16}$} & \multicolumn{1}{c|}{$2^{18}$} & \multicolumn{1}{c|}{$2^{20}$} & \multicolumn{1}{c|}{$2^{12}$} & \multicolumn{1}{c|}{$2^{14}$} & \multicolumn{1}{c|}{$2^{16}$} & \multicolumn{1}{c|}{$2^{18}$} & $2^{20}$ \\ \hline
+3 & 本文协议 & \multicolumn{1}{c|}{\textbf{0.015}} & \multicolumn{1}{c|}{\textbf{0.052}} & \multicolumn{1}{c|}{\textbf{0.237}} & \multicolumn{1}{c|}{\textbf{1.581}} & \multicolumn{1}{c|}{\textbf{8.050}} & \multicolumn{1}{c|}{\textbf{1.784}} & \multicolumn{1}{c|}{\textbf{2.800}} & \multicolumn{1}{c|}{\textbf{3.681}} & \multicolumn{1}{c|}{\textbf{6.498}} & \multicolumn{1}{c|}{\textbf{19.50}} & \multicolumn{1}{c|}{\textbf{1.836}} & \multicolumn{1}{c|}{\textbf{3.028}} & \multicolumn{1}{c|}{\textbf{5.202}} & \multicolumn{1}{c|}{\textbf{13.40}} & \multicolumn{1}{c|}{\textbf{46.89}} & \multicolumn{1}{c|}{\textbf{0.761}} & \multicolumn{1}{c|}{\textbf{3.035}} & \multicolumn{1}{c|}{\textbf{12.15}} & \multicolumn{1}{c|}{\textbf{48.76}} & \textbf{195.8} \\ \hline
+4 & 本文协议 & \multicolumn{1}{c|}{\textbf{0.016}} & \multicolumn{1}{c|}{\textbf{0.054}} & \multicolumn{1}{c|}{\textbf{0.252}} & \multicolumn{1}{c|}{\textbf{1.684}} & \multicolumn{1}{c|}{\textbf{8.300}} & \multicolumn{1}{c|}{\textbf{2.267}} & \multicolumn{1}{c|}{\textbf{3.780}} & \multicolumn{1}{c|}{\textbf{5.005}} & \multicolumn{1}{c|}{\textbf{8.565}} & \multicolumn{1}{c|}{\textbf{24.88}} & \multicolumn{1}{c|}{\textbf{2.331}} & \multicolumn{1}{c|}{\textbf{4.109}} & \multicolumn{1}{c|}{\textbf{6.905}} & \multicolumn{1}{c|}{\textbf{18.56}} & \multicolumn{1}{c|}{\textbf{64.89}} & \multicolumn{1}{c|}{\textbf{1.122}} & \multicolumn{1}{c|}{\textbf{4.472}} & \multicolumn{1}{c|}{\textbf{17.91}} & \multicolumn{1}{c|}{\textbf{71.83}} & \textbf{288.4} \\ \hline
+\multirow{2}{*}{5} & \cite{ChenDGB22} & \multicolumn{1}{c|}{0.670} & \multicolumn{1}{c|}{1.789} & \multicolumn{1}{c|}{6.289} & \multicolumn{1}{c|}{31.24} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{20.70} & \multicolumn{1}{c|}{94.49} & \multicolumn{1}{c|}{425.6} & \multicolumn{1}{c|}{1894} & $-$ \\ \cline{2-22} 
+ & 本文协议 & \multicolumn{1}{c|}{\textbf{0.018}} & \multicolumn{1}{c|}{\textbf{0.056}} & \multicolumn{1}{c|}{\textbf{0.270}} & \multicolumn{1}{c|}{\textbf{1.735}} & \multicolumn{1}{c|}{\textbf{8.616}} & \multicolumn{1}{c|}{\textbf{2.753}} & \multicolumn{1}{c|}{\textbf{4.747}} & \multicolumn{1}{c|}{\textbf{6.076}} & \multicolumn{1}{c|}{\textbf{10.42}} & \multicolumn{1}{c|}{\textbf{28.87}} & \multicolumn{1}{c|}{\textbf{2.872}} & \multicolumn{1}{c|}{\textbf{5.134}} & \multicolumn{1}{c|}{\textbf{8.819}} & \multicolumn{1}{c|}{\textbf{23.76}} & \multicolumn{1}{c|}{\textbf{83.80}} & \multicolumn{1}{c|}{\textbf{1.482}} & \multicolumn{1}{c|}{\textbf{5.909}} & \multicolumn{1}{c|}{\textbf{23.66}} & \multicolumn{1}{c|}{\textbf{94.90}} & \textbf{381.0} \\ \hline
+\multirow{2}{*}{10} & \cite{ChenDGB22} & \multicolumn{1}{c|}{1.477} & \multicolumn{1}{c|}{4.503} & \multicolumn{1}{c|}{12.81} & \multicolumn{1}{c|}{95.23} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{46.58} & \multicolumn{1}{c|}{212.6} & \multicolumn{1}{c|}{957.7} & \multicolumn{1}{c|}{4262} & $-$ \\ \cline{2-22} 
+ & 本文协议 & \multicolumn{1}{c|}{\textbf{0.026}} & \multicolumn{1}{c|}{\textbf{0.071}} & \multicolumn{1}{c|}{\textbf{0.375}} & \multicolumn{1}{c|}{\textbf{2.001}} & \multicolumn{1}{c|}{\textbf{9.226}} & \multicolumn{1}{c|}{\textbf{5.174}} & \multicolumn{1}{c|}{\textbf{9.578}} & \multicolumn{1}{c|}{\textbf{11.93}} & \multicolumn{1}{c|}{\textbf{18.43}} & \multicolumn{1}{c|}{\textbf{50.33}} & \multicolumn{1}{c|}{\textbf{5.346}} & \multicolumn{1}{c|}{\textbf{10.56}} & \multicolumn{1}{c|}{\textbf{18.07}} & \multicolumn{1}{c|}{\textbf{49.45}} & \multicolumn{1}{c|}{\textbf{174.6}} & \multicolumn{1}{c|}{\textbf{3.285}} & \multicolumn{1}{c|}{\textbf{13.09}} & \multicolumn{1}{c|}{\textbf{52.42}} & \multicolumn{1}{c|}{\textbf{210.2}} & \textbf{844.0} \\ \hline
+\end{tabular}}
+\caption{各 MPSI-card 协议的运行时间与通信开销对比}
+\label{tab:mpsi-card}
+\end{table*}
+
+\begin{table*}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|>{\centering\arraybackslash}p{1cm}|ccccccccccccccc|ccccc|}
+\hline
+\multicolumn{1}{|c|}{\multirow{2}{*}[-0.5ex]{\centering $m$}} & \multicolumn{15}{c|}{时间 (秒)} & \multicolumn{5}{c|}{\multirow{2}{*}{通信量 (MB)}} \\ \cline{2-16}
+\multicolumn{1}{|l|}{} & \multicolumn{5}{c|}{LAN} & \multicolumn{5}{c|}{400Mbps} & \multicolumn{5}{c|}{50Mbps} & \multicolumn{5}{c|}{} \\ \cline{2-21}
+& \multicolumn{1}{c|}{$2^{12}$} & \multicolumn{1}{c|}{$2^{14}$} & \multicolumn{1}{c|}{$2^{16}$} & \multicolumn{1}{c|}{$2^{18}$} & \multicolumn{1}{c|}{$2^{20}$} & \multicolumn{1}{c|}{$2^{12}$} & \multicolumn{1}{c|}{$2^{14}$} & \multicolumn{1}{c|}{$2^{16}$} & \multicolumn{1}{c|}{$2^{18}$} & \multicolumn{1}{c|}{$2^{20}$} & \multicolumn{1}{c|}{$2^{12}$} & \multicolumn{1}{c|}{$2^{14}$} & \multicolumn{1}{c|}{$2^{16}$} & \multicolumn{1}{c|}{$2^{18}$} & \multicolumn{1}{c|}{$2^{20}$} & \multicolumn{1}{c|}{$2^{12}$} & \multicolumn{1}{c|}{$2^{14}$} & \multicolumn{1}{c|}{$2^{16}$} & \multicolumn{1}{c|}{$2^{18}$} & $2^{20}$ \\ \hline
+
+3 & \multicolumn{1}{c|}{0.023} & \multicolumn{1}{c|}{0.088} & \multicolumn{1}{c|}{0.417} & \multicolumn{1}{c|}{2.810} & \multicolumn{1}{c|}{14.67} & \multicolumn{1}{c|}{2.519} & \multicolumn{1}{c|}{3.541} & \multicolumn{1}{c|}{4.686} & \multicolumn{1}{c|}{9.417} & \multicolumn{1}{c|}{31.88} & \multicolumn{1}{c|}{2.620} & \multicolumn{1}{c|}{3.987} & \multicolumn{1}{c|}{7.237} & \multicolumn{1}{c|}{20.83} & \multicolumn{1}{c|}{78.99} & \multicolumn{1}{c|}{1.283} & \multicolumn{1}{c|}{5.107} & \multicolumn{1}{c|}{20.43} & \multicolumn{1}{c|}{81.89} & 328.6 \\ \hline
+4 & \multicolumn{1}{c|}{0.025} & \multicolumn{1}{c|}{0.091} & \multicolumn{1}{c|}{0.436} & \multicolumn{1}{c|}{3.044} & \multicolumn{1}{c|}{15.16} & \multicolumn{1}{c|}{3.084} & \multicolumn{1}{c|}{4.680} & \multicolumn{1}{c|}{5.948} & \multicolumn{1}{c|}{12.40} & \multicolumn{1}{c|}{38.17} & \multicolumn{1}{c|}{3.207} & \multicolumn{1}{c|}{5.268} & \multicolumn{1}{c|}{9.564} & \multicolumn{1}{c|}{28.56} & \multicolumn{1}{c|}{104.4} & \multicolumn{1}{c|}{1.885} & \multicolumn{1}{c|}{7.499} & \multicolumn{1}{c|}{29.99} & \multicolumn{1}{c|}{120.2} & 482.4 \\ \hline
+5 & \multicolumn{1}{c|}{0.027} & \multicolumn{1}{c|}{0.094} & \multicolumn{1}{c|}{0.474} & \multicolumn{1}{c|}{3.150} & \multicolumn{1}{c|}{15.49} & \multicolumn{1}{c|}{3.650} & \multicolumn{1}{c|}{5.729} & \multicolumn{1}{c|}{7.288} & \multicolumn{1}{c|}{13.17} & \multicolumn{1}{c|}{43.06} & \multicolumn{1}{c|}{3.843} & \multicolumn{1}{c|}{6.526} & \multicolumn{1}{c|}{12.10} & \multicolumn{1}{c|}{36.71} & \multicolumn{1}{c|}{133.6} & \multicolumn{1}{c|}{2.486} & \multicolumn{1}{c|}{9.890} & \multicolumn{1}{c|}{39.56} & \multicolumn{1}{c|}{158.6} & 636.2 \\ \hline
+10 & \multicolumn{1}{c|}{0.039} & \multicolumn{1}{c|}{0.120} & \multicolumn{1}{c|}{0.632} & \multicolumn{1}{c|}{3.610} & \multicolumn{1}{c|}{16.65} & \multicolumn{1}{c|}{6.474} & \multicolumn{1}{c|}{10.93} & \multicolumn{1}{c|}{13.79} & \multicolumn{1}{c|}{23.56} & \multicolumn{1}{c|}{71.36} & \multicolumn{1}{c|}{6.781} & \multicolumn{1}{c|}{12.76} & \multicolumn{1}{c|}{24.96} & \multicolumn{1}{c|}{78.64} & \multicolumn{1}{c|}{287.1} & \multicolumn{1}{c|}{5.493} & \multicolumn{1}{c|}{21.85} & \multicolumn{1}{c|}{87.37} & \multicolumn{1}{c|}{350.2} & 1405 \\ \hline
+\end{tabular}}
+\caption{本文的 MPSI-card-sum 协议的运行时间与通信开销}
+\label{tab:mpsi-card-sum}
+\end{table*}
+
+\begin{table*}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|ccccccccccccccc|ccccc|}
+\hline
+\multirow{3}{*}{$m$} & \multirow{3}{*}{协议} & \multicolumn{15}{c|}{时间 (秒)} & \multicolumn{5}{c|}{\multirow{2}{*}{通信量 (MB)}} \\ \cline{3-17}
+ &  & \multicolumn{5}{c|}{LAN} & \multicolumn{5}{c|}{400Mbps} & \multicolumn{5}{c|}{50Mbps} & \multicolumn{5}{c|}{} \\ \cline{3-22} 
+ &  & \multicolumn{1}{c|}{$2^{12}$} & \multicolumn{1}{c|}{$2^{14}$} & \multicolumn{1}{c|}{$2^{16}$} & \multicolumn{1}{c|}{$2^{18}$} & \multicolumn{1}{c|}{$2^{20}$} & \multicolumn{1}{c|}{$2^{12}$} & \multicolumn{1}{c|}{$2^{14}$} & \multicolumn{1}{c|}{$2^{16}$} & \multicolumn{1}{c|}{$2^{18}$} & \multicolumn{1}{c|}{$2^{20}$} & \multicolumn{1}{c|}{$2^{12}$} & \multicolumn{1}{c|}{$2^{14}$} & \multicolumn{1}{c|}{$2^{16}$} & \multicolumn{1}{c|}{$2^{18}$} & \multicolumn{1}{c|}{$2^{20}$} & \multicolumn{1}{c|}{$2^{12}$} & \multicolumn{1}{c|}{$2^{14}$} & \multicolumn{1}{c|}{$2^{16}$} & \multicolumn{1}{c|}{$2^{18}$} & $2^{20}$ \\ \hline
+ & \cite{DongCZB24} & \multicolumn{1}{c|}{\textbf{0.017}} & \multicolumn{1}{c|}{\textbf{0.050}} & \multicolumn{1}{c|}{\textbf{0.215}} & \multicolumn{1}{c|}{\textbf{1.005}} & \multicolumn{1}{c|}{\textbf{4.352}} & \multicolumn{1}{c|}{\textbf{3.157}} & \multicolumn{1}{c|}{\textbf{3.734}} & \multicolumn{1}{c|}{\textbf{4.444}} & \multicolumn{1}{c|}{\textbf{9.705}} & \multicolumn{1}{c|}{\textbf{33.10}} & \multicolumn{1}{c|}{\textbf{3.340}} & \multicolumn{1}{c|}{\textbf{4.495}} & \multicolumn{1}{c|}{\textbf{9.779}} & \multicolumn{1}{c|}{\textbf{32.11}} & \multicolumn{1}{c|}{\textbf{118.7}}  & \multicolumn{1}{c|}{2.416} & \multicolumn{1}{c|}{9.702} & \multicolumn{1}{c|}{39.87} & \multicolumn{1}{c|}{161.2} & 652.1 \\ \cline{2-22}
+ \multirow{-2}{*}{3} & 本文协议 & \multicolumn{1}{c|}{0.022} & \multicolumn{1}{c|}{0.068} & \multicolumn{1}{c|}{0.298} & \multicolumn{1}{c|}{1.892} & \multicolumn{1}{c|}{9.607} & \multicolumn{1}{c|}{3.327} & \multicolumn{1}{c|}{3.774} & \multicolumn{1}{c|}{4.878} & \multicolumn{1}{c|}{11.04} & \multicolumn{1}{c|}{37.77} & \multicolumn{1}{c|}{3.535} & \multicolumn{1}{c|}{4.606} & \multicolumn{1}{c|}{10.25} & \multicolumn{1}{c|}{32.50} & \multicolumn{1}{c|}{120.97}  & \multicolumn{1}{c|}{\textbf{2.414}} & \multicolumn{1}{c|}{\textbf{9.695}} & \multicolumn{1}{c|}{\textbf{39.84}} & \multicolumn{1}{c|}{\textbf{161.1}} & \textbf{651.6} \\ \hline
+ & \cite{DongCZB24} & \multicolumn{1}{c|}{\textbf{0.023}} & \multicolumn{1}{c|}{\textbf{0.071}} & \multicolumn{1}{c|}{\textbf{0.286}} & \multicolumn{1}{c|}{\textbf{1.393}} & \multicolumn{1}{c|}{\textbf{5.645}} & \multicolumn{1}{c|}{\textbf{3.976}} & \multicolumn{1}{c|}{\textbf{4.618}} & \multicolumn{1}{c|}{\textbf{6.507}} & \multicolumn{1}{c|}{\textbf{17.10}} & \multicolumn{1}{c|}{\textbf{59.21}} & \multicolumn{1}{c|}{\textbf{4.270}} & \multicolumn{1}{c|}{6.924} & \multicolumn{1}{c|}{19.00} & \multicolumn{1}{c|}{69.23} & \multicolumn{1}{c|}{267.2} & \multicolumn{1}{c|}{5.653} & \multicolumn{1}{c|}{23.06} & \multicolumn{1}{c|}{93.06} & \multicolumn{1}{c|}{376.0} & 1520 \\ \cline{2-22} 
+ \multirow{-2}{*}{4} & 本文协议 & \multicolumn{1}{c|}{0.029} & \multicolumn{1}{c|}{0.089} & \multicolumn{1}{c|}{0.415} & \multicolumn{1}{c|}{2.345} & \multicolumn{1}{c|}{11.25} & \multicolumn{1}{c|}{3.996} & \multicolumn{1}{c|}{4.820} & \multicolumn{1}{c|}{6.756} & \multicolumn{1}{c|}{17.45} & \multicolumn{1}{c|}{64.04} & \multicolumn{1}{c|}{4.360} & \multicolumn{1}{c|}{\textbf{6.609}} & \multicolumn{1}{c|}{\textbf{17.85}} & \multicolumn{1}{c|}{\textbf{63.63}} & \multicolumn{1}{c|}{\textbf{245.0}} & \multicolumn{1}{c|}{\textbf{5.083}} & \multicolumn{1}{c|}{\textbf{20.77}} & \multicolumn{1}{c|}{\textbf{83.83}} & \multicolumn{1}{c|}{\textbf{338.9}} & \textbf{1370} \\ \hline
+ & \cite{DongCZB24} & \multicolumn{1}{c|}{\textbf{0.030}} & \multicolumn{1}{c|}{\textbf{0.087}} & \multicolumn{1}{c|}{\textbf{0.368}} & \multicolumn{1}{c|}{\textbf{1.714}} & \multicolumn{1}{c|}{\textbf{7.003}} & \multicolumn{1}{c|}{\textbf{4.800}} & \multicolumn{1}{c|}{\textbf{5.521}} & \multicolumn{1}{c|}{\textbf{8.938}} & \multicolumn{1}{c|}{\textbf{25.95}} & \multicolumn{1}{c|}{\textbf{95.40}} & \multicolumn{1}{c|}{5.419} & \multicolumn{1}{c|}{10.70} & \multicolumn{1}{c|}{32.81} & \multicolumn{1}{c|}{126.5} & \multicolumn{1}{c|}{500.1}  & \multicolumn{1}{c|}{10.69} & \multicolumn{1}{c|}{43.52} & \multicolumn{1}{c|}{175.6} & \multicolumn{1}{c|}{709.1} & 2865 \\ \cline{2-22}
+ \multirow{-2}{*}{5} & 本文协议 & \multicolumn{1}{c|}{0.039} & \multicolumn{1}{c|}{0.114} & \multicolumn{1}{c|}{0.542} & \multicolumn{1}{c|}{2.796} & \multicolumn{1}{c|}{13.18} & \multicolumn{1}{c|}{4.872} & \multicolumn{1}{c|}{5.705} & \multicolumn{1}{c|}{8.992} & \multicolumn{1}{c|}{26.09} & \multicolumn{1}{c|}{101.6} & \multicolumn{1}{c|}{\textbf{5.261}} & \multicolumn{1}{c|}{\textbf{9.393}} & \multicolumn{1}{c|}{\textbf{28.09}} & \multicolumn{1}{c|}{\textbf{105.6}} & \multicolumn{1}{c|}{\textbf{416.8}}  & \multicolumn{1}{c|}{\textbf{8.739}} & \multicolumn{1}{c|}{\textbf{35.69}} & \multicolumn{1}{c|}{\textbf{144.0}} & \multicolumn{1}{c|}{\textbf{582.1}} & \textbf{2358} \\ \hline
+ & \cite{DongCZB24} & \multicolumn{1}{c|}{\textbf{0.088}} & \multicolumn{1}{c|}{\textbf{0.286}} & \multicolumn{1}{c|}{\textbf{1.183}} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{9.203} & \multicolumn{1}{c|}{14.54} & \multicolumn{1}{c|}{38.31} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{18.01} & \multicolumn{1}{c|}{56.11} & \multicolumn{1}{c|}{213.2} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{74.68} & \multicolumn{1}{c|}{300.2} & \multicolumn{1}{c|}{1210} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{$-$} \\ \cline{2-22}
+ \multirow{-2}{*}{10} & 本文协议 & \multicolumn{1}{c|}{0.110} & \multicolumn{1}{c|}{0.337} & \multicolumn{1}{c|}{1.483} & \multicolumn{1}{c|}{\textbf{7.167}} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{\textbf{8.187}} & \multicolumn{1}{c|}{\textbf{12.06}} & \multicolumn{1}{c|}{\textbf{30.56}} & \multicolumn{1}{c|}{\textbf{105.7}} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{\textbf{12.14}} & \multicolumn{1}{c|}{\textbf{34.22}} & \multicolumn{1}{c|}{\textbf{125.1}} & \multicolumn{1}{c|}{\textbf{485.7}} & \multicolumn{1}{c|}{$-$} & \multicolumn{1}{c|}{\textbf{42.40}} & \multicolumn{1}{c|}{\textbf{170.2}} & \multicolumn{1}{c|}{\textbf{686.8}} & \multicolumn{1}{c|}{\textbf{2775}} & $-$ \\ \hline
+\end{tabular}}
+\caption{各 MPSU 协议的运行时间与通信开销对比}
+\label{tab:mpsu}
+\end{table}
 
 \section{本章小结}
 \esection{Summary}

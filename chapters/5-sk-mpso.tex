@@ -31,7 +31,7 @@
     \item \textbf{框架层.} 基于 CSPF 表示法与成员零分享原语，并结合多方秘密分享洗牌协议，本章构建了支持任意集合公式计算的 MPSO 统一框架。该框架的基本思想是将输入集合中所有满足目标集合公式的元素转化为各方持有的秘密分享序列，这一思想赋予了该框架极强的扩展性，使得其能进一步实现任意集合公式结果求势（MPSO-card）及基于电路的通用MPSO（Circuit-MPSO）功能，从而满足更复杂的数据分析需求。
 \end{enumerate}
 
-本章后续内容的安排如下：第 5.2 节提出规范集合谓词公式（CSPF）的定义，并证明任意集合公式转化为 CSPF 的等价性定理；第 5.3 节详细阐述谓词零分享原语的安全性定义、松弛定义以及组合与转化范式；第 5.4 节介绍成员零分享协议的实例化及关联于任意集合谓词公式的标准安全成员零分享协议的高效构造方案；第 5.5 节给出 MPSO 统一框架的完整执行流程及安全性证明、复杂度分析；最后，第 5.6 节对本章内容进行总结。
+本章后续内容安排如下：第 5.2 节提出规范集合谓词公式（CSPF）的定义，并证明任意集合公式转化为 CSPF 的等价性定理；第 5.3 节详细阐述谓词零分享原语的安全性定义、松弛定义以及组合与转化范式；第 5.4 节给出成员零分享协议的实例化及关联于任意集合谓词公式的标准安全成员零分享协议的高效构造；第 5.5 节给出 MPSO 统一框架的完整执行流程及安全性证明、复杂度分析；最后，第 5.6 节对本章内容进行总结。
 
 \section{集合公式的谓词公式表示}~\label{sec:predicate_formula}
 \esection{Predicate Formula Representation of Set Formulas}
@@ -182,7 +182,7 @@ $$C'_i = \bigwedge_{j=1}^{i-1} \neg C_j \land (x \in X_j) \land D_i = (x \in X_j
 \end{trivlist}
 \end{minipage}
 \end{framed}
-\caption{理想功能 $\FuncPZS^Q$}\label{fig:func-pzs}
+\caption{谓词零分享功能 $\FuncPZS^Q$}\label{fig:func-pzs}
 \end{figure}
 
 \subsection{安全性松弛}\label{relaxed-pzs}
@@ -329,7 +329,7 @@ s = r \cdot b = (r+a-a) \cdot b = (r+a) \cdot b - a \cdot b
 \end{gather*}
 上述等式表明，一旦 $u = r + a$ 公开，我们就可以在本地计算 $[s]$。因此，生成 $[s]$ 的任务便简化为重构 $[u] = [r] + [a]$。令每个参与方 $P_i$ 在本地计算其分享份额 $u_i = r_i + a_i$ 并将 $u_i$ 发送给 Leader 节点 $P_1$，随后 $P_1$ 计算 $u = u_1 + \cdots + u_m$ 并将其向所有参与方公开。由此可见，该转化技术仅消耗一个在离线阶段生成的 Beaver 三元组；在在线阶段，Leader 节点的通信开销为 $2 (m-1) \log_2\lvert \mathbb{F} \rvert$，每个 Client 节点的通信开销为 $2 \log_2\lvert \mathbb{F} \rvert$。
 
-上述优化后的转化技术采用星型通信拓扑，这使其能够集成到后续将介绍的 MPSO 协议中而不改变其原有拓扑结构 —— 从而在保证其标准半诚实安全性的同时，实现优越的复杂度性能（参见第~\ref{sec:mpsi} 节和第~\ref{sec:mpsu} 节）。
+上述优化后的转化技术采用星型通信拓扑，这使其能够集成到后续将介绍的 MPSO 协议中而不改变其原有拓扑结构 —— 从而在保证其标准半诚实安全性的同时，实现优越的复杂度性能。
 
 \subsection{从简单到复合的组合技术}\label{compound-pzs}
 
@@ -414,7 +414,7 @@ s = r \cdot b = (r+a-a) \cdot b = (r+a) \cdot b - a \cdot b
 
 \subsection{针对任意集合谓词公式的成员零分享}
 
-利用上述针对两方松弛成员零分享协议的实例化，并遵循图~\ref{fig:route} 中的技术路线，我们在图~\ref{fig:proto-cmzs} 中给出了针对任意集合谓词公式 $Q$ 的完整批量成员零分享协议。
+利用上述针对两方松弛成员零分享协议的实例化，我们在图~\ref{fig:proto-cmzs} 中给出了针对任意集合谓词公式 $Q$ 的完整批量成员零分享协议。
 
 \begin{figure}[!hbtp]
 \begin{framed}

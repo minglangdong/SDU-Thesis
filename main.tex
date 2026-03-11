@@ -43,6 +43,9 @@
 \usepackage{enumitem}
 \usetikzlibrary{decorations.pathreplacing} % 需要加载库
 
+\usepackage{longtable}
+\usepackage{array}
+
 \newcommand{\Adv}{\mathcal{A}}
 \newcommand{\Combine}{\mathsf{Combine}}
 \newcommand{\Corr}{\mathcal{C}orr}
@@ -135,6 +138,29 @@
 
 % 中文目录 和 英文目录
 \content
+
+% ================= 主要符号对照表 =================
+\cleartochapter
+\phantomsection
+\chapter*{主要符号对照表}
+\addcontentsline{toc}{chapter}{主要符号对照表}
+
+\vspace{0.5cm} 
+\noindent
+\begin{longtable}{@{} >{\centering\arraybackslash}p{2.5cm} p{12cm} @{}}
+        $m$ & 参与方的数量 \\
+        $P_i$ & 第 $i$ 个参与方 ($1 \le i \le m$) \\
+        $X_i$ & 第 $i$ 个参与方持有的私有集合 \\
+        $n$ & 参与方持有集合中的元素个数 \\
+        $l$ & 集合中元素的比特长度 \\
+        $[x]$ & $x$ 在 $m$ 个参与方之间的加法秘密分享 \\
+        $\lambda$ & 计算安全参数 \\
+        $\sigma$ & 统计安全参数 \\
+        $\overset{c}{\approx}$ & 两个分布在计算上不可区分 \\
+        $\overset{s}{\approx}$ & 两个分布在统计上不可区分 \\
+        $\Vert$ & 字符串拼接符 \\
+        $\oplus$ & 两个向量按分量异或 \\
+\end{longtable}
 
 % 插图目录 和 表格目录
 \ftcontent
