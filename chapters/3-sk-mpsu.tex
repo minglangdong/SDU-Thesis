@@ -23,7 +23,7 @@
 
 本章围绕上述问题展开研究，通过提出两种新型密码学组件 —— 批量秘密分享隐私成员测试（batch secret-shared private membership test, batch ssPMT）和多方秘密分享随机不经意传输（multi-party secret-shared ROT, mss-ROT），分别突破了现有对称密钥 MPSU 方案 \cite{LG-ASIACRYPT-2023} 的性能瓶颈和消除了其对非共谋假设的依赖，最终实现首个满足标准半诚实安全的基于对称密钥的高效 MPSU 协议。
 
-本章余下内容安排如下：第 3.2 节对 LG 协议进行回顾与安全性局限性分析，并概述本文的核心技术路线；第 3.3 节详细介绍 batch ssPMT的功能定义、协议构造及安全性证明；第 3.4 节介绍 mss-ROT的构造与安全性分析；第 3.5 节详细阐述 SK-MPSU 协议的完整构造及安全性证明；第 3.6 节对所提协议进行复杂度分析，并与 LG 协议进行对比；最后，第 3.7 节对本章工作进行总结。
+本章余下内容安排如下：第 3.2 节对 LG 协议进行回顾与局限性分析，并基于 LG 协议的两大“痛点”，概述本章提出的 SK-MPSU 协议的技术路线；第 3.3 节介绍 batch ssPMT 的功能定义、协议构造与安全性证明，以及复杂度分析，并与 LG 协议的核心组件 mq-ssPMT 进行对比；第 3.4 节介绍 mss-ROT的功能定义、协议构造与安全性证明；第 3.5 节详细阐述 SK-MPSU 协议的完整构造及安全性证明；第 3.6 节对 SK-MPSU 协议进行复杂度分析，并与 LG 协议的复杂度进行对比；最后，第 3.7 节对本章工作进行总结。
 
 \section{技术路线概述}
 \esection{Technical Overview}
@@ -368,7 +368,7 @@ $P_m$ 的视图由输入的掩码分享 $\Delta_m$、$\FuncROT$ 的输出 $(r_{m
 本节对本章提出的 SK-MPSU 协议（图 \ref{fig:proto-mpsu2}）中各阶段的具体开销进行详细分析。
 \begin{trivlist}
 
-\item \textbf{1. 执行 batch ssPMT}
+\item \textbf{1. 执行 batch ssPMT} 
 
 对于所有 $1 \le i < j \le m$，参与方 $P_i$ 与 $P_j$ 均需调用一次 batch ssPMT。总体而言，每个参与方 $P_j$ 共涉及 $m-1$ 次 batch ssPMT 调用，其中在前 $j-1$ 次调用中担任接收方 $\Rcv$，在后 $m-j$ 次调用中担任发送方 $\Sd$。每次调用 batch ssPMT 的 批量大小为 $B = 1.27n = O(n)$，其开销参考 \ref{sec:analysis-bsspmt} 节中的分析。
 
@@ -404,26 +404,38 @@ $P_m$ 的视图由输入的掩码分享 $\Delta_m$、$\FuncROT$ 的输出 $(r_{m
 \end{itemize}
 \end{trivlist}
 
-\subsection{与 LG 协议的对比}~\label{sec:compare-lg}
+\subsection{与 LG 协议的复杂度对比}~\label{sec:compare-lg}
 表 \ref{tab:compare-ske} 中展示了 LG 协议与本章提出的 SK-MPSU 协议在离线阶段和在线阶段中各参与方理论计算与通信复杂度的对比，其中 $n$ 为集合大小，$m$ 为参与方数量。$\lambda$ 和 $\sigma$ 分别表示计算和统计安全参数，且 $\lambda = 128, \sigma = 40$。$T$ 表示 SKE 解密电路中的 AND 门数量，$T \approx 600$。$l$ 表示输入元素的比特长度。$\gamma$ 为 OPPRF 的输出长度。$\gamma'$ 为 SKE 密文比特长度，且 $\gamma' \approx \gamma$。$t$ 为对偶 LPN 中的噪声权重，$t \approx 128$。
 
 \begin{table*}
 \centering
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
-\hline
+\hline \textbf{协议}
 & \multicolumn{4}{c|}{\textbf{计算复杂度}} & \multicolumn{4}{c|}{\textbf{通信复杂度}} \\
 \cline{2-9}
 & \multicolumn{2}{c|}{\textbf{离线阶段}} & \multicolumn{2}{c|}{\textbf{在线阶段}} & \multicolumn{2}{c|}{\textbf{离线阶段}} & \multicolumn{2}{c|}{\textbf{在线阶段}} \\
 \cline{4-5} \cline{8-9}
 & \multicolumn{2}{c|}{} & Leader & Client & \multicolumn{2}{c|}{} & Leader & Client \\
 \hline
-~\cite{LG-ASIACRYPT-2023} & \multicolumn{2}{c|}{$(T + \gamma' + m) m n \log n$} & $(T + \gamma' + m) m n$ & $(T + \gamma') m n$ & \multicolumn{2}{c|}{$\lambda m^2 n \log n$} & $(T + \gamma') m n + l m^2 n$ & $(T + \gamma') m n$ \\
+~\cite{LG-ASIACRYPT-2023} 
+& \multicolumn{2}{c|}{$O((T + \gamma' + m) m n \log n)$} 
+& $O((T + \gamma' + m) m n)$ 
+& $O((T + \gamma') m n)$ 
+& \multicolumn{2}{c|}{$O(\lambda m^2 n \log n)$} 
+& $O((T + \gamma') m n + l m^2 n)$ 
+& $O((T + \gamma') m n)$ \\
 \hline
-本文 SK-MPSU & \multicolumn{2}{c|}{$(\gamma + m) m n \log n$} & \multicolumn{2}{c|}{$m^2 n$} & \multicolumn{2}{c|}{$\lambda m^2 n \log n$} & $\gamma m n + l m^2 n$ & $(\gamma + l+ m) m n$ \\
+SK-MPSU 
+& \multicolumn{2}{c|}{$O((\gamma + m) m n \log n)$} 
+& \multicolumn{2}{c|}{$O(m^2 n)$} 
+& \multicolumn{2}{c|}{$O(\lambda m^2 n \log n)$} 
+& $O(\gamma m n + l m^2 n)$ 
+& $O((\gamma + l + m) m n)$ \\
 \hline
 \end{tabular}}
-\caption{LG 协议与 SK-MPSU 协议在离线和在线阶段的理论计算与通信复杂度对比}\label{tab:compare-ske}
+\caption{LG 协议与 SK-MPSU 协议在离线和在线阶段的理论计算与通信复杂度对比}
+\label{tab:compare-ske}
 \end{table*}
 
 % \section{实现与性能分析}
