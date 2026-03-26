@@ -1,4 +1,4 @@
-\chapter{基于对称密钥的实例化协议与综合性能评估}
+\chapter{基于对称密钥的实例化协议优化与性能评估}
 \echapter{Instantiated Symmetric-Key Based Protocols and Comprehensive Performance Evaluation}
 
 \section{引言}
@@ -6,14 +6,18 @@
 
 在第五章中，本文构建了一个基于对称密钥技术的多方隐私集合运算（MPSO）统一框架。该框架通过首先引入规范集合谓词公式（Canonical Set Predicate Formula, CSPF）对目标集合公式进行统一表示，然后提出谓词零分享（Predicative Zero-Sharing）这一新型密码学原语及其子类 —— 成员零分享（Membership Zero-Sharing）作为核心组件，成功实现了计算任意集合公式的通用 MPSO 功能，并打破了以往研究中的“功能孤岛”，解决了现有协议功能局限和缺乏统一性的问题。
 
-然而，在安全多方计算领域，协议的“通用性”往往意味着在处理某些具体场景时可能存在性能冗余。例如，在上述通用 MPSO 框架的设计中，为了消除按照 CSPF 中子公式的顺序生成秘密分享的位置与重构出的元素所属局部子集和在布谷鸟哈希表中的位置的之间的关联，以防止秘密分享重构阶段造成信息泄露，必须强制要求所有参与方在重构前执行一个多方秘密分享洗牌协议。然而，在某些特殊情况下，例如 MPSI 协议中，由于交集必然是 Leader 输入集合的子集，因此重构出的秘密的位置完全由其输入集合决定，这对其而言不再构成额外的信息泄露。基于这一子集属性，可以直接在 MPSI 协议中省去多方秘密分享洗牌这一步骤，优化实例化出的 MPSI 协议的效率。
-因此，为了在实际应用中实现极致的效率，本章针对 MPSO 中的典型功能，在第五章提出的通用 MPSO 框架下实例化的各具体协议进行深度的协议级优化，通过结合特定集合公式的结构特性，裁剪通用流程中的冗余步骤，给出了高效的多方隐私集合求交（Multi-party Private Set Intersection, MPSI）、多方隐私交集计算（Multi-party Private Computation on Set Intersection, MPCSI）和 MPSU 协议，其中的 MPSI 协议是首个在标准半诚实模型下实现\textbf{最优渐进复杂度}（即达到与不考虑隐私的明文传输方案相同量级的复杂度 —— Leader 的计算与通信复杂度为 $O(mn)$，Client 的计算与通信复杂度为 $O(n)$）的基于对称密钥技术的 MPSI 构造；多方隐私交集求势（MPSI-card） 和 多方隐私交集求势与和（MPSI-card-sum）协议是首个在标准半诚实模型下实现\textbf{最优渐进复杂度}的 MPSI-card 和 MPSI-card-sum 构造；基于电路的 MPSI（Circuit-MPSI）协议是首个在\textbf{不诚实大多数}（Dishonest Majority）设定下安全的 Circuit-MPSI 构造；MPSU 协议是标准半诚实模型下基于对称密钥的另一 MPSU 构造，相比第三章提出的首个构造在理论上实现了更优的渐进复杂度。
+然而，在安全多方计算领域，协议的“通用性”往往意味着在处理某些具体场景时可能存在性能冗余。例如，在上述通用 MPSO 框架的设计中，为了消除按照 CSPF 中子公式的顺序生成秘密分享的位置与重构出的元素所属局部子集和在布谷鸟哈希表中的位置的之间的关联，以防止秘密分享重构阶段造成信息泄露，必须强制要求所有参与方在重构前执行一个多方秘密分享洗牌协议。然而，在某些特殊情况下，例如多方隐私集合求交（Multi-party Private Set Intersection, MPSI）协议中，由于交集必然是 Leader 输入集合的子集，因此重构出的秘密的位置完全由其输入集合决定，这对其而言不再构成额外的信息泄露。基于这一子集属性，可以直接在 MPSI 协议中省去多方秘密分享洗牌这一步骤，优化实例化出的 MPSI 协议的效率。
+因此，为了在实际应用中实现极致的效率，本章针对 MPSO 中的典型功能，在第五章提出的通用 MPSO 框架下实例化的各具体协议进行深度的协议级优化，通过结合特定集合公式的结构特性，裁剪通用流程中的冗余步骤，给出了高效的 MPSI、多方隐私交集计算（Multi-party Private Computation on Set Intersection, MPCSI）、 多方隐私集合求并（Multi-party Private Set Union, MPSU）和多方隐私并集计算（Multi-party Private Computation on Set Union, MPCSU）协议，其中的 MPSI 协议是首个在标准半诚实模型下实现\textbf{最优渐进复杂度}（即达到与不考虑隐私的明文传输方案相同量级的复杂度 —— Leader 的计算与通信复杂度为 $O(mn)$，Client 的计算与通信复杂度为 $O(n)$）的基于对称密钥技术的 MPSI 构造；多方隐私交集求势（MPSI-card）和多方隐私交集求势与和（MPSI-card-sum）协议是首个在标准半诚实模型下实现\textbf{最优渐进复杂度}的 MPSI-card 和 MPSI-card-sum 构造；基于电路的 MPSI（Circuit-MPSI）协议是首个在\textbf{不诚实大多数}（Dishonest Majority）设定下安全的 Circuit-MPSI 构造；MPSU 协议是标准半诚实模型下基于对称密钥的另一 MPSU 构造，相比第三章提出的首个构造在理论上实现了更优的渐进复杂度；多方隐私并集求势（MPSU-card）和基于电路的 MPSU（Circuit-MPSU）协议是目前唯一实际可用的 MPSU-card 和 Circuit-MPSU 构造。
 
-为了验证第五章提出的通用 MPSO 框架的实际可用性，我们使用 C++ 语言系统实现了述该框架下实例化出的具体协议，并在相同的硬件平台和网络环境（涵盖局域网 LAN 和广域网 WAN）下，将本文提出的所有协议（包括第三章提出的 SK-MPSU 协议和第四章提出的 PK-MPSU 协议）与当前标准半诚实模型下各个具体子领域的 SOTA协议进行统一的基准测试（Benchmark）与性能对比。我们的实验数据充分证明，该框架在保证了功能通用性的同时，其实际在线效率已达到甚至超越了现有的各 SOTA 协议。
+为了验证第五章提出的通用 MPSO 框架的实际可用性，我们使用 C++ 语言系统实现了述该框架下实例化出的具体协议，并在相同的硬件平台和网络环境（涵盖局域网 LAN 和广域网 WAN）下，将本文提出的所有协议（包括第三章提出的 SK-MPSU 协议和第四章提出的 PK-MPSU 协议）与标准半诚实模型下各个具体子领域的 SOTA 协议进行统一的基准测试（Benchmark）与性能对比。我们的实验数据充分证明，该框架在保证了功能通用性的同时，其实际在线效率已达到甚至超越了现有的各 SOTA 协议。
 
-本章后续结构如下：6.2 节和 6.3 节首先介绍框架底层组件成员零分享的两个特例——全成员零分享和全非成员零分享的具体构造；6.4 节给出针对 MPSI 及其变体（MPSI, MPSI-card, MPSI-card-sum, Circuit-MPSI）的框架实例化协议的优化版本；6.5 节探讨针对 MPSU 及其变体（MPSU, MPSU-card, Circuit-MPSU）的框架实例化协议的优化版本；6.6 节 详细分析了各类协议的复杂度并给出了各个具体子领域的相关工作的全面理论对比；6.7 节展示各类协议的具体实现细节及综合性能评估结果；最后，6.8 节对本章内容进行总结。
+本章后续结构如下：6.2 节首先介绍第五章提出的核心组件成员零分享在特定谓词下的两个特例 —— 全成员零分享和全非成员零分享，以及全成员零分享的变体 —— 带载荷的全成员零分享（Full Membership Zero-Sharing with Payloads），用于后续构造各实例化协议；6.3 节对第五章提出的通用 MPSO 框架下实例化的 MPSI 和 MPCSI 协议，以及 MPSU 和 MPCSU 协议分别进行优化，给出各协议具体的构造；6.4 节详细分析了各实例化协议的计算与通信复杂度，并分别与各个具体子领域的相关工作进行全面的理论对比；6.5 节展示各实例化协议的具体实现细节及性能评估结果；最后，6.8 节对本章内容进行总结。
 
 \section{成员零分享实例及其变体} 
+
+在第五章中，本文介绍了谓词零分享（Predicative Zero-Sharing）在集合运算场景下的特化实例 —— 成员零分享（Membership Zero-Sharing），作为本文提出的 MPSO 框架的核心底层子协议。具体地，谓词零分享是一类 MPC 协议，其中每个成员零分享协议都与一个集合谓词公式 $Q$ 相关联
+
+% 特别地，若 $Q$ 是 $m-1$ 个集合成员谓词的合取（即 $\bigwedge_{j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}} x \in X_j$），我们将其称为批量纯成员零分享（Batch Pure Membership Zero-Sharing）（适配于第~\ref{sec:mpsi} 节中的 MPSI 及其变体）；若 $Q$ 是 $m-1$ 个集合非成员谓词的合取（即 $\bigwedge_{j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}} x \notin X_j$），我们将其称为批量纯非成员零分享（Batch Pure Non-Membership Zero-Sharing）（适配于第~\ref{sec:mpsu} 节中的 MPSU 及其变体）。这两个功能的正式定义（及其构造）分别在附录~\ref{bpMZS} 和~\ref{bpNMZS} 中给出。我们还引入了纯成员零分享的一种变体，称为带有效载荷的纯成员零分享（Pure Membership Zero-Sharing with Payloads），其中 $P_\mathsf{pivot}$ 持有一个元素 $x$，而其他参与方各持有一个元素集合和一组关联的有效载荷。该功能专为附录~\ref{appdix:mpsi-card-sum} 中的 MPSI-card-sum 设计，其正式定义和构造见附录~\ref{bpMZSpayloads}。
 
 \subsection{全成员零分享}
 
@@ -23,7 +27,7 @@
 \begin{framed}
 \begin{minipage}[center]{\textwidth}
 \begin{trivlist}
-\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots P_m$，其中仅枢纽方 $P_\mathsf{pivot}$ 持有 $n$ 个独立元素作为输入，其余参与方持有大小为 $n$ 的集合。批量大小 $n$。有限域 $\mathbb{F}$。 
+\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots P_m$，其中 $P_\mathsf{pivot}$ 持有 $n$ 个独立元素作为输入，其余参与方持有大小为 $n$ 的集合。批量大小 $n$。有限域 $\mathbb{F}$。 
 \item \textbf{功能：} 接收来自 $P_\mathsf{pivot}$ 的输入 $\textbf{x} = (x_1, \cdots, x_n)$ 以及来自每个 $P_j$ ($j \in \{1,\cdots m\} \setminus \{\mathsf{pivot}\}$) 的输入 $\textbf{X}_j = (X_{j,1}, \cdots, X_{j,n})$。对于 $1 \le i \le m$，采样 $\textbf{s}_i = (s_{i,1}, \cdots, s_{i,n}) \gets \mathbb{F}^n$，且满足：对于 $1 \le d \le n$，如果 $\bigwedge_{j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}} (x_d \in X_{j,d}) = 1$，则 $\sum_{1 \le i \le m} s_{i,d} = 0$。向 $P_i$ 发送 $\textbf{s}_i$。
 \end{trivlist}
 \end{minipage}
@@ -37,7 +41,7 @@
 \begin{trivlist}
 \item \textbf{参数：} $m$ 个参与方 $P_1, \cdots P_m$。批量大小 $n$。有限域 $\mathbb{F}$。离线阶段生成的 $n$ 个 Beaver 三元组 $([\textbf{a}], [\textbf{b}], [\textbf{c}])$，其中 $[\textbf{a}] = ([a_1], \cdots, [a_n])$，$[\textbf{b}] = ([b_1], \cdots, [b_n])$，$[\textbf{c}] = ([c_1], \cdots, [c_n])$ 且满足 $c_i = a_i \cdot b_i$。
 \item \textbf{输入：} $P_\mathsf{pivot}$ 输入向量 $\textbf{x} = (x_1, \cdots, x_n)$。对于 $j \in \{1,\cdots m\} \setminus \{\mathsf{pivot}\}$，$P_j$ 输入 $\textbf{X}_j = (X_{j,1}, \cdots, X_{j,n})$。
-\item \textbf{协议流程：}
+\item \textbf{协议：}
 \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=15pt]
 \item 对于第 $i$ 个实例 ($1 \le i \le n$)，$P_j$ 采样 $r_{j,i}$ 并设置键集合 $K_{j,i} = X_{j,i}$，值集合 $V_{j,i} = \{-r_{j,i}, \cdots, -r_{j,i}\}$，其中 $\lvert K_{j,i} \rvert = \lvert V_{j,i} \rvert$。
 \item $P_\mathsf{pivot}$ 和 $P_j$ 调用 $\FuncbOPPRF$。其中 $P_j$ 作为发送方 $\Sd$ 输入 $(K_{j,1},\cdots,K_{j,n})$ 和 $(V_{j,1},\cdots,V_{j,n})$；$P_\mathsf{pivot}$ 作为接收方 $\Rcv$ 输入 $\textbf{x}$ 并接收输出 $\textbf{u}_{j}$。
@@ -82,7 +86,7 @@
 \begin{minipage}[center]{\textwidth}
 \begin{trivlist}
 \item \textbf{参数：} 同上，另需 $n$ 个 Beaver 三元组 $([\textbf{a}], [\textbf{b}], [\textbf{c}])$。
-\item \textbf{协议流程：}
+\item \textbf{协议：}
 \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=15pt]
 \item 对于第 $i$ 个实例，$P_j$ 采样 $(r_{j,i}, w_{j,i})$。设置键集合 $K_{j,i} = X_{j,i} = (x_{j,i,1}, \dots)$，值集合 $V_{j,i}' = \{(-r_{j,i}, v_{j,i,1} - w_{j,i}), \dots\}$。
 \item $P_\mathsf{pivot}$ 和 $P_j$ 调用 $\FuncbOPPRF$。$P_j$ 作为 $\Sd$ 输入键值对，$P_\mathsf{pivot}$ 作为 $\Rcv$ 接收 $(\textbf{r}_{j}',\textbf{w}_{j}')$。
@@ -118,7 +122,7 @@
 \begin{minipage}[center]{\textwidth}
 \begin{trivlist}
 \item \textbf{参数：} $m$ 个参与方，批量大小 $n$。Beaver 三元组 $([\textbf{a}], [\textbf{b}], [\textbf{c}])$。
-\item \textbf{协议流程：}
+\item \textbf{协议：}
 \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=15pt]
 \item $P_\mathsf{pivot}$ 和 $P_j$ 调用 $\FuncbssPMT$。对于第 $i$ 个实例，$P_j$ 输入 $X_{j,i}$ 获得布尔份额 $e_{j,i}^0$，$P_\mathsf{pivot}$ 输入 $x_i$ 获得布尔份额 $e_{j,i}^1$。 
 \item $P_\mathsf{pivot}$ 和 $P_j$ 调用 $n$ 个 ROT 实例。$P_j$ 作为发送方 $\Sd$ 接收随机数 $r_{j,i}^0,r_{j,i}^1$，$P_\mathsf{pivot}$ 作为接收方 $\Rcv$ 输入选择比特 $e_{j,i}^1$ 并接收 $r_{j,i}^{e_{j,i}^1}$。$P_\mathsf{pivot}$ 设置 $\textbf{r}'_{j} = (r_{j,1}^{e_{j,1}^1},\cdots,r_{j,n}^{e_{j,n}^1})$。 
@@ -135,13 +139,13 @@
 \item \textbf{复杂度分析.} 在协议中，$P_\mathsf{pivot}$ 与每个 $P_j$ 执行 $\FuncbssPMT$。基于本文第三章的结论，该操作具有线性的计算和通信复杂度。后续的 ROT 操作也可在离线阶段预处理，使得在线阶段 $P_\mathsf{pivot}$ 仅需发送掩码后的选择比特。最后的三元组乘法同样保持线性开销。因此，在线阶段 $P_\mathsf{pivot}$ 的复杂度为 $O(mn)$，每个 Client $P_j$ 为 $O(n)$。
 \end{trivlist}
 
-\section{实例化协议构造}
+\section{实例化协议的优化}
 
 \subsection{多方隐私集合求交与交集计算协议构造} 
 
 考虑计算目标为一个可构造交集 $Y$，其规范集合谓词公式 $\psi$ 相对于 $X_1$ 是局部的。例如 $X_1 \cap X_2 \cap X_3$ 相对于 $X_1$ 的局部剩余公式为 $x \in X_2 \land x \in X_3$。在这种情况下，$Y$ 的所有元素必然属于 $P_1$（即 $Y \subseteq X_1$）。这意味着秘密分享的排列顺序完全由 $X_1$ 决定。对于 MPSI 而言，由于 $P_1$ 最终将获得结果集，这种原本会被视为泄露的“顺序信息”对 $P_1$ 而言不再构成真实的隐私泄露。
 
-因此，在 MPSI 协议中，我们可以\textbf{省去多方秘密分享洗牌（Shuffle）步骤}。当 $P_1$（作为枢纽方 $P_{\mathsf{pivot}}$）与其他各方调用完批量全成员零分享后，各方可以直接向 $P_1$ 重构秘密。如果重构的秘密为 0，则说明 $P_1$ 对应的元素属于交集。这一优化极大地提升了在线效率。
+因此，在 MPSI 协议中，我们可以省去多方秘密分享洗牌步骤。当 $P_1$（作为 $P_{\mathsf{pivot}}$）与其他各方调用完批量全成员零分享后，各方可以直接向 $P_1$ 重构秘密。如果重构的秘密为 0，则说明 $P_1$ 对应的元素属于交集。这一优化极大地提升了在线效率。
 （注意：对于 MPSI-card，为了防止 $P_1$ 知道具体哪些元素在交集内，仍然需要执行洗牌操作）。
 
 此外，在这种针对性优化下，协议开销不再依赖于元素的比特长度 $l$，因为参与方可以提前在本地对元素进行哈希压缩。为了保证正确性，必须确保哈希过程在 $P_1$ 和其他参与方的元素之间不引入冲突，因此哈希函数的输出长度至少为 $\sigma + \log_2 (m-1) + 2 \log_2 n$。
@@ -257,7 +261,7 @@ MPSI-card-sum 协议通过利用 6.2 节中“带载荷的批量全成员零分�
 \caption{MPSU / MPSU-card / Circuit-MPSU 协议}\label{fig:proto-mpsu}
 \end{figure}
 
-\section{各类协议的复杂度分析与对比}
+\section{实例化协议的复杂度分析与对比}
 
 \subsection{多方隐私集合求交与交集计算的复杂度分析} 
 
@@ -393,7 +397,7 @@ MPSI-card-sum 协议通过利用 6.2 节中“带载荷的批量全成员零分�
 \label{tab:mpsu-offline-comparisons}
 \end{table}
 
-\section{各类协议的实现与综合性能评估}
+\section{实例化协议的实现与在线性能评估}
 
 \subsection{实现细节与参数设置}
 
