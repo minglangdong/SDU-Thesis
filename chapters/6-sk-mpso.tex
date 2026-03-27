@@ -15,13 +15,13 @@
 
 \section{成员零分享实例及其变体} 
 
-在第五章中，本文介绍了谓词零分享（Predicative Zero-Sharing）在集合运算场景下的特化实例 —— 成员零分享（Membership Zero-Sharing），作为本文提出的 MPSO 框架的核心底层子协议。具体地，谓词零分享是一类 MPC 协议，其中每个成员零分享协议都与一个集合谓词公式 $Q$ 相关联
-
-% 特别地，若 $Q$ 是 $m-1$ 个集合成员谓词的合取（即 $\bigwedge_{j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}} x \in X_j$），我们将其称为批量纯成员零分享（Batch Pure Membership Zero-Sharing）（适配于第~\ref{sec:mpsi} 节中的 MPSI 及其变体）；若 $Q$ 是 $m-1$ 个集合非成员谓词的合取（即 $\bigwedge_{j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}} x \notin X_j$），我们将其称为批量纯非成员零分享（Batch Pure Non-Membership Zero-Sharing）（适配于第~\ref{sec:mpsu} 节中的 MPSU 及其变体）。这两个功能的正式定义（及其构造）分别在附录~\ref{bpMZS} 和~\ref{bpNMZS} 中给出。我们还引入了纯成员零分享的一种变体，称为带有效载荷的纯成员零分享（Pure Membership Zero-Sharing with Payloads），其中 $P_\mathsf{pivot}$ 持有一个元素 $x$，而其他参与方各持有一个元素集合和一组关联的有效载荷。该功能专为附录~\ref{appdix:mpsi-card-sum} 中的 MPSI-card-sum 设计，其正式定义和构造见附录~\ref{bpMZSpayloads}。
+在第五章中，本文介绍了谓词零分享（Predicative Zero-Sharing）在集合运算场景下的特化实例 —— 成员零分享（Membership Zero-Sharing），作为本文提出的 MPSO 框架的核心底层子协议。具体地，成员零分享是一类 MPC 协议，其中每个成员零分享协议都与一个集合谓词公式 $Q$ 相关联。设共有 $m$ ($m \ge 2$) 个参与方参与，其中一个参与方（记为 $P_\mathsf{pivot}$）持有一个元素 $x$ 作为输入，而其他每个参与方 $P_j$ ($j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}$) 持有一个集合 $X_j$ 作为输入。如果输入元素 $x$ 与各输入集合在集合谓词公式 $Q$ 上的取值 $Q(x,X_1,\cdots,X_{\mathsf{pivot}-1},X_{\mathsf{pivot}+1},\cdots, X_m) = 1$，参与方将获得 $0$ 的秘密分享；否则，他们将获得一个随机值的秘密分享。
+批量版本的成员零分享允许 $P_\mathsf{pivot}$ 持有一个向量 $\textbf{x} = (x_1, \cdots, x_n)$，而每个 $P_j$ 持有 $n$ 个集合序列作为输入。参与方获得 $n$ 组秘密分享，其中第 $i$ 组秘密分享表示对第 $i$ 个输入计算相同公式 $Q$ 得到的真值。本节介绍 $Q$ 在两种特殊情况下关联的具体成员零分享协议 —— 全成员零分享（Full Membership Zero-Sharing）和全非成员零分享（Full Non-Membership Zero-Sharing），以及带载荷版本的纯成员零分享，用于构造后续的 MPSI / MPCSI 协议和 MPSU / MPCSU 协议.
 
 \subsection{全成员零分享}
 
-批量全成员零分享（Batch Full Membership Zero-Sharing）是成员零分享在特定谓词下的一个特例，即当关联的公式 $Q$ 是 $m-1$ 个集合成员谓词的合取时（即 $\bigwedge_{j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}} x \in X_j$）。该功能专门为第 \ref{sec:opt-mpsi} 节中优化的 MPSI 及其变体设计。理想功能 $\FuncbpMZS$ 在图 \ref{fig:func-bpmzs} 中给出，其完整协议构造在图 \ref{fig:proto-bpmzs} 中描述。
+当成员零分享关联的集合谓词公式 $Q$ 形如 $P_\mathsf{pivot}$ 的输入元素 $x$ 和其他每个参与方 $P_j$ 的输入集合 $X_j$ 组成的集合成员谓词的合取，即 $\bigwedge_{j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}} x \in X_j$时，称该协议为纯成员零分享（Full Membership Zero-Sharing）。如果输入元素 $x$ 与各输入集合在集合谓词公式 $Q$ 上的取值为真，即当且仅当元素 $x$ 属于所有其他参与方的集合时，各方获得 $0$ 的秘密分享；否则获得随机值的秘密分享。该功能完美契合交集计算的需求。
+批量版本的全成员零分享（Batch Full Membership Zero-Sharing）的理想功能 $\FuncbpMZS$ 在图 \ref{fig:func-bpmzs} 中给出，其协议构造遵循第\ref{sec:compound-mzs}中成员零分享协议中的构造范式：首先，对于 $Q$ 中所有的原子命题 $x \in X_j$，$P_\mathsf{pivot}$ 和 $P_j$ 调用 batch OPPRF 实现第\ref{zs-PNMT}节中给出的针对集合非成员谓词的松弛成员零分享（Relaxed Predicative Zero-Sharing）协议，其他参与方将对应的分享份额设置为 $0$；随后，所有参与方将所有松弛成员零分享生成的秘密分享在本地相加，实现所有松弛成员零分享协议通过 $\mathsf{AND}$ 组合得到与 $Q$ 相关联的松弛成员零分享协议；最后，参与方利用 Beaver 三元组执行一次安全乘法，将松弛成员零分享转化为满足标准半诚实安全的成员零分享。完整的构造过程在图 \ref{fig:proto-bpmzs} 中描述。
 
 \begin{figure}[!hbtp]
 \begin{framed}
@@ -57,17 +57,21 @@
 \begin{trivlist}
 \item \textbf{复杂度分析.} 在批量全成员零分享协议（图~\ref{fig:proto-bpmzs}）中，各阶段的开销计算如下：
 \begin{itemize}
-  \item $P_\mathsf{pivot}$ 与每个 $P_j$ 执行批量大小为 $n$ 的 $\FuncbOPPRF$。结合哈希分桶技术时，每组集合大小 $\lvert X_{j,i} \rvert = O(1)$。我们遵循相关文献利用向量不经意线性求值（Vector Oblivious Linear Evaluation, VOLE）和不经意键值存储（OKVS）来实例化 $\FuncbOPPRF$。利用通信均摊技术，计算 $n$ 个实例的总通信量与总元素数量 $3n$ 相当。这使得批量 OPPRF 的计算复杂度随 $n$ 线性扩展。因此，在此阶段，$P_\mathsf{pivot}$ 的计算和通信复杂度均为 $O(mn)$，每个 $P_j$ 的计算和通信复杂度均为 $O(n)$。
-  \item 参与方利用 Beaver 三元组执行 $n$ 次安全乘法，并指定 $P_\mathsf{pivot}$ 作为领导者。这需要 $P_\mathsf{pivot}$ 产生 $O(mn)$ 的开销，每个 $P_j$ 产生 $O(n)$ 的开销。
+  \item $P_\mathsf{pivot}$ 与每个 $P_j$ 执行批量大小为 $n$ 的 $\FuncbOPPRF$。结合哈希分桶技术时，每组集合大小 $\lvert X_{j,i} \rvert = O(1)$。本文利用向量不经意线性求值（Vector Oblivious Linear Evaluation, VOLE）和不经意键值存储（OKVS）来实例化 $\FuncbOPPRF$。利用通信均摊技术，计算 $n$ 个实例的总通信量与总元素数量 $3n$ 相当。这使得批量 OPPRF 的计算复杂度随 $n$ 线性扩展。因此，在此阶段，$P_\mathsf{pivot}$ 的计算和通信复杂度均为 $O(mn)$，每个 $P_j$ 的计算和通信复杂度均为 $O(n)$。
+  \item 参与方利用 Beaver 三元组执行 $n$ 次安全乘法，并指定 $P_\mathsf{pivot}$ 作为 Leader。这需要 $P_\mathsf{pivot}$ 产生 $O(mn)$ 的开销，每个 $P_j$ 产生 $O(n)$ 的开销。
 \end{itemize}
 综上所述，在在线阶段，$P_\mathsf{pivot}$ 的整体计算和通信复杂度为 $O(mn)$，每个 $P_j$ 的计算和通信复杂度为 $O(n)$。
 \end{trivlist}
 
 \subsection{带载荷的全成员零分享}
 
-为了支持 MPSI-card-sum 功能，我们引入了一种称为“带载荷的批量全成员零分享（Batch Full Membership Zero-Sharing with Payloads）”的变体。在此变体中，$P_\mathsf{pivot}$ 持有元素 $x$，其他参与方持有元素集合及关联的载荷（Payload）集合。如果公式为真（即 $x$ 属于所有集合），参与方将获得 0 的秘密分享，以及 $x$ 的所有关联载荷之和的秘密分享；否则获得两个随机值的分享。
+为了支持更丰富的统计分析（如 MPSI-card-sum，即计算交集元素的关联数据之和），本节引入全成员零分享的一种变体，称为“带载荷的全成员零分享（Full Membership Zero-Sharing with Payloads）”。 $P_\mathsf{pivot}$）持有元素 $x$，其他参与方持有元素集合及关联的载荷（Payload）集合。如果公式 $Q$ 取值为真，即 $x$ 属于所有集合时，参与方不仅获得 0 的秘密分享，同时获得 $x$ 的所有关联载荷之和的秘密分享；否则获得两个随机值的分享。
 
-其构造思想与图 \ref{fig:proto-bpmzs} 类似，核心在于将载荷集合编码到 OPPRF 发送方的输入值集合中。具体而言，$P_j$ 采样两个份额 $r, w$，并设置值集合为一对元组 $(-r, v_i - w)$，其中 $v_i$ 是元素的关联载荷。通过 $\FuncbOPPRF$，$P_\mathsf{pivot}$ 最终可以获得 $(r', w')$。如果 $x$ 匹配，则 $(r', w') = (-r, v - w)$。该变体理想功能 $\FuncbpMZSp$ 的定义详见图 \ref{fig:func-mzsp}，协议细节见图 \ref{fig:proto-bpmzsp}。其渐进复杂度与不带载荷的版本保持一致。
+带载荷的批量纯成员零分享协议的构造与图~\ref{fig:proto-bpmzs} 中的批量纯成员零分享协议相似。核心思想是在每个松弛纯成员载荷分享的两方协议中，以某种方式将载荷集合编码到 OPPRF 的发送方输入中。具体而言，我们首先在两方设定下实现带载荷的松弛纯成员零分享。接下来，我们展示如何将该原语扩展到多方设定。
+
+在两方的带载荷的松弛成员零分享协议中，存在两个参与方：持有元素集合 $Y$ 和载荷集合 $V$ 的发送方 $\Sd$，以及持有元素 $x$ 的接收方 $\Rcv$。$\Sd$ 采样两个秘密分享份额 $r, w$，并将 $Y$ 设置为键集合，将包含元素对 $(-r, v_i - w)$ （其中 $1 \le i \le n$，$v_i \in V$ 是与 $y_i \in Y$ 关联的载荷）的集合设置为值集合。$\Sd$ 输出 $(r, w)$ 作为其两个秘密分享份额。$\Sd$ 和 $\Rcv$ 调用 OPPRF，其中 $\Rcv$ 输入 $x$ 并接收 $(r', w')$ 作为其秘密分享份额。根据 OPPRF 的定义，如果 $x \in Y$，则 $(r', w') = (-r, v - w)$，其中 $v$ 是 $Y$ 中与 $x$ 关联的载荷。也就是说，如果 $x \in Y$，双方持有一个 0 的秘密分享和一个 $x$ 的关联载荷的秘密分享；否则，他们持有两个伪随机值的秘密分享。
+
+在多方的带载荷的成员零分享协议中，存在 $m$ ($m>2$) 个参与方，其中 $P_\mathsf{pivot}$ 持有元素 $x$，并且每个 $P_j$ ($j \in \{1,\cdots m\} \setminus \{\mathsf{pivot}\}$) 持有元素集合 $X_j$ 和载荷集合 $V_j$。$P_\mathsf{pivot}$ 与每个 $P_j$ 执行上述两方版本协议，其中 $P_\mathsf{pivot}$ 接收 $r'_j$ 和 $w'_j$，而 $P_j$ 接收 $r_j$ 和 $w_j$。根据定义，我们有：如果 $x \in X_j$，则 $r_j + r'_j = 0$ 且 $w_j + w'_j = v_j$，其中 $v_j$ 是 $V_j$ 中与 $x$ 关联的载荷；否则 $r_j + r'_j$ 和 $w_j + w'_j$ 均为随机值。$P_\mathsf{pivot}$ 设置 $r_\mathsf{pivot} = \sum_{j \in \{1,\cdots m\} \setminus \{\mathsf{pivot}\}} r'_j$ 作为其第一个秘密分享份额，并设置 $w_\mathsf{pivot} = \sum_{j \in \{1,\cdots m\} \setminus \{\mathsf{pivot}\}} w'_j$ 作为其第二个秘密分享份额。同时，$P_j$ 设置 $r_j$ 作为其第一个秘密分享份额，$w_j$ 作为其第二个秘密分享份额。请注意，当且仅当对于所有 $j$ 均满足 $x \in X_j$ 时，有 $\sum_{1 \le i \le m} r_i = 0$ 且 $\sum_{1 \le i \le m} w_i = \sum_{j \in \{1,\cdots m\} \setminus \{\mathsf{pivot}\}} v_j$；否则，$\sum_{1 \le i \le m} r_i$ 和 $\sum_{1 \le i \le m} w_i$ 均为随机值。此时，第一个秘密分享是松弛的纯成员零分享，而第二个秘密分享是松弛的纯成员载荷分享。为了实现带载荷的成员零分享功能，最后一步是将第一个松弛纯成员零分享转化为标准形式。完整的批量版本在图~\ref{fig:proto-bpmzsp} 中给出。
 
 \begin{figure}[!hbtp]
 \begin{framed}
@@ -101,9 +105,9 @@
 
 \subsection{全非成员零分享} 
 
-批量全非成员零分享（Batch Full Non-Membership Zero-Sharing）是当关联公式 $Q$ 是 $m-1$ 个集合非成员谓词的合取时（即 $\bigwedge_{j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}} x \notin X_j$）的特例。该功能专门为第 \ref{sec:opt-mpsu} 节中的优化的 MPSU 及其变体设计。理想功能 $\FuncbpNMZS$ 在图 \ref{fig:func-bpnmzs} 中给出，协议构造见图 \ref{fig:proto-bpnmzs}。
+当成员零分享关联的集合谓词公式 $Q$ 形如 $P_\mathsf{pivot}$ 的输入元素 $x$ 和其他每个参与方 $P_j$ 的输入集合 $X_j$ 组成的集合非成员谓词的合取，即 $\bigwedge_{j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}} x \notin X_j$ 时，称该协议为全非成员零分享（Full Non-Membership Zero-Sharing）。如果输入元素 $x$ 与各输入集合在集合谓词公式 $Q$ 上的取值为真，即当且仅当元素 $x$ 不属于任何其他参与方的集合时，各方获得 $0$ 的秘密分享；否则获得随机值的秘密分享。该功能完美契合并集（MPSU）计算中差集提取的需求。
 
-该协议的构造核心在于将底层的秘密分享隐私成员测试（ssPMT，输出布尔秘密分享）高效地转化为算术域 $\mathbb{F}$ 上的零分享。我们利用双选择比特的 ROT 协议完成了这一转化，实现了线性开销。
+批量版本的全非成员零分享（Batch Full Non-Membership Zero-Sharing）的理想功能 $\FuncbpNMZS$ 在图 \ref{fig:func-bpnmzs} 中给出，其协议构造同样遵循本章中成员零分享协议的构造范式：首先，对于 $Q$ 中所有的原子命题 $x \notin X_j$，$P_\mathsf{pivot}$ 和 $P_j$ 调用 batch ssPMT 与 ROT，实现第五章中给出的针对集合非成员谓词的松弛成员零分享协议，其他参与方将对应的分享份额设置为 $0$；随后，所有参与方将所有松弛成员零分享生成的秘密分享在本地相加，实现所有松弛成员零分享协议通过 $\mathsf{AND}$ 组合得到与 $Q$ 相关联的松弛成员零分享协议；最后，参与方利用 Beaver 三元组执行一次安全乘法，将松弛成员零分享转化为满足标准半诚实安全的成员零分享。完整的构造过程在图 \ref{fig:proto-bpnmzs} 中描述。
 
 \begin{figure}[!hbtp]
 \begin{framed}

@@ -89,9 +89,111 @@ $\lambda$ 和 $\sigma$ 分别表示计算安全参数和统计安全参数。
 \caption{二选一随机不经意传输的理想功能 $\FuncROT$}\label{fig:func-rot}
 \end{figure}
 
+\subsection{向量不经意线性求值}
+\esection{Vector Oblivious Linear Evaluation}
+
+向量不经意线性求值（Vector Oblivious Linear Evaluation, VOLE）\cite{TODO_VOLE_1} 允许发送方获得接收方持有的两个向量的秘密线性组合。在本文中，我们重点关注 VOLE 的随机变体，为了简便起见，我们在后文中仍将其简称为 VOLE。
+
+令 $\mathbb{F}$ 为某个有限域。在 VOLE 中，参与方没有任何输入。发送方获得一个随机值 $\Delta \in \mathbb{F}$ 以及一个随机向量 $\vec{C} \in \mathbb{F}^m$，而接收方获得两个随机向量 $\vec{A}, \vec{B} \in \mathbb{F}^m$。
+
+我们进一步考虑 VOLE 的一种特例，即允许发送方输入该随机值 $\Delta$。在近期的研究中 \cite{TODO_VOLE_2}，该变体已通过一种被称为伪随机相关性生成器（pseudorandom correlation generator, PCG）的密码学原语得到了高效实现，它允许参与方生成具有相同 $\Delta$ 的多个 VOLE 实例。我们在图 \ref{fig:func-vole} 中给出了该 VOLE 的理想功能 $\mathcal{F}_{\mathsf{vole}}^{\mathbb{F}, m}$。
+
+\begin{figure}[!hbtp]
+\begin{framed}
+\begin{minipage}[center]{\textwidth}
+\begin{trivlist}
+\item \textbf{参数：} 两个参与方（发送方 $\Sd$ 和接收方 $\Rcv$）；有限域 $\mathbb{F}$；输出向量的维度 $m$。
+\item \textbf{功能：} 
+\begin{itemize}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
+    \item 等待接收来自发送方 $\Sd$ 的输入 $\Delta \in \mathbb{F}$，并等待接收方 $\Rcv$ 参与。
+    \item 随机采样 $\vec{A}, \vec{B} \gets \mathbb{F}^m$，并计算 $\vec{C} = \vec{A} \cdot \Delta \oplus \vec{B}$。
+    \item 向发送方 $\Sd$ 输出 $\vec{C}$，向接收方 $\Rcv$ 输出 $(\vec{A}, \vec{B})$。
+\end{itemize}
+\end{trivlist}
+\end{minipage}
+\end{framed}
+\caption{向量不经意线性求值（VOLE）的理想功能 $\mathcal{F}_{\mathsf{vole}}^{\mathbb{F}, m}$}\label{fig:func-vole}
+\end{figure}
+
+本文采用子域向量不经意线性求值（subfield vector oblivious linear evaluation, subfield-VOLE）~\cite{BCGIKS19,BCGIKRS19,RRT23} 技术来高效实例化批量不经意伪随机函数。子域 VOLE 的理想功能 $\FuncSubVOLE$ 在图 \ref{fig:func-subvole} 中给出。
+
+\begin{figure}[!hbtp]
+\begin{framed}
+\begin{minipage}[center]{\textwidth}
+\begin{trivlist}
+\item \textbf{参数：} 发送方 $\Sd$。接收方 $\Rcv$。输出向量的大小 $n$。定义在基础域 $\mathbb{B}$ 上的扩域 $\mathbb{F}$。
+\item \textbf{功能：} 
+\begin{itemize}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
+\item 采样 $\vec{a} \gets \mathbb{B}^n$，$\vec{b} \gets \mathbb{F}^n$，$\Delta \gets \mathbb{F}$。
+\item 计算 $\vec{c} = \Delta \vec{a} + \vec{b}$。
+\item 将 $(\Delta, \vec{b})$ 发送给 $\Sd$，并将 $(\vec{a}, \vec{c})$ 发送给 $\Rcv$。
+\end{itemize}
+\end{trivlist}
+\end{minipage}
+\end{framed}
+\caption{子域 VOLE 的理想功能 $\FuncSubVOLE$}\label{fig:func-subvole}
+\end{figure}
+
+\subsection{不经意伪随机函数}
+\label{sec:boprf}
+
+不经意伪随机函数（Oblivious Pseudorandom Function, OPRF）~\cite{FIPR-TCC-2005} 是隐私集合运算（PSO）领域的核心原语。Kolesnikov 等人~\cite{KKRT-CCS-2016} 引入了批量不经意伪随机函数（Batch OPRF），它通过以下方式提供了一批 OPRF 实例：在第 $i$ 个实例中，接收方 $\Rcv$ 拥有输入 $x_i$；发送方 $\Sd$ 获得一个 PRF 密钥 $k_i$，而 $\Rcv$ 获得伪随机求值结果 $\PRF(k_i, x_i)$。需要注意的是，每个密钥 $\Rcv$ 仅能在一个点上进行 PRF 求值。批量 OPRF 的理想功能 $\FuncbOPRF$ 在图 \ref{fig:func-boprf} 中给出了形式化描述。
+
+\begin{figure}[!hbtp]
+\begin{framed}
+\begin{minipage}[center]{\textwidth}
+\begin{trivlist}
+\item \textbf{参数：} 发送方 $\Sd$。接收方 $\Rcv$。批量大小 $B$。集合元素的比特长度 $l$。PRF 族 $\PRF: \{0,1\}^* \times \{0,1\}^* \to \{0,1\}^{\gamma}$。
+\item \textbf{功能：} 在接收到来自 $\Rcv$ 的输入 $\vec{x} \subseteq (\{0,1\}^l)^B$ 后：
+\begin{itemize}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
+\item 对于每个 $i \in [B]$，均匀采样 PRF 密钥 $k_i$。
+\item 对于每个 $i \in [B]$，定义 $f_i = \PRF(k_i,x_i)$。
+\item 将向量 $\vec{k} = (k_1, \cdots, k_B)$ 发送给 $\Sd$，并将向量 $\vec{f} = (f_1, \cdots, f_B)$ 发送给 $\Rcv$。
+\end{itemize}
+\end{trivlist}
+\end{minipage}
+\end{framed}
+\caption{批量 OPRF 的理想功能 $\FuncbOPRF$}\label{fig:func-boprf}
+\end{figure}
+
+% 为了高效实例化批量 OPRF，我们采用了子域向量不经意线性求值（subfield-VOLE）技术~\cite{BCGIKS19,BCGIKRS19,RRT23}。
+基于子域 VOLE 的批量 OPRF 协议具体构造如下。为了简便起见，我们假设输入比特长度 $l$ 能够整除 $\lambda$，并令输入 $\vec{x} = (x_1, \cdots , x_n)$ 被视为基础域 $\F{l}$ 中的元素序列。
+在离线阶段，发送方 $\Sd$ 和接收方 $\Rcv$ 调用定义在扩域 $\F{\lambda}$（其子域为 $\F{l}$）上的 $\FuncSubVOLE$，其中 $\Sd$ 接收到 $(\Delta, \vec{b})$，$\Rcv$ 接收到 $(\vec{a}, \vec{c})$。根据功能定义，满足等式 $\vec{c} = \Delta \vec{a} + \vec{b}$。
+在在线阶段，$\Rcv$ 计算并向 $\Sd$ 发送掩码向量 $\vec{p} = \vec{x} + \vec{a}$。随后，$\Sd$ 定义其批量 OPRF 的密钥为 $(\Delta, \vec{k} = \Delta \vec{p} + \vec{b})$。
+底层的 PRF 函数定义为 $\PRF((\Delta, k_i),x_i) = \Hash(i, k_i - \Delta x_i)$，其中 $\Hash: [n] \times \F{\lambda} \to \{0,1\}^\gamma$ 为随机预言机（Random Oracle）。对于第 $i$ 个实例，$\Rcv$ 在本地输出 $\Hash(i, c_i)$。
+该构造的正确性可以通过以下等式推导得出：
+\begin{gather*}
+\begin{aligned}
+\Hash(i, c_i) &= \Hash(i, \Delta a_i + b_i) = \Hash(i, \Delta (p_i - x_i) + k_i - \Delta p_i)\\ &= \Hash(i, k_i - \Delta x_i) = \PRF((\Delta, k_i),x_i)
+\end{aligned}
+\end{gather*}
+
+\subsection{不经意键值存储}
+\label{sec:okvs}
+
+键值存储（Key-Value Store, KVS）~\cite{PRTY20,GPRTY-CRYPTO-2021} 是一种能够将一组键到对应值的映射关系进行高度紧凑表示的数据结构。
+
+\begin{definition} 一个\textbf{键值存储（KVS）}由键集合 $\mathcal{K}$、值集合 $\mathcal{V}$ 以及哈希函数族 $\Hash$ 参数化，并由以下两个算法组成：
+\begin{itemize}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
+\item $\Encode$：接收一组键值对 $(k_i, v_i)$ 作为输入，并输出一个数据结构对象 $D$（或以极小的统计概率输出错误指示符 $\perp$）。
+\item $\Decode$：接收数据结构对象 $D$ 和键 $k$ 作为输入，并输出对应的值 $v$。 
+\end{itemize}
+\end{definition}
+
+\noindent \textbf{正确性（Correctness）.} 对于所有由不重复键组成的子集 $A \subseteq \mathcal{K} \times \mathcal{V}$，满足：
+\begin{gather*}
+(k, v) \in A \ \ 且 \  \perp \ne D \gets \Encode(A) \Longrightarrow \Decode(D, k) = v
+\end{gather*}
+
+\noindent \textbf{不经意性（Obliviousness）.} 对于所有互不相同的键集合 $\{k_1^0, \cdots, k_n^0\}$ 和 $\{k_1^1, \cdots, k_n^1\}$，如果 $\Encode$ 算法对这两组键集合均不输出 $\perp$，那么由 $D_0 \gets \Encode(\{(k_1^0,v_1), \cdots, (k_n^0,v_n)\})$ 生成的分布与由 $D_1 \gets \Encode(\{(k_1^1,v_1), \cdots, (k_n^1,v_n)\})$ 生成的分布是计算上不可区分的，其中 $v_i \gets \mathcal{V}$ ($i \in [n]$) 为均匀采样的值。
+
+如果一个 KVS 满足不经意性，则称其为不经意键值存储（OKVS）。在我们的协议构造中，还要求 OKVS 满足以下额外的随机性属性：
+
+\noindent \textbf{随机性（Randomness）.} 对于任意键值对集合 $A = \{(k_1, v_1), \cdots ,(k_n, v_n)\}$ 以及任意不在集合中的键 $k^* \notin \{k_1, \cdots , k_n\}$，在给定 $D \gets \Encode(A)$ 的情况下，$\Decode(D, k^*)$ 的输出分布与 $\mathcal{V}$ 上的均匀分布在统计上是不可区分的。
+
 \subsection{不经意可编程伪随机函数}\label{sec:bopprf}
 
-不经意伪随机函数（Oblivious Pseudorandom Function, OPRF）~\cite{FIPR-TCC-2005,CM-CRYPTO-2020,RS-EUROCRYPT-2021} 是 PSO 领域的核心原语。Kolesnikov 等人~\cite{KKRT-CCS-2016} 引入了批量不经意伪随机函数（batch oblivious pseudorandom function, batch OPRF），其提供了一批 OPRF 实例。在第 $i$ 个实例中，发送方 $\Sd$ 获得一个 PRF 密钥 $k_i$，而接收方 $\Rcv$ 输入 $x_i$ 并获得 $\PRF(k_i, x_i)$。
+% 不经意伪随机函数（Oblivious Pseudorandom Function, OPRF）~\cite{FIPR-TCC-2005,CM-CRYPTO-2020,RS-EUROCRYPT-2021} 是 PSO 领域的核心原语。Kolesnikov 等人~\cite{KKRT-CCS-2016} 引入了批量不经意伪随机函数（batch oblivious pseudorandom function, batch OPRF），其提供了一批 OPRF 实例。在第 $i$ 个实例中，发送方 $\Sd$ 获得一个 PRF 密钥 $k_i$，而接收方 $\Rcv$ 输入 $x_i$ 并获得 $\PRF(k_i, x_i)$。
 
 不经意可编程伪随机函数（Oblivious Programmable Pseudorandom Function, OPPRF）~\cite{KMPRT-CCS-2017,PSTY-EUROCRYPT-2019,CGS22,RS-EUROCRYPT-2021,RR-CCS-2022} 是 OPRF 的扩展，其允许发送方 $\Sd$ 首先生成一个均匀随机密钥 $k$，并根据 $k$ 和给定的键值对集合生成一个“提示值” $\mathsf{hint}$（提示生成算法记为 $\mathsf{hint} \gets \mathsf{Hint}(k, K, V)$，其中 $K$ 为键集合，$V$ 为值集合）。利用 $\mathsf{hint}$ 对 PRF $F$ 进行编程，使得 $F$ 对于特定输入（$K$ 中的键）输出特定的均匀值（$V$ 中的值），而对其他输入则输出伪随机值。这种在特定输入集上输出编程值的的 PRF 被称为可编程 PRF（Programmable PRF, PPRF）~\cite{PSTY-EUROCRYPT-2019}。接收方 $\Rcv$ 利用其输入和给定的 $\mathsf{hint}$ 计算 OPPRF，但他无法区分自己获得的是编程后的输出还是伪随机值。批量版本的 OPPRF（batch OPPRF）的理想功能 $\mathcal{F}_{\mathsf{bOPPRF}}$ 如图 \ref{fig:func-bopprf} 所示。
 
@@ -106,8 +208,7 @@ $\lambda$ 和 $\sigma$ 分别表示计算安全参数和统计安全参数。
 \item 值集合 $\textbf{V} = (V_1, \dots, V_B)$，其中 $\lvert K_i \rvert = \lvert V_i \rvert, 1 \le i \le B$。
 \end{itemize}
 \item \textbf{接收方输入：} $\Rcv$ 输入 $B$ 个查询 $\textbf{x} \subseteq (\{0,1\}^l)^B$。
-\item \textbf{功能：} 在接收到来自 $\mathsf{S}$ 的 $\textbf{K}, \textbf{V}$ 和来自 $\mathsf{R}$ 的 $\textbf{x}$ 后：
-\item \textbf{功能：} 在从 $\Sd$ 收到 $\textbf{K}$ 与 $\textbf{V}$，并从 $\Rcv$ 收到 $\textbf{x}$ 后，
+\item \textbf{功能：} 在收到来自 $\mathsf{S}$ 的 $\textbf{K}, \textbf{V}$ 和来自 $\mathsf{R}$ 的 $\textbf{x}$ 后：
 \begin{itemize}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
 \item 生成均匀密钥 $\textbf{k} = (k_1, \cdots, k_B)$，并计算 {$\mathsf{hint} \gets \Hint(\textbf{k}, \textbf{K}, \textbf{V})$}，满足 $F(k_i, {\mathsf{hint}}, K_i(j)) = V_i(j)$，其中 $1 \le i \le B, 1 \le j \le \lvert K_i \rvert$；
 \item 定义 $f_i = F(k_i, {\mathsf{hint}}, x_i)$，$1 \le i \le B$；
@@ -117,6 +218,36 @@ $\lambda$ 和 $\sigma$ 分别表示计算安全参数和统计安全参数。
 \end{minipage}
 \end{framed}
 \caption{批量不经意可编程伪随机函数的理想功能 $\mathcal{F}_{\mathsf{bOPPRF}}$}\label{fig:func-bopprf}
+\end{figure}
+
+批量 OPPRF 协议可以通过结合上述的批量 OPRF 与 OKVS 高效构造得出~\cite{PSTY-EUROCRYPT-2019,CGS22,RS-EUROCRYPT-2021,RR-CCS-2022}，如图 \ref{fig:proto-bopprf} 所示。
+% 这一构造范式构成了所有现有批量 OPPRF 协议 的基础，它们之间的区别仅在于对批量 OPRF 或 OKVS 的具体实例化方式不同。
+
+\begin{figure}[!hbtp]
+\begin{framed}
+\begin{minipage}[center]{\textwidth}
+\begin{trivlist}
+\item \textbf{参数：} 发送方 $\Sd$。接收方 $\Rcv$。批量大小 $B$。键的比特长度 $l$。值的比特长度 $\gamma$。一个 OKVS 方案 $(\Encode, \Decode)$。
+\item \textbf{发送方输入：} $\Sd$ 输入 $B$ 组键值对集合，包括：
+\begin{itemize}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
+\item 不相交的键集合 $K_1, \cdots, K_B$。
+\item 值集合 $V_1, \cdots, V_B$，其中对于每个 $i \in [B]$ 满足 $\lvert K_i \rvert = \lvert V_i \rvert$，并且对于每个 $i \in [B]$ 和 $j \in [1, \lvert K_i \rvert]$ 有 $V_i(j) \in \{0,1\}^\gamma$。
+\end{itemize}
+\item \textbf{接收方输入：} $\Rcv$ 输入 $B$ 个查询 $\vec{x} \subseteq (\{0,1\}^l)^B$。
+\item \textbf{协议：}
+\begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
+\item 双方调用 $\FuncbOPRF$。在第 $i \in [B]$ 个实例中，$\Sd$ 作为发送方接收密钥 $k_i$，$\Rcv$ 作为接收方输入 $x_i$ 并接收 $\PRF(k_i,x_i)$。
+\item 对于每个 $i \in [B]$，$\Sd$ 计算集合：
+\begin{gather*}
+    A=\{(K_i(j), V_i(j) \oplus \PRF(k_i, K_i(j))) \mid i \in [B], 1 \le j \le \lvert K_i \rvert \}
+\end{gather*}
+$\Sd$ 计算 OKVS 结构 $D = \Encode(A)$ 并将 $D$ 发送给 $\Rcv$。
+\item $\Rcv$ 计算向量 $\vec{f}$，其中 $f_i = \Decode(D, x_i) \oplus \PRF(k_i, x_i)$。
+\end{enumerate}
+\end{trivlist}
+\end{minipage}
+\end{framed}
+\caption{基于 OPRF 和 OKVS 的批量 OPPRF 协议 $\ProtobOPPRF$}\label{fig:proto-bopprf}
 \end{figure}
 
 \subsection{秘密分享隐私等值测试}
@@ -135,6 +266,30 @@ $\lambda$ 和 $\sigma$ 分别表示计算安全参数和统计安全参数。
 \end{minipage}
 \end{framed}
 \caption{秘密分享隐私等值测试的理想功能 $\FuncssPEQT$}\label{fig:func-sspeqt}
+\end{figure}
+
+本节中，我们将采用分治策略（divide-and-conquer strategy），利用通用 MPC 技术来高效实例化 ssPEQT。该协议的具体构造在图~\ref{fig:proto-sspeqt} 中给出。
+
+\begin{figure}[!hbtp]
+\begin{framed}
+\begin{minipage}[center]{\textwidth}
+\begin{trivlist}
+\item \textbf{参数：} 两个参与方 $P_1, P_2$。输入的比特长度为 $\gamma$\footnote{为简便起见，我们假设 $\gamma$ 是 2 的幂。如果不是，可以在双方输入的末尾补 1 对齐。}。
+\item \textbf{输入：} $P_1$ 持有输入 $x \in \{0,1\}^\gamma$。$P_2$ 持有输入 $y \in \{0,1\}^\gamma$。
+\item \textbf{协议：} 
+\begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
+    \item $P_1$ 定义比特向量 $\vec{a} \in \{0,1\}^\gamma$ 并设置 $a_j = 1 \oplus x[j]$ ($1 \le j \le \gamma$)。同时，$P_2$ 定义比特向量 $\vec{b} \in \{0,1\}^\gamma$ 并设置 $b_j = y[j]$ ($1 \le j \le \gamma$)。
+    \item 对于 $1 \le h \le \log_2 \gamma$，令 $w = \frac{\gamma}{2^h}$。对于 $1 \le j \le w$ 执行以下交互：
+    \begin{itemize}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
+    \item $P_1$ 将 $a_{j}$ 和 $a_{w + j}$ 作为输入，$P_2$ 将 $b_{j}$ 和 $b_{w + j}$ 作为输入，共同馈入一个通用 MPC 的 AND 门电路。$P_1$ 接收返回的份额比特 $e^1_{j}$，而 $P_2$ 接收返回的份额比特 $e^2_{j}$。
+    \item $P_1$ 更新状态 $a_{j} = e^1_{j}$。$P_2$ 更新状态 $b_{j} = e^2_{j}$。
+    \end{itemize}
+    \item $P_1$ 最终输出 $a = a_1$。$P_2$ 最终输出 $b = b_1$。
+\end{enumerate} 
+\end{trivlist}
+\end{minipage}
+\end{framed}
+\caption{基于通用 MPC 的秘密分享隐私等值测试协议 $\ProtossPEQT$}\label{fig:proto-sspeqt}
 \end{figure}
 
 \subsection{多方秘密分享洗牌}
