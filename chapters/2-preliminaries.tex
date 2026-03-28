@@ -92,58 +92,39 @@ $\lambda$ 和 $\sigma$ 分别表示计算安全参数和统计安全参数。
 \subsection{向量不经意线性求值}
 \esection{Vector Oblivious Linear Evaluation}
 
-向量不经意线性求值（Vector Oblivious Linear Evaluation, VOLE）\cite{TODO_VOLE_1} 允许发送方获得接收方持有的两个向量的秘密线性组合。在本文中，我们重点关注 VOLE 的随机变体，为了简便起见，我们在后文中仍将其简称为 VOLE。
+向量不经意线性求值（Vector Oblivious Linear Evaluation, VOLE）~\cite{BCGIKS19,BCGIKRS19,RRT23} 是 MPC 中的另一基础原语，允许发送方获得接收方持有的两个向量的秘密线性组合。在本文中，我们重点关注 VOLE 的随机变体（Random VOLE），为了行文简便，我们在后文中仍将其简称为 VOLE。
+具体而言，令 $\mathbb{F}$ 为一个有限域。协议执行后，发送方 $\Sd$ 获得两个随机向量 $\vec{a}, \vec{b} \in \mathbb{F}^n$；接收方 $\Rcv$ 输入一个随机标量 $\Delta \in \mathbb{F}$，并获得一个随机向量 $\vec{c} \in \mathbb{F}^n$，满足线性关联关系: $\vec{c} = \Delta \cdot \vec{a} + \vec{b}$。
 
-令 $\mathbb{F}$ 为某个有限域。在 VOLE 中，参与方没有任何输入。发送方获得一个随机值 $\Delta \in \mathbb{F}$ 以及一个随机向量 $\vec{C} \in \mathbb{F}^m$，而接收方获得两个随机向量 $\vec{A}, \vec{B} \in \mathbb{F}^m$。
-
-我们进一步考虑 VOLE 的一种特例，即允许发送方输入该随机值 $\Delta$。在近期的研究中 \cite{TODO_VOLE_2}，该变体已通过一种被称为伪随机相关性生成器（pseudorandom correlation generator, PCG）的密码学原语得到了高效实现，它允许参与方生成具有相同 $\Delta$ 的多个 VOLE 实例。我们在图 \ref{fig:func-vole} 中给出了该 VOLE 的理想功能 $\mathcal{F}_{\mathsf{vole}}^{\mathbb{F}, m}$。
-
-\begin{figure}[!hbtp]
-\begin{framed}
-\begin{minipage}[center]{\textwidth}
-\begin{trivlist}
-\item \textbf{参数：} 两个参与方（发送方 $\Sd$ 和接收方 $\Rcv$）；有限域 $\mathbb{F}$；输出向量的维度 $m$。
-\item \textbf{功能：} 
-\begin{itemize}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
-    \item 等待接收来自发送方 $\Sd$ 的输入 $\Delta \in \mathbb{F}$，并等待接收方 $\Rcv$ 参与。
-    \item 随机采样 $\vec{A}, \vec{B} \gets \mathbb{F}^m$，并计算 $\vec{C} = \vec{A} \cdot \Delta \oplus \vec{B}$。
-    \item 向发送方 $\Sd$ 输出 $\vec{C}$，向接收方 $\Rcv$ 输出 $(\vec{A}, \vec{B})$。
-\end{itemize}
-\end{trivlist}
-\end{minipage}
-\end{framed}
-\caption{向量不经意线性求值（VOLE）的理想功能 $\mathcal{F}_{\mathsf{vole}}^{\mathbb{F}, m}$}\label{fig:func-vole}
-\end{figure}
-
-本文采用子域向量不经意线性求值（subfield vector oblivious linear evaluation, subfield-VOLE）~\cite{BCGIKS19,BCGIKRS19,RRT23} 技术来高效实例化批量不经意伪随机函数。子域 VOLE 的理想功能 $\FuncSubVOLE$ 在图 \ref{fig:func-subvole} 中给出。
+在本文后续的高效协议构造中，我们进一步依赖 VOLE 的一种重要变体 —— 子域向量不经意线性求值（Subfield Vector Oblivious Linear Evaluation, Subfield-VOLE）~\cite{BCGIKS19,BCGIKRS19,RRT23}。Subfield-VOLE 是一种定义在扩域 $\mathbb{F}$（基于某个子域 $\mathbb{B} \subset \mathbb{F}$ 构建）上的不经意线性求值协议。在该变体中，发送方持有的向量 $\vec{a}$ 被严格限制在子域 $\mathbb{B}$ 内（即 $\vec{a} \in \mathbb{B}^n$），而标量 $\Delta$ 和向量 $\vec{b}, \vec{c}$ 均属于扩域 $\mathbb{F}$。在计算 $\vec{c} = \Delta \cdot \vec{a} + \vec{b}$ 时，标量 $\Delta \in \mathbb{F}$ 与向量 $\vec{a} \in \mathbb{B}^n$ 的乘法为按分量相乘（即将 $\vec{a}$ 隐式视为 $\mathbb{F}$ 上的向量进行运算）。
+值得注意的是，标准的 VOLE 可以看作是 Subfield-VOLE 在子域与扩域相同时（即 $\mathbb{B} = \mathbb{F}$）的特例。目前，基于伪随机相关性生成器（Pseudorandom Correlation Generator, PCG）~\cite{BCGIKS19,BCGIKRS19,RRT23} 等先进技术，Subfield-VOLE 已经能够实现极高的运行效率，其计算和通信开销具备高度的实用性。图 \ref{fig:func-subvole} 中给出了 Subfield-VOLE 的理想功能 $\FuncSubVOLE$ 的形式化描述。
 
 \begin{figure}[!hbtp]
 \begin{framed}
 \begin{minipage}[center]{\textwidth}
 \begin{trivlist}
-\item \textbf{参数：} 发送方 $\Sd$。接收方 $\Rcv$。输出向量的大小 $n$。定义在基础域 $\mathbb{B}$ 上的扩域 $\mathbb{F}$。
-\item \textbf{功能：} 
+\item \textbf{参数：} 发送方 $\Sd$。接收方 $\Rcv$。输出向量的大小 $n$。有限域 $\mathbb{B}$ 和 $\mathbb{F}$，其中 $\mathbb{F}$ 是定义在 $\mathbb{B}$ 上的扩域。
+\item \textbf{功能：} 在接收到来自 $\Rcv$ 的输入 $\Delta \in \mathbb{F}$ 后：
 \begin{itemize}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
-\item 采样 $\vec{a} \gets \mathbb{B}^n$，$\vec{b} \gets \mathbb{F}^n$，$\Delta \gets \mathbb{F}$。
-\item 计算 $\vec{c} = \Delta \vec{a} + \vec{b}$。
+    \item 随机采样 $\vec{a} \gets \mathbb{B}^n$，$\vec{b} \gets \mathbb{F}^n$。
+\item 计算 $\vec{c} = \Delta \cdot \vec{a} + \vec{b}$。
 \item 将 $(\Delta, \vec{b})$ 发送给 $\Sd$，并将 $(\vec{a}, \vec{c})$ 发送给 $\Rcv$。
 \end{itemize}
 \end{trivlist}
 \end{minipage}
 \end{framed}
-\caption{子域 VOLE 的理想功能 $\FuncSubVOLE$}\label{fig:func-subvole}
+\caption{子域向量不经意线性求值的理想功能 $\FuncSubVOLE$}\label{fig:func-subvole}
 \end{figure}
 
 \subsection{不经意伪随机函数}
 \label{sec:boprf}
 
-不经意伪随机函数（Oblivious Pseudorandom Function, OPRF）~\cite{FIPR-TCC-2005} 是隐私集合运算（PSO）领域的核心原语。Kolesnikov 等人~\cite{KKRT-CCS-2016} 引入了批量不经意伪随机函数（Batch OPRF），它通过以下方式提供了一批 OPRF 实例：在第 $i$ 个实例中，接收方 $\Rcv$ 拥有输入 $x_i$；发送方 $\Sd$ 获得一个 PRF 密钥 $k_i$，而 $\Rcv$ 获得伪随机求值结果 $\PRF(k_i, x_i)$。需要注意的是，每个密钥 $\Rcv$ 仅能在一个点上进行 PRF 求值。批量 OPRF 的理想功能 $\FuncbOPRF$ 在图 \ref{fig:func-boprf} 中给出了形式化描述。
+不经意伪随机函数（Oblivious Pseudorandom Function, OPRF）~\cite{FIPR-TCC-2005,CM-CRYPTO-2020,RS-EUROCRYPT-2021} 是 PSO 领域的核心原语。Kolesnikov 等人~\cite{KKRT-CCS-2016} 引入了批量不经意伪随机函数（batch oblivious pseudorandom function, batch OPRF），在第 $i$ 个实例中，发送方 $\Sd$ 获得一个 PRF 密钥 $k_i$，而接收方 $\Rcv$ 输入 $x_i$ 并获得该输入在对应密钥下的 PRF 结果 $\PRF(k_i, x_i)$。需要强调的是，对于每个独立的密钥，$\Rcv$ 仅能获得一个点的求值结果。图 \ref{fig:func-boprf} 中给出了 batch OPRF 的理想功能 $\FuncbOPRF$ 的形式化描述。
 
 \begin{figure}[!hbtp]
 \begin{framed}
 \begin{minipage}[center]{\textwidth}
 \begin{trivlist}
-\item \textbf{参数：} 发送方 $\Sd$。接收方 $\Rcv$。批量大小 $B$。集合元素的比特长度 $l$。PRF 族 $\PRF: \{0,1\}^* \times \{0,1\}^* \to \{0,1\}^{\gamma}$。
+\item \textbf{参数：} 发送方 $\Sd$。接收方 $\Rcv$。批量大小 $B$。输入元素的比特长度 $l$。PRF 族 $\PRF: \{0,1\}^* \times \{0,1\}^* \to \{0,1\}^{\gamma}$。
 \item \textbf{功能：} 在接收到来自 $\Rcv$ 的输入 $\vec{x} \subseteq (\{0,1\}^l)^B$ 后：
 \begin{itemize}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
 \item 对于每个 $i \in [B]$，均匀采样 PRF 密钥 $k_i$。
@@ -153,14 +134,16 @@ $\lambda$ 和 $\sigma$ 分别表示计算安全参数和统计安全参数。
 \end{trivlist}
 \end{minipage}
 \end{framed}
-\caption{批量 OPRF 的理想功能 $\FuncbOPRF$}\label{fig:func-boprf}
+\caption{批量不经意伪随机函数的理想功能 $\FuncbOPRF$}\label{fig:func-boprf}
 \end{figure}
 
-% 为了高效实例化批量 OPRF，我们采用了子域向量不经意线性求值（subfield-VOLE）技术~\cite{BCGIKS19,BCGIKRS19,RRT23}。
-基于子域 VOLE 的批量 OPRF 协议具体构造如下。为了简便起见，我们假设输入比特长度 $l$ 能够整除 $\lambda$，并令输入 $\vec{x} = (x_1, \cdots , x_n)$ 被视为基础域 $\F{l}$ 中的元素序列。
-在离线阶段，发送方 $\Sd$ 和接收方 $\Rcv$ 调用定义在扩域 $\F{\lambda}$（其子域为 $\F{l}$）上的 $\FuncSubVOLE$，其中 $\Sd$ 接收到 $(\Delta, \vec{b})$，$\Rcv$ 接收到 $(\vec{a}, \vec{c})$。根据功能定义，满足等式 $\vec{c} = \Delta \vec{a} + \vec{b}$。
-在在线阶段，$\Rcv$ 计算并向 $\Sd$ 发送掩码向量 $\vec{p} = \vec{x} + \vec{a}$。随后，$\Sd$ 定义其批量 OPRF 的密钥为 $(\Delta, \vec{k} = \Delta \vec{p} + \vec{b})$。
-底层的 PRF 函数定义为 $\PRF((\Delta, k_i),x_i) = \Hash(i, k_i - \Delta x_i)$，其中 $\Hash: [n] \times \F{\lambda} \to \{0,1\}^\gamma$ 为随机预言机（Random Oracle）。对于第 $i$ 个实例，$\Rcv$ 在本地输出 $\Hash(i, c_i)$。
+基于 subfield VOLE 可以高效构造 batch OPRF 协议，其具体构造思路如下：\footnote{为简便起见，假设输入元素的比特长度 $l$ 能够 $\lambda$。在此条件下，可将 $\F{\lambda}$ 视为输入域 $\F{l}$ 的扩域。}
+
+\noindent \textbf{离线阶段：} 发送方 $\Sd$ 和接收方 $\Rcv$ 调用定义在扩域 $\F{\lambda}$（其子域为 $\F{l}$）上的 $\FuncSubVOLE$，其中 $\Sd$ 接收到 $(\Delta, \vec{b})$，$\Rcv$ 接收到 $(\vec{a}, \vec{c})$。根据 subfield-VOLE 的功能定义，满足等式 $\vec{c} = \Delta \vec{a} + \vec{b}$。
+
+\noindent \textbf{在线阶段：} $\Rcv$ 将其输入序列 $\vec{x} = (x_1, \cdots , x_n)$ 视为子域 $\F{l}$ 中的元素，在本地计算掩码向量 $\vec{p} = \vec{x} + \vec{a}$ 并发送给 $\Sd$。
+在接收到 $\vec{p}$ 后，$\Sd$  在本地推导 batch OPRF 的密钥，定义为 $(\Delta, \vec{k} = \Delta \vec{p} + \vec{b})$。
+这时，底层的 PRF 函数可被构造性地定义为 $\PRF((\Delta, k_i),x_i) = \Hash(i, k_i - \Delta x_i)$，其中 $\Hash: [n] \times \F{\lambda} \to \{0,1\}^\gamma$ 建模为随机预言机（Random Oracle）。对于第 $i$ 个实例，$\Rcv$ 在本地输出 $\Hash(i, c_i)$。
 该构造的正确性可以通过以下等式推导得出：
 \begin{gather*}
 \begin{aligned}
@@ -187,15 +170,30 @@ $\lambda$ 和 $\sigma$ 分别表示计算安全参数和统计安全参数。
 
 \noindent \textbf{不经意性（Obliviousness）.} 对于所有互不相同的键集合 $\{k_1^0, \cdots, k_n^0\}$ 和 $\{k_1^1, \cdots, k_n^1\}$，如果 $\Encode$ 算法对这两组键集合均不输出 $\perp$，那么由 $D_0 \gets \Encode(\{(k_1^0,v_1), \cdots, (k_n^0,v_n)\})$ 生成的分布与由 $D_1 \gets \Encode(\{(k_1^1,v_1), \cdots, (k_n^1,v_n)\})$ 生成的分布是计算上不可区分的，其中 $v_i \gets \mathcal{V}$ ($i \in [n]$) 为均匀采样的值。
 
-如果一个 KVS 满足不经意性，则称其为不经意键值存储（OKVS）。在我们的协议构造中，还要求 OKVS 满足以下额外的随机性属性：
+如果一个 KVS 满足不经意性，则称其为不经意键值存储（oblivious key-value store, OKVS）~\cite{PRTY20,GPRTY-CRYPTO-2021,RR-CCS-2022,BPSY-USENIX-2023}。在本文的协议构造中，还要求 OKVS 满足以下性质：
 
 \noindent \textbf{随机性（Randomness）.} 对于任意键值对集合 $A = \{(k_1, v_1), \cdots ,(k_n, v_n)\}$ 以及任意不在集合中的键 $k^* \notin \{k_1, \cdots , k_n\}$，在给定 $D \gets \Encode(A)$ 的情况下，$\Decode(D, k^*)$ 的输出分布与 $\mathcal{V}$ 上的均匀分布在统计上是不可区分的。
 
+\subsection{哈希分桶}
+\esection{Hashing to Bins}
+
+哈希分桶（Hashing to Bins）技术~\cite{PSZ-USENIX-2014,PSZ-USENIX-2015} 被广泛用于 PSO 中，以确保不同参与方持有的相同元素被分配到具有相同索引的桶（bin）中。这种对齐是通过简单哈希（Simple Hashing）和布谷鸟哈希（Cuckoo Hashing）~\cite{PR04} 对输入集合进行预处理来实现的。
+
+本文用以下符号表示简单哈希：
+\begin{gather*}
+\mathcal{T}^1, \cdots, \mathcal{T}^B \gets \Simple_{h_1,h_2,h_3}^B(X)
+\end{gather*}
+该表达式表示使用哈希函数 $h_1, h_2, h_3: \{0, 1\}^* \to \{1, \cdots, B\}$ 将集合 $X$ 中的元素哈希到 $B$ 个桶中。输出为简单哈希表 $\mathcal{T}^1, \cdots, \mathcal{T}^B$，其中对于任意 $x \in X$，满足 $\mathcal{T}^{h_i(x)} \supseteq \{x \Vert i \vert i= 1, 2, 3\}$\footnote{附加哈希函数的索引 $i$ 有助于处理如 $h_1(x) = h_2(x) = i$ 这样的边缘情况，这些情况发生的概率是不可忽略的。}。
+
+本文用以下符号表示布谷鸟哈希：
+\begin{gather*}
+\mathcal{C}^1, \cdots, \mathcal{C}^B \gets \Cuckoo_{h_1,h_2,h_3}^B(X)
+\end{gather*}
+该表达式表示使用哈希函数 $h_1, h_2, h_3$ 将集合 $X$ 中的元素哈希到 $B$ 个桶中。输出为布谷鸟哈希表 $\mathcal{C}^1, \cdots, \mathcal{C}^B$，其中对于任意 $x \in X$，存在唯一的 $i \in \{1, 2, 3\}$ 使得 $\mathcal{C}^{h_i(x)} = \{x \Vert i\}$。
+
 \subsection{不经意可编程伪随机函数}\label{sec:bopprf}
 
-% 不经意伪随机函数（Oblivious Pseudorandom Function, OPRF）~\cite{FIPR-TCC-2005,CM-CRYPTO-2020,RS-EUROCRYPT-2021} 是 PSO 领域的核心原语。Kolesnikov 等人~\cite{KKRT-CCS-2016} 引入了批量不经意伪随机函数（batch oblivious pseudorandom function, batch OPRF），其提供了一批 OPRF 实例。在第 $i$ 个实例中，发送方 $\Sd$ 获得一个 PRF 密钥 $k_i$，而接收方 $\Rcv$ 输入 $x_i$ 并获得 $\PRF(k_i, x_i)$。
-
-不经意可编程伪随机函数（Oblivious Programmable Pseudorandom Function, OPPRF）~\cite{KMPRT-CCS-2017,PSTY-EUROCRYPT-2019,CGS22,RS-EUROCRYPT-2021,RR-CCS-2022} 是 OPRF 的扩展，其允许发送方 $\Sd$ 首先生成一个均匀随机密钥 $k$，并根据 $k$ 和给定的键值对集合生成一个“提示值” $\mathsf{hint}$（提示生成算法记为 $\mathsf{hint} \gets \mathsf{Hint}(k, K, V)$，其中 $K$ 为键集合，$V$ 为值集合）。利用 $\mathsf{hint}$ 对 PRF $F$ 进行编程，使得 $F$ 对于特定输入（$K$ 中的键）输出特定的均匀值（$V$ 中的值），而对其他输入则输出伪随机值。这种在特定输入集上输出编程值的的 PRF 被称为可编程 PRF（Programmable PRF, PPRF）~\cite{PSTY-EUROCRYPT-2019}。接收方 $\Rcv$ 利用其输入和给定的 $\mathsf{hint}$ 计算 OPPRF，但他无法区分自己获得的是编程后的输出还是伪随机值。批量版本的 OPPRF（batch OPPRF）的理想功能 $\mathcal{F}_{\mathsf{bOPPRF}}$ 如图 \ref{fig:func-bopprf} 所示。
+不经意可编程伪随机函数（Oblivious Programmable Pseudorandom Function, OPPRF）~\cite{KMPRT-CCS-2017,PSTY-EUROCRYPT-2019,CGS22,RS-EUROCRYPT-2021,RR-CCS-2022} 是 OPRF 的扩展，其允许发送方 $\Sd$ 首先生成一个均匀随机密钥 $k$，并根据 $k$ 和给定的键值对集合生成一个“提示值” $\mathsf{hint}$（提示生成算法记为 $\mathsf{hint} \gets \mathsf{Hint}(k, K, V)$，其中 $K$ 为键集合，$V$ 为值集合）。利用 $\mathsf{hint}$ 对 PRF $F$ 进行编程，使得 $F$ 对于特定输入（$K$ 中的键）输出特定的均匀值（$V$ 中的值），而对其他输入则输出伪随机值。这种在特定输入集上输出编程值的的 PRF 被称为可编程 PRF（Programmable PRF, PPRF）~\cite{PSTY-EUROCRYPT-2019}。接收方 $\Rcv$ 利用其输入和给定的 $\mathsf{hint}$ 计算 OPPRF，但其无法区分自己获得的是编程后的输出还是伪随机值。批量版本的 OPPRF（batch OPPRF）的理想功能 $\mathcal{F}_{\mathsf{bOPPRF}}$ 如图 \ref{fig:func-bopprf} 所示。
 
 \begin{figure}[!hbtp]
 \begin{framed}
@@ -220,8 +218,8 @@ $\lambda$ 和 $\sigma$ 分别表示计算安全参数和统计安全参数。
 \caption{批量不经意可编程伪随机函数的理想功能 $\mathcal{F}_{\mathsf{bOPPRF}}$}\label{fig:func-bopprf}
 \end{figure}
 
-批量 OPPRF 协议可以通过结合上述的批量 OPRF 与 OKVS 高效构造得出~\cite{PSTY-EUROCRYPT-2019,CGS22,RS-EUROCRYPT-2021,RR-CCS-2022}，如图 \ref{fig:proto-bopprf} 所示。
-% 这一构造范式构成了所有现有批量 OPPRF 协议 的基础，它们之间的区别仅在于对批量 OPRF 或 OKVS 的具体实例化方式不同。
+一种最为直观且高效的 batch OPPRF 构造范式是通过结合 \textbf{Batch OPRF} 与 \textbf{OKVS} 来实现，其具体协议流程如图 \ref{fig:proto-bopprf} 所示。这一范式构成了目前几乎所有先进 batch OPPRF 协议~\cite{PSTY-EUROCRYPT-2019,CGS22,RS-EUROCRYPT-2021,RR-CCS-2022} 的理论内核，现有方案之间的差异仅在于对底层 batch OPRF 和 OKVS 数据结构的具体实例化不同。
+进一步地，在 PSO 中，该 batch OPPRF 构造通常与上文所述的哈希分桶技术紧密结合，即在调用 batch OPPRF 前对参与方的输入集合进行预处理对齐。这样不仅能将 $\Rcv$ 的每个输入元素在 $\Sd$ 的输入集合中的测试转化为其在每个对应桶中局部元素组成的子集中的测试，更关键的是可以将整体的通信开销进行\textbf{均摊（Amortize）}。具体而言，在处理总规模为 $n$ 个元素的集合时，通过哈希分桶将计算任务切分为 $B = O(n)$ 个 OPPRF 实例，其总通信复杂度将严格控制在与元素总数 $n$ 呈线性相关的水平，从而极大地突破了大规模数据集下的通信瓶颈。
 
 \begin{figure}[!hbtp]
 \begin{framed}
@@ -241,20 +239,20 @@ $\lambda$ 和 $\sigma$ 分别表示计算安全参数和统计安全参数。
 \begin{gather*}
     A=\{(K_i(j), V_i(j) \oplus \PRF(k_i, K_i(j))) \mid i \in [B], 1 \le j \le \lvert K_i \rvert \}
 \end{gather*}
-$\Sd$ 计算 OKVS 结构 $D = \Encode(A)$ 并将 $D$ 发送给 $\Rcv$。
+$\Sd$ 计算 OKVS $D = \Encode(A)$ 并将 $D$ 发送给 $\Rcv$。
 \item $\Rcv$ 计算向量 $\vec{f}$，其中 $f_i = \Decode(D, x_i) \oplus \PRF(k_i, x_i)$。
 \end{enumerate}
 \end{trivlist}
 \end{minipage}
 \end{framed}
-\caption{基于 OPRF 和 OKVS 的批量 OPPRF 协议 $\ProtobOPPRF$}\label{fig:proto-bopprf}
+\caption{基于 batch OPRF 和 OKVS 的 batch OPPRF 协议 $\ProtobOPPRF$}\label{fig:proto-bopprf}
 \end{figure}
 
 \subsection{秘密分享隐私等值测试}
 \esection{Secret-Shared Private Equality Test}
 \label{sec:sspeqt}
 
-秘密分享隐私等值测试（Secret-Shared Private Equality Test, ssPEQT）~\cite{PSTY-EUROCRYPT-2019,CGS22} 是一个两方协议，其中发送方 $\Sd$ 和接收方 $\Rcv$ 各输入一个元素。若双方输入元素相同，则他们获得 1 的秘密分享，否则获得 0 的秘密分享。图 \ref{fig:func-sspeqt} 定义了该理想功能。
+秘密分享隐私等值测试（Secret-Shared Private Equality Test, ssPEQT）~\cite{PSTY-EUROCRYPT-2019,CGS22} 是一个两方协议，其中每个参与方各自输入一个元素。若双方输入元素相同，则他们获得 1 的比特秘密分享，否则获得 0 的比特秘密分享。图 \ref{fig:func-sspeqt} 定义了该理想功能。
 
 \begin{figure}[!hbtp]
 \begin{framed}
@@ -268,13 +266,13 @@ $\Sd$ 计算 OKVS 结构 $D = \Encode(A)$ 并将 $D$ 发送给 $\Rcv$。
 \caption{秘密分享隐私等值测试的理想功能 $\FuncssPEQT$}\label{fig:func-sspeqt}
 \end{figure}
 
-本节中，我们将采用分治策略（divide-and-conquer strategy），利用通用 MPC 技术来高效实例化 ssPEQT。该协议的具体构造在图~\ref{fig:proto-sspeqt} 中给出。
+本文采用分治（divide-and-conquer）策略，利用通用 MPC 技术来高效实例化 ssPEQT，其具体构造如图~\ref{fig:proto-sspeqt} 所示。
 
 \begin{figure}[!hbtp]
 \begin{framed}
 \begin{minipage}[center]{\textwidth}
 \begin{trivlist}
-\item \textbf{参数：} 两个参与方 $P_1, P_2$。输入的比特长度为 $\gamma$\footnote{为简便起见，我们假设 $\gamma$ 是 2 的幂。如果不是，可以在双方输入的末尾补 1 对齐。}。
+\item \textbf{参数：} 两个参与方 $P_1, P_2$。输入的比特长度为 $\gamma$。\footnote{为简化协议描述，假设 $\gamma$ 是 2 的幂；否则，双方在各自输入末尾补 1 对齐。}
 \item \textbf{输入：} $P_1$ 持有输入 $x \in \{0,1\}^\gamma$。$P_2$ 持有输入 $y \in \{0,1\}^\gamma$。
 \item \textbf{协议：} 
 \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
@@ -289,7 +287,7 @@ $\Sd$ 计算 OKVS 结构 $D = \Encode(A)$ 并将 $D$ 发送给 $\Rcv$。
 \end{trivlist}
 \end{minipage}
 \end{framed}
-\caption{基于通用 MPC 的秘密分享隐私等值测试协议 $\ProtossPEQT$}\label{fig:proto-sspeqt}
+\caption{基于通用 MPC 的 ssPEQT 协议 $\ProtossPEQT$}\label{fig:proto-sspeqt}
 \end{figure}
 
 \subsection{多方秘密分享洗牌}
@@ -309,23 +307,6 @@ $\Sd$ 计算 OKVS 结构 $D = \Encode(A)$ 并将 $D$ 发送给 $\Rcv$。
 \end{framed}
 \caption{多方秘密分享洗牌的理想功能 $\FuncMS$}\label{fig:func-ms}
 \end{figure}
-
-\subsection{哈希分桶}
-\esection{Hashing to Bins}
-
-哈希分桶（Hashing to Bins）技术~\cite{PSZ-USENIX-2014,PSZ-USENIX-2015} 被广泛用于 PSO 中，以确保不同参与方持有的相同元素被分配到具有相同索引的桶（bin）中。这种对齐是通过简单哈希（Simple Hashing）和布谷鸟哈希（Cuckoo Hashing）~\cite{PR04} 对输入集合进行预处理来实现的。
-
-本文用以下符号表示简单哈希：
-\begin{gather*}
-\mathcal{T}^1, \cdots, \mathcal{T}^B \gets \Simple_{h_1,h_2,h_3}^B(X)
-\end{gather*}
-该表达式表示使用哈希函数 $h_1, h_2, h_3: \{0, 1\}^* \to \{1, \cdots, B\}$ 将集合 $X$ 中的元素哈希到 $B$ 个桶中。输出为简单哈希表 $\mathcal{T}^1, \cdots, \mathcal{T}^B$，其中对于任意 $x \in X$，满足 $\mathcal{T}^{h_i(x)} \supseteq \{x \Vert i \vert i= 1, 2, 3\}$\footnote{附加哈希函数的索引 $i$ 有助于处理如 $h_1(x) = h_2(x) = i$ 这样的边缘情况，这些情况发生的概率是不可忽略的。}。
-
-本文用以下符号表示布谷鸟哈希：
-\begin{gather*}
-\mathcal{C}^1, \cdots, \mathcal{C}^B \gets \Cuckoo_{h_1,h_2,h_3}^B(X)
-\end{gather*}
-该表达式表示使用哈希函数 $h_1, h_2, h_3$ 将集合 $X$ 中的元素哈希到 $B$ 个桶中。输出为布谷鸟哈希表 $\mathcal{C}^1, \cdots, \mathcal{C}^B$，其中对于任意 $x \in X$，存在唯一的 $i \in \{1, 2, 3\}$ 使得 $\mathcal{C}^{h_i(x)} = \{x \Vert i\}$。
 
 \subsection{多密钥重随机化公钥加密}
 \esection{Multi-Key Rerandomizable Public-Key Encryption}
