@@ -26,7 +26,7 @@ PSO 允许参与方在各自持有私有集合的前提下，协同完成对私�
 
 与两方场景不同，MPSO 涉及多个输入集合 $X_1, \dots, X_m$ ($m > 2$)。由于集合运算的组合方式呈指数级增长，理想条件下的 MPSO 协议应该能够计算由有限次二元集合运算（包括交集、并集和差集）组成的任意集合公式 $f(X_1, \dots, X_m)$。\footnote{在 MPSO 的设定中，通常指定一名领导者（Leader）获得结果集合，而其他参与方（Client）无法获取除自身输入外的任何信息。}这使得 MPSO 涵盖了更加丰富的功能。然而，目前 MPSO 的研究主要聚焦于以下四类特定功能：
 \begin{itemize}
-    \item \textbf{多方隐私集合求交（Multi-party Private Set Intersection, MPSI）.} 允许 $m$ ($m > 2$) 个参与方分别持有隐私集合 $X_i$ ($1 \le i \le m$)，最终准确地共同计算出所有集合的交集 $\bigcap_{i=1}^m X_i$。其典型应用包括隐私保护下的位置信息共享 \cite{NTLHB-NDSS-2011}、隐私通讯录的公共联系人发现~\cite{DRRT-PPET-2018}、DNA 检测和模式匹配 \cite{TKC-CCS-2007}、以及联合僵尸网络检测等。
+    \item \textbf{多方隐私集合求交（Multi-party Private Set Intersection, MPSI）.} 允许 $m$ ($m > 2$) 个参与方分别持有隐私集合 $X_i$ ($i \in [m]$)，最终准确地共同计算出所有集合的交集 $\bigcap_{i=1}^m X_i$。其典型应用包括隐私保护下的位置信息共享 \cite{NTLHB-NDSS-2011}、隐私通讯录的公共联系人发现~\cite{DRRT-PPET-2018}、DNA 检测和模式匹配 \cite{TKC-CCS-2007}、以及联合僵尸网络检测等。
     
     \item \textbf{多方隐私交集计算（Multi-party Private Computation on Set Intersection, MPCSI）.} 允许 $m$ 个参与方分别持有隐私集合 $X_i$，最终输出交集 $\bigcap_{i=1}^m X_i$ 的部分或汇总信息。MPCSI 主要包括基于电路的 MPSI 协议（Circuit-MPSI）、多方隐私交集求势协议（MPSI-card）和多方隐私交集求势与和协议（MPSI-card-sum）。其中，Circuit-MPSI 允许参与方在交集上计算任意函数 $f(\bigcap_{i=1}^m X_i)$；MPSI-card 用于计算交集的基数；MPSI-card-sum 用于计算交集基数及对应权值的总和。这类功能被广泛应用于在线广告效果评估 \cite{Ion-EUROSP-2020}、打击儿童性虐待材料（CSAM）传播 \cite{BBM21} 以及 COVID-19 隐私接触者追踪 \cite{BBV20,DPT20,DIL20}。
     

@@ -46,7 +46,7 @@
 给定集合 $X_1,\cdots,X_m$，若集合 $Y$ 可由 $X_1, \dots, X_m$ 经过有限次集合运算（包括求交、并、差集运算）导出，则称 $Y$ 为 $X_1, \cdots, X_m$ 上的可构造集合。\footnote{在上下文语境明确时，可简称为可构造集合。}
 \end{definition}
 
-特别地，若对于某个 $1 \le i \le m$，可构造集合 $Y$ 满足 $Y \subseteq X_i$，则称其为（$X_1, \cdots, X_m$ 上的）$X_i$-局部的可构造集合（$X_i$-local constructible set）。
+特别地，若对于某个 $i \in [m]$，可构造集合 $Y$ 满足 $Y \subseteq X_i$，则称其为（$X_1, \cdots, X_m$ 上的）$X_i$-局部的可构造集合（$X_i$-local constructible set）。
 
 为了刻画集合元素级别的成员判定关系，下面引入集合谓词公式的概念。
 
@@ -114,9 +114,9 @@ $$x \in Y \iff \psi(x, X_1, \cdots, X_m) = 1。$$
 \begin{proof}
 根据定理 \ref{theorem:set1}，$Y$ 可以表示为一个集合谓词公式。因为任何集合谓词公式都可以转化为析取范式（Disjunctive Normal Form, DNF），$Y$ 可以表示为一个 DNF 公式：
 $$\varphi(x, X_1, \cdots, X_m) = C_1 \lor \cdots \lor C_n$$
-其中每个 $C_i$ ($1 \le i \le n$) 都是一个合取项。
+其中每个 $C_i$ ($i \in [n]$) 都是一个合取项。
 
-首先，利用反证法证明 $\varphi$ 可以转化为另一个包含 $s$ 个合取项 ($s > n$) 的 DNF 公式 $\psi$，使得每个 $C_i$ ($1 \le i \le s$) 至少包含一个形如 $x \in X_j$ 的原子命题，即 $C_i$ 可以写成 $C_i = (x \in X_j) \land D_i$ 的形式：
+首先，利用反证法证明 $\varphi$ 可以转化为另一个包含 $s$ 个合取项 ($s > n$) 的 DNF 公式 $\psi$，使得每个 $C_i$ ($i \in [s]$) 至少包含一个形如 $x \in X_j$ 的原子命题，即 $C_i$ 可以写成 $C_i = (x \in X_j) \land D_i$ 的形式：
 假设存在一个合取项 $C_i$ 不包含任何形如 $x \in X_j$ 的原子命题，即 $C_i$ 是若干形如 $x \notin X_j$ 的原子命题的合取。考虑以下两种情况：
 \begin{itemize}
     \item \textbf{情况 1：} $C_i = (x \notin X_{i_1}) \land \cdots \land (x \notin X_{i_{t}})$，其中 $t < m$。由于 $C_i$ 是 $\varphi$ 的一个合取项，其对应的集合 $Y'_i$ 是可构造集合 $Y$ 的子集，且 $Y'_i$ 本身也是一个可构造集合。因此，可以通过如下方式扩充 $C_i$：
@@ -129,14 +129,14 @@ $$\varphi(x, X_1, \cdots, X_m) = C_1 \lor \cdots \lor C_n$$
     \end{align*}
     这将每个 $C_i$ 拆分为 $m-t$ 个合取项，其中每个合取项至少包含一个形如 $x \in X_j$ 的原子命题。将每个 $C_i$ 替换为上述等式，可得到新的 DNF 公式：
     $$\psi(x, X_1, \cdots, X_m) = C_1 \lor \cdots \lor C_s,$$
-    其中每个 $C_i$ ($1 \le i \le s$) 表示某个 $X_j$-局部的可构造集合，但此时 $C_i$ 尚未满足 $X_j$-局部的集合谓词公式的定义，因为 $D_i$ 中可能仍包含与 $X_j$ 相关的原子命题。
+    其中每个 $C_i$ ($i \in [s]$) 表示某个 $X_j$-局部的可构造集合，但此时 $C_i$ 尚未满足 $X_j$-局部的集合谓词公式的定义，因为 $D_i$ 中可能仍包含与 $X_j$ 相关的原子命题。
     \item \textbf{情况 2：} $C_i = (x \notin X_1) \land \cdots \land (x \notin X_m)$。这与 $C_i$ 表示的集合 $Y_i$ 可由 $X_1, \cdots, X_m$ 通过集合运算得到相矛盾（即元素不可能不属于任何输入集合，却在可构造集合中），因此这种情况不成立。
 \end{itemize}
 
 接下来，将新的 DNF 公式 $\psi$ 转化为表示互不相交集合 $\{Y_1, \cdots, Y_s\}$ 的子公式析取形式：由于 $\psi$ 的析取形式蕴含 $Y_1 \cup \cdots \cup Y_s = Y$，若能证明不相交性，则证明了 $\{Y_1, \cdots, Y_s\}$ 构成 $Y$ 的一个划分。
 令 $\psi_1(x, X_1, \cdots, X_m) = C_2 \lor \cdots \lor C_s$，则有 $\psi(x, X_1, \cdots, X_m) = C_1 \lor \psi_1(x, X_1, \cdots, X_m)$。我们将此式扩充为 $C_1 \lor ((C_1 \land \neg C_1) \lor \psi_1(x, X_1, \cdots, X_m))$，展开得到 $C_1 \lor (C_1 \land \psi_1(x, X_1, \cdots, X_m)) \lor (\neg C_1 \land \psi_1(x, X_1, \cdots, X_m))$。鉴于 $C_1 \land \psi_1 = 1$ 必然要求 $C_1 = 1$，故 $C_1 \lor (C_1 \land \psi_1) = C_1$，因此：
 $$\psi(x, X_1, \cdots, X_m) = C_1 \lor (\neg C_1 \land \psi_1(x, X_1, \cdots, X_m)).$$
-对所有的 $C_i$ ($1 \le i \le s$) 重复此过程，我们得到：
+对所有的 $C_i$ ($i \in [s]$) 重复此过程，我们得到：
 $$\psi(x, X_1, \cdots, X_m) = C_1 \lor (\neg C_1 \land C_2) \lor \cdots \lor (\neg C_1 \land \neg C_2 \land \cdots \land \neg C_{s-1} \land C_s).$$
 记作 $\psi(x, X_1, \cdots, X_m) = C'_1 \lor C'_2 \cdots \lor C'_s$。可以看出任意两个不同的 $C'_i$ 和 $C'_k$均满足 $C'_i \land C'_k = 0$，因此 $C'_i$ 和 $C'_k$ 表示的集合 $Y_i$ 和 $Y_k$ 满足 $Y_i \cap Y_k = \emptyset$。因此，每个 $C'_i$ 表示一个互不相交的集合。
 
@@ -158,7 +158,7 @@ $$C'_i = \bigwedge_{j=1}^{i-1} \neg C_j \land (x \in X_j) \land D_i = (x \in X_j
     \item \textbf{复合集合公式.} 在该情况下，$Y$ 可表示为下面两种不同的 CSPF：
     \begin{itemize}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
       \item $\psi(x, X_1, X_2, X_3) = ((x \in X_1) \land (x \in X_2) \land (x \notin X_3)) \lor ((x \in X_1) \land (x \in X_3) \land (x \notin X_2))$。$\psi$ 是两个子公式 $Q_1, Q_2$ 的析取，其中 $Q_1$ 和 $Q_2$ 分别表示集合 $Y_1 = X_1 \cap X_2 \setminus X_3$ 和 $Y_2 = X_1 \cap X_3 \setminus X_2$。$Q_1$ 相对于 $X_1$ 和 $X_2$ 是局部的，而 $Q_2$ 相对于 $X_1$ 和 $X_3$ 是局部的，并且 $\{Y_1, Y_2\}$ 是 $Y$ 的一个划分，因此 $\psi$ 满足定义 \ref{def:cspf}。
-      \item $\psi(x, X_1, X_2, X_3) = (x \in X_1) \land [((x \in X_2) \land (x \notin X_3)) \lor ((x \in X_3) \land (x \notin X_2))]$。将 $\psi$ 看作单个子公式 $Q_1 = \psi$ 的析取，其中 $Q_1$ 相对于 $X_1$ 是局部的，因此 $\psi$ 满足定义 \ref{def:cspf}。
+      \item $\psi(x, X_1, X_2, X_3) = (x \in X_1) \land (((x \in X_2) \land (x \notin X_3)) \lor ((x \in X_3) \land (x \notin X_2)))$。将 $\psi$ 看作单个子公式 $Q_1 = \psi$ 的析取，其中 $Q_1$ 相对于 $X_1$ 是局部的，因此 $\psi$ 满足定义 \ref{def:cspf}。
       \end{itemize}
 \end{trivlist}
 
@@ -173,9 +173,9 @@ $$C'_i = \bigwedge_{j=1}^{i-1} \neg C_j \land (x \in X_j) \land D_i = (x \in X_j
 
 谓词零分享协议允许 $m$ ($m \ge 2$) 个持有私有输入的参与方获得一组在有限域 $\mathbb{F}$ 上的秘密分享：如果与协议相关联的谓词公式 $Q$ 在所有参与方的输入上的取值为真，那么参与方获得 $0$ 的秘密分享；否则，参与方获得一个独立且均匀采样的随机值的秘密分享。该\textbf{概率性}功能 $\FuncPZS^Q$ 的形式化定义如图~\ref{fig:func-pzs} 所示。
 
-\begin{figure}[!hbtp]
+\begin{figure}[!htb]
 \begin{framed}
-\begin{minipage}[center]{\textwidth}
+\begin{minipage}[c]{\textwidth}
 \begin{trivlist}
 \item \textbf{参数：} $m$ 个参与方 $P_1, \cdots P_m$，输入向量为 $\textbf{x} = (x_1, \cdots, x_m)$；有限域 $\mathbb{F}$；指定谓词公式 $Q$。
 \item \textbf{功能：} 收到每个参与方 $P_i$ 的输入 $x_i$后，随机采样分享值 $s_i \gets \mathbb{F}$，且满足：若 $Q(\textbf{x}) = 1$，则 $s_1 + \cdots + s_m = 0$。将分享份额 $s_i$ 发送给 $P_i$。
@@ -193,7 +193,7 @@ $$C'_i = \bigwedge_{j=1}^{i-1} \neg C_j \land (x \in X_j) \land D_i = (x \in X_j
 由于上述协议安全性的松弛难以基于定义~\ref{def:prob-secure} 精准刻画，下面为谓词零分享引入一种等价的安全性定义，该定义由三个核心要求组成：正确性、隐私性和独立性。以下定理不仅给出了该定义的详细描述，并且严格声明了其与标准安全性定义的等价性。
 
 \begin{theorem}\label{security}
-考虑一个概率多项式的 $m$ 元功能 $\Func^f$，其接收各参与方的输入 $\textbf{x} = (x_1, \cdots, x_m)$，并向各参与方输出 $f(\textbf{x})$ 的秘密分享。令 $\Pi$ 为用于计算 $\Func^f$ 的 $m$ 方协议，$s_i$ 和 $s^{\Pi}_i$ 分别用来表示参与方 $P_i$ 在理想世界中从 $\Func^f$ 获得的输出以及在真实世界中实际执行 $\Pi$ 获得的输出（$1 \le i \le m$）。
+考虑一个概率多项式的 $m$ 元功能 $\Func^f$，其接收各参与方的输入 $\textbf{x} = (x_1, \cdots, x_m)$，并向各参与方输出 $f(\textbf{x})$ 的秘密分享。令 $\Pi$ 为用于计算 $\Func^f$ 的 $m$ 方协议，$s_i$ 和 $s^{\Pi}_i$ 分别用来表示参与方 $P_i$ 在理想世界中从 $\Func^f$ 获得的输出以及在真实世界中实际执行 $\Pi$ 获得的输出（$i \in [m]$）。
 若协议 $\Pi$ 满足：
 \begin{itemize}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
     \item \textbf{正确性.} $\Pi$ 的输出构成 $f(\textbf{x})$ 的秘密分享，即：
@@ -302,7 +302,7 @@ $$f(\textbf{x}) =
 \subsection{从松弛到标准的转化技术}\label{transform-pzs}
 
 本节给出一种将松弛谓词零分享转化为关联相同谓词公式的满足标准半诚实安全的谓词零分享的高效方法：
-假设所有参与方已调用松弛谓词零分享协议 $\ProtorPZS^Q$ 获得了一组秘密分享 $[r] = (r_1, \cdots, r_m)$，其目标是生成一组满足标准谓词零分享安全性定义的秘密分享 $[s] = (s_1, \cdots, s_m)$。为此，参与方只需在离线阶段准备一组随机值的秘密分享 $[b]$（由每个参与方 $P_i$ 采样一个均匀随机的分享份额 $b_i$），并在在线阶段协作执行一次安全乘法计算 $[s] = [r] \cdot [b]$。
+假设所有参与方已调用松弛谓词零分享协议 $\ProtorPZS^Q$ 获得了一组秘密分享 $[\! [ r ] \!] = (r_1, \cdots, r_m)$，其目标是生成一组满足标准谓词零分享安全性定义的秘密分享 $[\! [ s ] \!] = (s_1, \cdots, s_m)$。为此，参与方只需在离线阶段准备一组随机值的秘密分享 $[\! [ b ] \!]$（由每个参与方 $P_i$ 采样一个均匀随机的分享份额 $b_i$），并在在线阶段协作执行一次安全乘法计算 $[\! [ s ] \!] = [\! [ r ] \!] \cdot [\! [ b ] \!]$。
 
 \begin{theorem} \label{theorem:bssPMT}
 在 $\FuncrPZS^Q$ 和安全乘法的混合模型下，上述协议安全地实现了功能 $\FuncPZS^Q$。
@@ -319,39 +319,39 @@ $$f(\textbf{x}) =
 
 鉴于松弛谓词零分享输出的秘密分享中的均匀随机秘密值依赖于某些 $t \le m-1$ 个参与方的联合视图，在调用谓词零分享后对这些秘密值进行重构时，若这 $t$ 个参与方发生共谋，则可能会泄露信息。该转化技术通过消除这种依赖性来防止此类泄露。这一步骤对于确保我们的 MPSO 框架在抵御任意共谋攻击时的安全性至关重要。该转化技术可以利用 Beaver 三元组 \cite{Beaver-CRYPTO-1991} 对在线阶段进行如下优化：
 
-首先回顾 Beaver 三元组技术。一个 Beaver 三元组由三个秘密分享 $([a], [b], [c])$ 组成，其中 $[a]$ 和 $[b]$ 是随机的秘密分享，且满足 $c = a \cdot b$。通常情况下，Beaver 三元组用于在在线阶段将一次乘法运算规约为两次重构过程；而在此处，由于乘数 $b$ 本身是随机的，Beaver 三元组可用于在在线阶段将一次乘法运算规约为仅一次重构过程。具体而言：
+首先回顾 Beaver 三元组技术。一个 Beaver 三元组由三个秘密分享 $([\! [ a ] \!], [\! [ b ] \!], [\! [ c ] \!])$ 组成，其中 $[\! [ a ] \!]$ 和 $[\! [ b ] \!]$ 是随机的秘密分享，且满足 $c = a \cdot b$。通常情况下，Beaver 三元组用于在在线阶段将一次乘法运算规约为两次重构过程；而在此处，由于乘数 $b$ 本身是随机的，Beaver 三元组可用于在在线阶段将一次乘法运算规约为仅一次重构过程。具体而言：
 \begin{gather*}
 s = r \cdot b = (r+a-a) \cdot b = (r+a) \cdot b - a \cdot b
 \end{gather*}
 因此我们可以计算：
 \begin{gather*}
-[s] = (r+a) \cdot [b] - [a \cdot b] = (r+a) \cdot [b] - [c]
+[\! [ s ] \!] = (r+a) \cdot [\! [ b ] \!] - [\! [ a \cdot b ] \!] = (r+a) \cdot [\! [ b ] \!] - [\! [ c ] \!]
 \end{gather*}
-上述等式表明，一旦 $u = r + a$ 公开，我们就可以在本地计算 $[s]$。因此，生成 $[s]$ 的任务便简化为重构 $[u] = [r] + [a]$。令每个参与方 $P_i$ 在本地计算其分享份额 $u_i = r_i + a_i$ 并将 $u_i$ 发送给 Leader 节点 $P_1$，随后 $P_1$ 计算 $u = u_1 + \cdots + u_m$ 并将其向所有参与方公开。由此可见，该转化技术仅消耗一个在离线阶段生成的 Beaver 三元组；在在线阶段，Leader 节点的通信开销为 $2 (m-1) \log_2\lvert \mathbb{F} \rvert$，每个 Client 节点的通信开销为 $2 \log_2\lvert \mathbb{F} \rvert$。
+上述等式表明，一旦 $u = r + a$ 公开，我们就可以在本地计算 $[\! [ s ] \!]$。因此，生成 $[\! [ s ] \!]$ 的任务便简化为重构 $[\! [ u ] \!] = [\! [ r ] \!] + [\! [ a ] \!]$。令每个参与方 $P_i$ 在本地计算其分享份额 $u_i = r_i + a_i$ 并将 $u_i$ 发送给 Leader 节点 $P_1$，随后 $P_1$ 计算 $u = u_1 + \cdots + u_m$ 并将其向所有参与方公开。由此可见，该转化技术仅消耗一个在离线阶段生成的 Beaver 三元组；在在线阶段，Leader 节点的通信开销为 $2 (m-1) \log_2\lvert \mathbb{F} \rvert$，每个 Client 节点的通信开销为 $2 \log_2\lvert \mathbb{F} \rvert$。
 
 上述优化后的转化技术采用星型通信拓扑，这使其能够集成到后续将介绍的 MPSO 协议中而不改变其原有拓扑结构 —— 从而在保证其标准半诚实安全性的同时，实现优越的复杂度性能。
 
 \subsection{从简单到复合的组合技术}\label{compound-pzs}
 
-根据所关联的谓词公式 $Q$ 的类型，可将谓词零分享协议分为两类：若 $Q$ 是一个简单谓词，则称之为简单谓词零分享（Simple Predicative Zero-Sharing）；若 $Q$ 是一个复合谓词，即 $Q$ 由 $q>1$ 个文字（原子命题或其否定）和逻辑联结词 $\land$ 与 $\lor$ 构成，其中每个文字 $Q_i$ 是一个简单谓词或其否定 ($1 \le i \le q$)，则称对应的谓词零分享为复合谓词零分享（Compound Predicative Zero-Sharing）。本节将介绍将简单谓词零分享协议组合成复合谓词零分享协议的高效方法 —— 对于任何复合谓词 $Q$，只要为其中每个文字 $Q_i$ 构造对应的松弛版本的简单谓词零分享协议，就可以构造与 $Q$ 相关联的满足标准半诚实安全的复合谓词零分享协议。
+根据所关联的谓词公式 $Q$ 的类型，可将谓词零分享协议分为两类：若 $Q$ 是一个简单谓词，则称之为简单谓词零分享（Simple Predicative Zero-Sharing）；若 $Q$ 是一个复合谓词，即 $Q$ 由 $q>1$ 个文字（原子命题或其否定）和逻辑联结词 $\land$ 与 $\lor$ 构成，其中每个文字 $Q_i$ 是一个简单谓词或其否定 ($i \in [q]$)，则称对应的谓词零分享为复合谓词零分享（Compound Predicative Zero-Sharing）。本节将介绍将简单谓词零分享协议组合成复合谓词零分享协议的高效方法 —— 对于任何复合谓词 $Q$，只要为其中每个文字 $Q_i$ 构造对应的松弛版本的简单谓词零分享协议，就可以构造与 $Q$ 相关联的满足标准半诚实安全的复合谓词零分享协议。
 
 总的来说，构造与 $Q$ 相关联的的复合谓词零分享协议可分为三个阶段：首先，参与方为每个文字 $Q_i$ 执行对应的松弛简单谓词零分享协议。对于仅涉及参与方子集的文字，未参与的参与方将其缺失的分享份额设置为 $0$；其次，参与方参照由所有文字通过逻辑与 $\mathsf{AND}$、逻辑或 $\mathsf{OR}$ 操作符组合成公式 $Q$ 的计算过程，逐步对持有的秘密分享进行协同处理，将其组合成一个满足与 $Q$ 相关联的松弛版本的复合谓词零分享定义的输出秘密分享。其中，在每一步结束时，参与方都会获得一个与当前计算的中间公式相对应的秘密分享；最后，参与方将松弛复合谓词零分享转化为满足标准半诚实安全的复合谓词零分享。完整的构造过程详见图~\ref{fig:proto-cpzs}。
 
-\begin{figure}[!hbtp]
+\begin{figure}[!htb]
 \begin{framed}
-\begin{minipage}[center]{\textwidth}
+\begin{minipage}[c]{\textwidth}
 \begin{trivlist}
-\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots P_m$，其输入为 $\textbf{x} = (x_1, \cdots, x_m)$。有限域 $\mathbb{F}$。一个由 $q$ 个文字 $Q_1,\cdots,Q_q$ ($q \ge 1$) 和逻辑联结词 $\mathsf{AND}$ 和 $\mathsf{OR}$ 构成的简单/复合谓词 $Q$。离线阶段生成的 Beaver 三元组 $([a], [b], [c])$。
+\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots P_m$，其输入为 $\textbf{x} = (x_1, \cdots, x_m)$。有限域 $\mathbb{F}$。一个由 $q$ 个文字 $Q_1,\cdots,Q_q$ ($q \ge 1$) 和逻辑联结词 $\mathsf{AND}$ 和 $\mathsf{OR}$ 构成的简单/复合谓词 $Q$。离线阶段生成的 Beaver 三元组 $([\! [ a ] \!], [\! [ b ] \!], [\! [ c ] \!])$。
 \item \textbf{协议：}
 \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
-\item \textbf{简单谓词分享阶段.} 参与方为每个文字 $Q_i$ 调用 $\FuncrPZS^{Q_i}$ ($1 \le i \le q$)。若 $Q_i$ 未涉及所有参与方，则未参与的参与方将对应 $Q_i$ 的分享份额设置为 $0$。由此，每个 $Q_i$ 在参与方之间都有一个对应的秘密分享。
+\item \textbf{简单谓词分享阶段.} 参与方为每个文字 $Q_i$ 调用 $\FuncrPZS^{Q_i}$ ($i \in [q]$)。若 $Q_i$ 未涉及所有参与方，则未参与的参与方将对应 $Q_i$ 的分享份额设置为 $0$。由此，每个 $Q_i$ 在参与方之间都有一个对应的秘密分享。
 \item \textbf{模拟公式计算阶段.} 若 $q>1$，参与方按照操作符的优先级，逐步模拟 $Q$ 的计算。在其中的每一步中，参与方模拟两个谓词 $Q'_i$ 和 $Q'_j$ 通过逻辑操作符连接成一个谓词公式 $Q'$ 的计算 —— 参与方已经从前一步获得了与 $Q'_i$ 和 $Q'_j$ 对应的秘密分享，目标是生成一组满足与 $Q'$ 相关联的松弛谓词零分享输出的秘密分享。具体的操作取决于所计算的操作符类型：
 \begin{itemize}
-\item $\mathsf{AND}$：假设参与方持有分别与 $Q'_i$ 和 $Q'_j$ 对应的两个秘密分享 $[r_i]$ 和 $[r_j]$。为了计算 $Q'$ 的松弛谓词零分享（其中 $Q'(\textbf{x}) = Q'_i(\textbf{x}) \land Q'_j(\textbf{x})$），参与方在本地将两个秘密分享对应的份额相加，得到秘密分享 $[r_i + r_j]$。
-\item $\mathsf{OR}$：假设参与方持有分别与 $Q'_i$ 和 $Q'_j$ 对应的两个秘密分享 $[r_i]$ 和 $[r_j]$。为了计算 $Q'$ 的松弛谓词零分享（其中 $Q'(\textbf{x}) = Q'_i(\textbf{x}) \lor Q'_j(\textbf{x})$），参与方执行一次安全乘法计算，得到 $[r_i \cdot r_j] = [r_i] \cdot [r_j]$。
+\item $\mathsf{AND}$：假设参与方持有分别与 $Q'_i$ 和 $Q'_j$ 对应的两个秘密分享 $[\! [ r_i ] \!]$ 和 $[\! [ r_j ] \!]$。为了计算 $Q'$ 的松弛谓词零分享（其中 $Q'(\textbf{x}) = Q'_i(\textbf{x}) \land Q'_j(\textbf{x})$），参与方在本地将两个秘密分享对应的份额相加，得到秘密分享 $[\! [ r_i + r_j ] \!]$。
+\item $\mathsf{OR}$：假设参与方持有分别与 $Q'_i$ 和 $Q'_j$ 对应的两个秘密分享 $[\! [ r_i ] \!]$ 和 $[\! [ r_j ] \!]$。为了计算 $Q'$ 的松弛谓词零分享（其中 $Q'(\textbf{x}) = Q'_i(\textbf{x}) \lor Q'_j(\textbf{x})$），参与方执行一次安全乘法计算，得到 $[\! [ r_i \cdot r_j ] \!] = [\! [ r_i ] \!] \cdot [\! [ r_j ] \!]$。
 \end{itemize}
-在每一步结束后，参与方将 $Q'$ 视为一个新的文字，并重复上述过程，直到 $Q$ 中仅剩一个文字。与最终文字对应的秘密分享 $[r]$ 即为与 $Q$ 相关联的松弛谓词零分享协议的输出秘密分享。
-\item \textbf{从松弛到标准的转化。} 所有参与方利用 Beaver 三元组执行一次安全乘法计算 $[s] = [r] \cdot [b]$ 来计算 $[s]$（参见第 \ref{transform-pzs} 节）。
+在每一步结束后，参与方将 $Q'$ 视为一个新的文字，并重复上述过程，直到 $Q$ 中仅剩一个文字。与最终文字对应的秘密分享 $[\! [ r ] \!]$ 即为与 $Q$ 相关联的松弛谓词零分享协议的输出秘密分享。
+\item \textbf{从松弛到标准的转化。} 所有参与方利用 Beaver 三元组执行一次安全乘法计算 $[\! [ s ] \!] = [\! [ r ] \!] \cdot [\! [ b ] \!]$ 来计算 $[\! [ s ] \!]$（参见第 \ref{transform-pzs} 节）。
 \end{enumerate}
 \end{trivlist}
 \end{minipage}
@@ -366,8 +366,8 @@ s = r \cdot b = (r+a-a) \cdot b = (r+a) \cdot b - a \cdot b
 \begin{trivlist}
 \item \textbf{正确性与独立性分析.} 在模拟公式计算阶段的每一步中：
 \begin{itemize}[itemsep=2pt,topsep=5pt,parsep=0pt,leftmargin=10pt]
-    \item 若 $Q'(\textbf{x}) = Q'_i(\textbf{x}) \land Q'_j(\textbf{x})$，参与方计算 $[r_i + r_j] = [r_i] + [r_j]$。若 $Q'(\textbf{x}) = 1$，即 $Q'_i(\textbf{x}) = 1$ 且 $Q'_j(\textbf{x}) = 1$，根据 $\FuncrPZS^{Q'_i}$ 和 $\FuncrPZS^{Q'_j}$ 的功能可知 $r_i = 0$ 且 $r_j = 0$，因此 $r_i + r_j = 0$；否则，$Q'_i(\textbf{x}) = 0$ 或 $Q'_j(\textbf{x}) = 0$，根据 $\FuncrPZS^{Q'_i}$ 和 $\FuncrPZS^{Q'_j}$ 的功能 $r_i$ 和 $r_j$ 中至少有一个是随机值，故 $r_i + r_j$ 也是随机值。
-    \item 若 $Q'(\textbf{x}) = Q'_i(\textbf{x}) \lor Q'_j(\textbf{x})$，参与方计算 $[r_i \cdot r_j] = [r_i] \cdot [r_j]$。若 $Q'(\textbf{x}) = 1$，即 $Q'_i(\textbf{x}) = 1$ 或 $Q'_j(\textbf{x}) = 1$，根据 $\FuncrPZS^{Q'_i}$ 和 $\FuncrPZS^{Q'_j}$ 的功能 $r_i = 0$ 或 $r_j = 0$，因此 $r_i \cdot r_j = 0$；否则，$Q'_i(\textbf{x}) = 0$ 且 $Q'_j(\textbf{x}) = 0$，则 $r_i$ 和 $r_j$ 均为随机值。用 $E^{i,j}$ 表示事件 $r_i \cdot r_j$ 是随机值。用 $E_0^{i}$ 表示事件 $r_i = 0$，$E_1^{i}$ 表示事件 $r_i \ne 0$。我们有事件 $E^{i,j}$ 发生的概率为 $Pr[E^{i,j}] = Pr[E^{i,j} \vert E_0^{i}] \cdot Pr[E_0^{i}] + Pr[E \vert E_1^{i}] \cdot Pr[E_1^{i}] = 0 \cdot Pr[E_0^{i}] + 1 \cdot Pr[E_1^{i}] = Pr[E_1^{i}] = 1- Pr[E_0^{i}]$。为了将正确性误差限制在 $2^{-\sigma}$ 以内，要求任何 $E_0^{i}$ 发生的概率是可忽略的。通过联合界（Union Bound），$Pr[\bigvee_i E_0^{i}] \le \sum_{i} Pr[E_0^{i}] = \frac{\lvert \mathsf{OR} \rvert}{\lvert \mathbb{F} \rvert}$。因此，需设置有限域大小 $\lvert \mathbb{F} \rvert \ge \lvert \mathsf{OR} \rvert \cdot 2^\sigma$，其中 $\lvert \mathsf{OR} \rvert$ 是 $Q$ 中 $\mathsf{OR}$ 操作符的数量。
+    \item 若 $Q'(\textbf{x}) = Q'_i(\textbf{x}) \land Q'_j(\textbf{x})$，参与方计算 $[\! [ r_i + r_j ] \!] = [\! [ r_i ] \!] + [\! [ r_j ] \!]$。若 $Q'(\textbf{x}) = 1$，即 $Q'_i(\textbf{x}) = 1$ 且 $Q'_j(\textbf{x}) = 1$，根据 $\FuncrPZS^{Q'_i}$ 和 $\FuncrPZS^{Q'_j}$ 的功能可知 $r_i = 0$ 且 $r_j = 0$，因此 $r_i + r_j = 0$；否则，$Q'_i(\textbf{x}) = 0$ 或 $Q'_j(\textbf{x}) = 0$，根据 $\FuncrPZS^{Q'_i}$ 和 $\FuncrPZS^{Q'_j}$ 的功能 $r_i$ 和 $r_j$ 中至少有一个是随机值，故 $r_i + r_j$ 也是随机值。
+    \item 若 $Q'(\textbf{x}) = Q'_i(\textbf{x}) \lor Q'_j(\textbf{x})$，参与方计算 $[\! [ r_i \cdot r_j ] \!] = [\! [ r_i ] \!] \cdot [\! [ r_j ] \!]$。若 $Q'(\textbf{x}) = 1$，即 $Q'_i(\textbf{x}) = 1$ 或 $Q'_j(\textbf{x}) = 1$，根据 $\FuncrPZS^{Q'_i}$ 和 $\FuncrPZS^{Q'_j}$ 的功能 $r_i = 0$ 或 $r_j = 0$，因此 $r_i \cdot r_j = 0$；否则，$Q'_i(\textbf{x}) = 0$ 且 $Q'_j(\textbf{x}) = 0$，则 $r_i$ 和 $r_j$ 均为随机值。用 $E^{i,j}$ 表示事件 $r_i \cdot r_j$ 是随机值。用 $E_0^{i}$ 表示事件 $r_i = 0$，$E_1^{i}$ 表示事件 $r_i \ne 0$。我们有事件 $E^{i,j}$ 发生的概率为 $Pr[E^{i,j}] = Pr[E^{i,j} \vert E_0^{i}] \cdot Pr[E_0^{i}] + Pr[E \vert E_1^{i}] \cdot Pr[E_1^{i}] = 0 \cdot Pr[E_0^{i}] + 1 \cdot Pr[E_1^{i}] = Pr[E_1^{i}] = 1- Pr[E_0^{i}]$。为了将正确性误差限制在 $2^{-\sigma}$ 以内，要求任何 $E_0^{i}$ 发生的概率是可忽略的。通过联合界（Union Bound），$Pr[\bigvee_i E_0^{i}] \le \sum_{i} Pr[E_0^{i}] = \frac{\lvert \mathsf{OR} \rvert}{\lvert \mathbb{F} \rvert}$。因此，需设置有限域大小 $\lvert \mathbb{F} \rvert \ge \lvert \mathsf{OR} \rvert \cdot 2^\sigma$，其中 $\lvert \mathsf{OR} \rvert$ 是 $Q$ 中 $\mathsf{OR}$ 操作符的数量。
 \end{itemize}
 上面模拟公式计算阶段中每一步模拟 $\mathsf{AND}$ 和 $\mathsf{OR}$ 操作符计算的正确性，保证了该阶段实现与 $Q$ 相关联的松弛谓词零分享协议的正确性。根据第~\ref{transform-pzs} 节中的正确性和独立性分析，最终协议满足与 $Q$ 相关联的标准谓词零分享的正确性和独立性要求。
 \item \textbf{隐私性分析.} 谓词零分享的隐私性易于验证：由于所有交互均发生在对构建模块（即所有松弛简单谓词零分享协议、安全乘法计算及转化技术）的调用内部，因此给定理想功能的输出，模拟器只需以反向链式的方式调用这些构建模块的子模拟器。最终，只要所有松弛简单谓词零分享协议、安全乘法计算和转化技术的隐私性成立，那么敌手的视图在理想世界和真实世界中就是不可区分的。
@@ -386,12 +386,12 @@ s = r \cdot b = (r+a-a) \cdot b = (r+a) \cdot b - a \cdot b
 
 图~\ref{fig:func-bmzs} 定义了成员零分享的批量版本，其中 $P_\mathsf{pivot}$ 持有一个向量 $\textbf{x} = (x_1, \cdots, x_n)$，而每个 $P_j$ 持有 $n$ 个集合序列作为输入。参与方获得 $n$ 组秘密分享，其中第 $i$ 组秘密分享表示对第 $i$ 个输入计算相同公式 $Q$ 得到的真值。
 
-\begin{figure}[!hbtp]
+\begin{figure}[!htb]
 \begin{framed}
-\begin{minipage}[center]{\textwidth}
+\begin{minipage}[c]{\textwidth}
 \begin{trivlist}
 \item \textbf{参数：} $m$ 个参与方 $P_1, \cdots P_m$，其中 $P_\mathsf{pivot}$ 是唯一持有 $n$ 个元素（而非 $n$ 个集合）的参与方。一个集合成员谓词公式 $Q$。批量大小 $n$。有限域 $\mathbb{F}$。
-\item \textbf{功能：} 收到来自 $P_\mathsf{pivot}$ 的输入 $\textbf{x} = (x_1, \cdots, x_n)$ 以及来自每个 $P_j$ ($j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}$) 的输入 $\textbf{X}_j = (X_{j,1}, \cdots, X_{j,n})$ 后，为 $1 \le i \le m$ 随机采样 $\textbf{s}_i = (s_{i,1},\cdots,s_{i,n}) \gets \mathbb{F}^n$，且满足：对于 $1 \le d \le n$，若 $Q(x_d,X_{1,d},X_{\mathsf{pivot}-1,d},X_{\mathsf{pivot}+1,d},\cdots,X_{m,d})=1$，则 $\sum_{1 \le i \le m} s_{i,d} = 0$。将 $\textbf{s}_i$ 发送给 $P_i$。
+\item \textbf{功能：} 收到来自 $P_\mathsf{pivot}$ 的输入 $\textbf{x} = (x_1, \cdots, x_n)$ 以及来自每个 $P_j$ ($j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}$) 的输入 $\textbf{X}_j = (X_{j,1}, \cdots, X_{j,n})$ 后，为 $i \in [m]$ 随机采样 $\textbf{s}_i = (s_{i,1},\cdots,s_{i,n}) \gets \mathbb{F}^n$，且满足：对于 $d \in [n]$，若 $Q(x_d,X_{1,d},X_{\mathsf{pivot}-1,d},X_{\mathsf{pivot}+1,d},\cdots,X_{m,d})=1$，则 $\sum_{i \in [m]} s_{i,d} = 0$。将 $\textbf{s}_i$ 发送给 $P_i$。
 \end{trivlist}
 \end{minipage}
 \end{framed}
@@ -414,26 +414,26 @@ s = r \cdot b = (r+a-a) \cdot b = (r+a) \cdot b - a \cdot b
 
 利用上述针对两方松弛成员零分享协议的实例化，我们在图~\ref{fig:proto-cmzs} 中给出了针对任意集合谓词公式 $Q$ 的完整批量成员零分享协议。
 
-\begin{figure}[!hbtp]
+\begin{figure}[!htb]
 \begin{framed}
-\begin{minipage}[center]{\textwidth}
+\begin{minipage}[c]{\textwidth}
 \begin{trivlist}
-\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots P_m$，其中 $P_\mathsf{pivot}$ 持有 $n$ 个元素而非 $n$ 个集合。集合谓词公式 $Q$ 由 $q \ge 1$ 个文字 $Q_1,\cdots,Q_q$ 组成，每个 $Q_i$ ($1 \le i \le q$) 的形式为 $x \in X_j$ 或 $x \notin X_j$ ($j \ne \mathsf{pivot}$)。$n$ 个 Beaver 三元组 $([\textbf{a}], [\textbf{b}], [\textbf{c}])$。批量大小 $n$。域 $\mathbb{F}$。 
+\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots P_m$，其中 $P_\mathsf{pivot}$ 持有 $n$ 个元素而非 $n$ 个集合。集合谓词公式 $Q$ 由 $q \ge 1$ 个文字 $Q_1,\cdots,Q_q$ 组成，每个 $Q_i$ ($i \in [q]$) 的形式为 $x \in X_j$ 或 $x \notin X_j$ ($j \ne \mathsf{pivot}$)。$n$ 个 Beaver 三元组 $([\! [ \textbf{a} ] \!], [\! [ \textbf{b} ] \!], [\! [ \textbf{c} ] \!])$。批量大小 $n$。域 $\mathbb{F}$。 
 \item \textbf{协议：}
 \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
 \item \textbf{简单谓词分享阶段.} 在此阶段，对于每个 $Q_i$，$P_\mathsf{pivot}$ 和 $P_j$ 根据 $Q_i$ 的形式调用批量大小为 $n$ 的针对 $x \in X_j$ 或 $x \notin X_j$ 的松弛批量成员零分享协议，其余参与方将其秘密分享设为 0。最终，参与方持有一个与 $Q_i$ 相关联的包含 $n$ 组秘密分享的向量。具体地：
     \begin{itemize}
-        \item $x \in X_j$：对于第 $k$ 个实例 ($1 \le k \le n$)，$P_j$ 采样 $r_{i,k}$ 并设置 $K_{i,k} = X_{j,k}$ 和 $V_{i,k} = \{-r_{i,k}, \cdots, -r_{i,k}\}$。然后 $P_\mathsf{pivot}$ 和 $P_j$ 调用 $\FuncbOPPRF$，其中 $P_j$ 作为 $\Sd$，输入为 $(K_{i,1},\cdots,K_{i,n})$ 和 $(V_{i,1},\cdots,V_{i,n})$；$P_\mathsf{pivot}$ 作为 $\Rcv$ 输入为 $\textbf{x}$，并接收 $\textbf{u}_{i}$。$P_\mathsf{pivot}$ 设置其份额 $\textbf{r}_{i,\mathsf{pivot}} = \textbf{u}_{i}$。$P_j$ 设置其份额 $\textbf{r}_{i,j} = (r_{i,1}, \cdots, r_{i,n})$。对于其余每个 $P_{d}$，设置其份额 $\textbf{r}_{i,d} = \textbf{0}$。 
-        \item $x \notin X_j$：$P_\mathsf{pivot}$ 和 $P_j$ 调用 $\FuncbssPMT$，在第 $k$ 个实例 ($1 \le k \le n$) 中，$P_j$ 输入 $X_{j,k}$ 并接收 $e_{i,k}^0$，$P_\mathsf{pivot}$ 输入 $x_k$ 并接收 $e_{i,k}^1$。然后他们调用 $n$ 个 ROT 实例，在第 $k$ 个实例中，$P_j$ 作为 $\Sd$ 接收 $r_{i,k}^0,r_{i,k}^1$，$P_\mathsf{pivot}$ 作为 $\Rcv$ 输入 $e_{i,k}^1$ 并接收 $r_{i,k}^{e_{i,k}^1}$。$P_\mathsf{pivot}$ 设置其份额 $\textbf{r}_{i,\mathsf{pivot}} = (r_{i,1}^{e_{i,1}^1},\cdots,r_{i,n}^{e_{i,n}^1})$。$P_j$ 设置其份额 $\textbf{r}_{i,j} = (-r_{i,1}^{e_{i,1}^0}, \cdots, -r_{i,n}^{e_{i,n}^0})$。对于其余每个 $P_{d}$，设置其份额 $\textbf{r}_{i,d} = \textbf{0}$。 
+        \item $x \in X_j$：对于第 $k$ 个实例 ($k \in [n]$)，$P_j$ 采样 $r_{i,k}$ 并设置 $K_{i,k} = X_{j,k}$ 和 $V_{i,k} = \{-r_{i,k}, \cdots, -r_{i,k}\}$。然后 $P_\mathsf{pivot}$ 和 $P_j$ 调用 $\FuncbOPPRF$，其中 $P_j$ 作为 $\Sd$，输入为 $(K_{i,1},\cdots,K_{i,n})$ 和 $(V_{i,1},\cdots,V_{i,n})$；$P_\mathsf{pivot}$ 作为 $\Rcv$ 输入为 $\textbf{x}$，并接收 $\textbf{u}_{i}$。$P_\mathsf{pivot}$ 设置其份额 $\textbf{r}_{i,\mathsf{pivot}} = \textbf{u}_{i}$。$P_j$ 设置其份额 $\textbf{r}_{i,j} = (r_{i,1}, \cdots, r_{i,n})$。对于其余每个 $P_{d}$，设置其份额 $\textbf{r}_{i,d} = \textbf{0}$。 
+        \item $x \notin X_j$：$P_\mathsf{pivot}$ 和 $P_j$ 调用 $\FuncbssPMT$，在第 $k$ 个实例 ($k \in [n]$) 中，$P_j$ 输入 $X_{j,k}$ 并接收 $e_{i,k}^0$，$P_\mathsf{pivot}$ 输入 $x_k$ 并接收 $e_{i,k}^1$。然后他们调用 $n$ 个 ROT 实例，在第 $k$ 个实例中，$P_j$ 作为 $\Sd$ 接收 $r_{i,k}^0,r_{i,k}^1$，$P_\mathsf{pivot}$ 作为 $\Rcv$ 输入 $e_{i,k}^1$ 并接收 $r_{i,k}^{e_{i,k}^1}$。$P_\mathsf{pivot}$ 设置其份额 $\textbf{r}_{i,\mathsf{pivot}} = (r_{i,1}^{e_{i,1}^1},\cdots,r_{i,n}^{e_{i,n}^1})$。$P_j$ 设置其份额 $\textbf{r}_{i,j} = (-r_{i,1}^{e_{i,1}^0}, \cdots, -r_{i,n}^{e_{i,n}^0})$。对于其余每个 $P_{d}$，设置其份额 $\textbf{r}_{i,d} = \textbf{0}$。 
     \end{itemize}
-$Q_i$ 的 $n$ 组秘密分享向量记作 $[\textbf{r}_i] = (\textbf{r}_{i,1},\cdots,\textbf{r}_{i,m})$。
+$Q_i$ 的 $n$ 组秘密分享向量记作 $[\! [ \textbf{r}_i ] \!] = (\textbf{r}_{i,1},\cdots,\textbf{r}_{i,m})$。
 \item \textbf{公式模拟阶段.} 参与方遵循图~\ref{fig:proto-cpzs} 中的相同阶段，但在每一步中生成包含 $n$ 组秘密分享的向量，操作取决于操作符类型：
     \begin{itemize}
         \item $\mathsf{AND}$ 操作符：参与方本地将两个向量的对应分量相加。 
-        \item $\mathsf{OR}$ 操作符：参与方在两个向量的对应分量之间执行 $n$ 次安全乘法计算，即 $[\textbf{r}_i \cdot \textbf{r}_j] = [\textbf{r}_i] \cdot [\textbf{j}]$。
+        \item $\mathsf{OR}$ 操作符：参与方在两个向量的对应分量之间执行 $n$ 次安全乘法计算，即 $[\! [ \textbf{r}_i \cdot \textbf{r}_j ] \!] = [\! [ \textbf{r}_i ] \!] \cdot [\! [ \textbf{j} ] \!]$。
     \end{itemize}
-最终向量 $[\textbf{r}]$ 包含 $n$ 组来自针对 $Q$ 的松弛批量成员零分享的输出秘密分享。
-\item \textbf{从松弛到标准的转化。} 所有参与方使用 $([\textbf{a}], [\textbf{b}], [\textbf{c}])$ 计算 $[\textbf{s}] = [\textbf{r}] \cdot [\textbf{b}]$。
+最终向量 $[\! [ \textbf{r} ] \!]$ 包含 $n$ 组来自针对 $Q$ 的松弛批量成员零分享的输出秘密分享。
+\item \textbf{从松弛到标准的转化。} 所有参与方使用 $([\! [ \textbf{a} ] \!], [\! [ \textbf{b} ] \!], [\! [ \textbf{c} ] \!])$ 计算 $[\! [ \textbf{s} ] \!] = [\! [ \textbf{r} ] \!] \cdot [\! [ \textbf{b} ] \!]$。
 \end{enumerate}
 \end{trivlist}
 \end{minipage}
@@ -456,12 +456,12 @@ $Q_i$ 的 $n$ 组秘密分享向量记作 $[\textbf{r}_i] = (\textbf{r}_{i,1},\c
 
 \subsection{技术路线概述}
 
-本章提出的 MPSO 框架可分为两个阶段：第一阶段基于任何可构造集合 $Y$ 的 CSPF 表示 $\psi(x, X_1, \cdots, X_m)$，目标是各方获得与 $Y$ 的一个划分相对应的秘密分享。回顾 $\psi = Q_1 \lor \cdots \lor Q_s$，对于每个子公式 $Q_i$（$1 \le i \le s$），
-设 $X_{i_1},\cdots,X_{i_q}$（$1 \le q \le m$）为 $Q_i$ 中所有原子命题涉及的集合，并用 $X_j$ ($j \in \{{i_1},\cdots,{i_q}\}$) 表示 $Q_i$ 相对于其满足局部性的集合。即：$$Q_i(x,X_{i_1},\cdots,X_{i_q}) = (x \in X_j) \land Q'_i(x,X_{i_1},\cdots,X_{j-1},X_{j+1},\cdots,X_{i_q})$$ 其中 $Q'_i$ 是 $Q_i$ 的 $X_j$-局部剩余公式。设 $Y_i$ 为由 $Q_i$ 表示的集合，则 $Q'_i$ 本质上是针对 $X_j$ 中元素关于 $Y_i$ 的成员测试集合谓词公式。我们先给出第一阶段的初步构造：对于每个 $Q_i$，$P_{i_1},\cdots,P_{i_q}$ 调用 $n$ 个与 $Q'_i$ 相关联的成员零分享实例。在每个实例中，$P_j$ 作为 $P_{\mathsf{pivot}}$ 输入 $X_j$ 中的一个元素。对于每个 $x \in X_j$，如果 $Q'_i = 1$，参与方收到 0 的秘密分享，否则收到随机值的秘密分享。$P_j$ 将 $x$ 加到其对应的分享份额上，使得对于每个 $x \in X_j$，如果 $Q_i = 1$（即 $Q'_i = 1$），各方收到 $x$ 的秘密分享，否则还是收到随机值的秘密分享。
+本章提出的 MPSO 框架可分为两个阶段：第一阶段基于任何可构造集合 $Y$ 的 CSPF 表示 $\psi(x, X_1, \cdots, X_m)$，目标是各方获得与 $Y$ 的一个划分相对应的秘密分享。回顾 $\psi = Q_1 \lor \cdots \lor Q_s$，对于每个子公式 $Q_i$（$i \in [s]$），
+设 $X_{i_1},\cdots,X_{i_q}$（$q \in [m]$）为 $Q_i$ 中所有原子命题涉及的集合，并用 $X_j$ ($j \in \{{i_1},\cdots,{i_q}\}$) 表示 $Q_i$ 相对于其满足局部性的集合。即：$$Q_i(x,X_{i_1},\cdots,X_{i_q}) = (x \in X_j) \land Q'_i(x,X_{i_1},\cdots,X_{j-1},X_{j+1},\cdots,X_{i_q})$$ 其中 $Q'_i$ 是 $Q_i$ 的 $X_j$-局部剩余公式。设 $Y_i$ 为由 $Q_i$ 表示的集合，则 $Q'_i$ 本质上是针对 $X_j$ 中元素关于 $Y_i$ 的成员测试集合谓词公式。我们先给出第一阶段的初步构造：对于每个 $Q_i$，$P_{i_1},\cdots,P_{i_q}$ 调用 $n$ 个与 $Q'_i$ 相关联的成员零分享实例。在每个实例中，$P_j$ 作为 $P_{\mathsf{pivot}}$ 输入 $X_j$ 中的一个元素。对于每个 $x \in X_j$，如果 $Q'_i = 1$，参与方收到 0 的秘密分享，否则收到随机值的秘密分享。$P_j$ 将 $x$ 加到其对应的分享份额上，使得对于每个 $x \in X_j$，如果 $Q_i = 1$（即 $Q'_i = 1$），各方收到 $x$ 的秘密分享，否则还是收到随机值的秘密分享。
 
 在上述初步构造中，针对 $X_j$ 的成员测试需要在大小为 $n$ 的相同输入集合上，重复执行 $n$ 次与 $Q'_i$ 相关联的成员零分享。因此，每个实例的均摊开销相对于 $n$ 的复杂度是 $O(n)$。为了实现 $O(1)$ 的均摊开销，利用哈希分桶（Hashing-to-bins）技术来优化该过程，具体而言：令 $P_j$ 通过布谷鸟哈希预处理 $X_j$，其他参与方通过简单哈希预处理各自的集合。该预处理过程使得 $P_j$ 的每个元素 $x \in X_j$ 仅需与其他参与方拥有的具有相同索引的桶进行比较，同时保持成员测试的正确性。因此，在每个成员零分享实例中，当 $P_j$ 作为 $P_{\mathsf{pivot}}$ 输入其布谷鸟哈希桶的单个元素时，其他参与方只需输入具有相同索引的简单哈希桶中所有元素组成的集合，该集合是输入集合的子集而非整个集合。在 $n$ 次成员零分享调用中，每个输入集合的参与方输入到 $n$ 个成员零分享实例中的集合大小总和等于其简单哈希表的大小，相对于 $n$ 的复杂度是 $O(n)$，因此每个实例的摊销开销被降到 $O(1)$。优化后的第一阶段具体构造如下。
 
-对于每个 $Q_i$，$P_j$ 使用哈希函数 $h_1, h_2, h_3$ 通过布谷鸟哈希将元素分配到 $B = O(n)$ 个桶中，使得每个桶 $\mathcal{C}_j^b$ ($1 \le b \le B$) 最多包含一个元素。同时，每个 $P_{j'}$ ($j' \in \{{i_1},\cdots,{i_q}\}\setminus \{j\}$) 将其每个元素 $y \in X_{j'}$ 分配到桶 $\mathcal{T}_{j'}^{h_1(y)}, \mathcal{T}_{j'}^{h_2(y)}, \mathcal{T}_{j'}^{h_3(y)}$ 中。如果 $P_j$ 将元素 $x \in X_j$ 映射到 $\mathcal{C}_j^b$ 中，则 $b \in \{h_1(x),h_2(x),h_3(x)\}$。如果 $P_{j'}$ 也持有 $x$，则 $x$ 必定也被映射到 $\mathcal{T}_{j'}^b$。这使得除了 $X_j$ 以外的其他参与方能够将其输入集合相对于 $X_j$ 在布谷鸟哈希桶里的排列对齐，从而保证对于 $\mathcal{C}_j^b$ 中的每个 $x$，$x \in X_j'$ 当且仅当 $x$ 在 $\mathcal{T}_{j'}^b$ 中。由此可推导出：$$Q'_i(x,X_{i_1},\cdots,X_{j-1},X_{j+1},\cdots,X_{i_q}) = Q'_i(x,\mathcal{T}_{i_1}^b,\cdots,\mathcal{T}_{j-1}^b,\mathcal{T}_{j+1}^b,\cdots,\mathcal{T}_{i_q}^b).$$ 根据上述关系，让 $P_{i_1},\cdots,P_{i_q}$ 调用与 $Q'_i$ 相关联的批量成员零分享，其中 $P_j$ 作为 $P_{\mathsf{pivot}}$ 输入 $\mathcal{C}_j^1, \cdots, \mathcal{C}_j^B$，每个 $P_{j'}$ 输入 $\mathcal{T}_{j'}^1, \cdots, \mathcal{T}_{j'}^B$。协议结束后，他们收到 $B$ 组秘密分享，使得如果每个桶 $C_j^b$ 中的元素 $x$ 满足 $Q_i(x,X_{i_1},\cdots,X_{i_q}) = 1$（即 $x \in Y_i$），参与方收到 0 的秘密分享，否则收到随机值的秘密分享。最后，$P_j$ 将 $x$ 拼接上全零字符串（用于区分元素与随机值），然后将该值加到自己的第 $b$ 个分享份额上，从而满足：如果 $x \in Y_i$，参与方持有 $x$ 的秘密分享。
+对于每个 $Q_i$，$P_j$ 使用哈希函数 $h_1, h_2, h_3$ 通过布谷鸟哈希将元素分配到 $B = O(n)$ 个桶中，使得每个桶 $\mathcal{C}_j^b$ ($b \in [B]$) 最多包含一个元素。同时，每个 $P_{j'}$ ($j' \in \{{i_1},\cdots,{i_q}\}\setminus \{j\}$) 将其每个元素 $y \in X_{j'}$ 分配到桶 $\mathcal{T}_{j'}^{h_1(y)}, \mathcal{T}_{j'}^{h_2(y)}, \mathcal{T}_{j'}^{h_3(y)}$ 中。如果 $P_j$ 将元素 $x \in X_j$ 映射到 $\mathcal{C}_j^b$ 中，则 $b \in \{h_1(x),h_2(x),h_3(x)\}$。如果 $P_{j'}$ 也持有 $x$，则 $x$ 必定也被映射到 $\mathcal{T}_{j'}^b$。这使得除了 $X_j$ 以外的其他参与方能够将其输入集合相对于 $X_j$ 在布谷鸟哈希桶里的排列对齐，从而保证对于 $\mathcal{C}_j^b$ 中的每个 $x$，$x \in X_j'$ 当且仅当 $x$ 在 $\mathcal{T}_{j'}^b$ 中。由此可推导出：$$Q'_i(x,X_{i_1},\cdots,X_{j-1},X_{j+1},\cdots,X_{i_q}) = Q'_i(x,\mathcal{T}_{i_1}^b,\cdots,\mathcal{T}_{j-1}^b,\mathcal{T}_{j+1}^b,\cdots,\mathcal{T}_{i_q}^b).$$ 根据上述关系，让 $P_{i_1},\cdots,P_{i_q}$ 调用与 $Q'_i$ 相关联的批量成员零分享，其中 $P_j$ 作为 $P_{\mathsf{pivot}}$ 输入 $\mathcal{C}_j^1, \cdots, \mathcal{C}_j^B$，每个 $P_{j'}$ 输入 $\mathcal{T}_{j'}^1, \cdots, \mathcal{T}_{j'}^B$。协议结束后，他们收到 $B$ 组秘密分享，使得如果每个桶 $C_j^b$ 中的元素 $x$ 满足 $Q_i(x,X_{i_1},\cdots,X_{i_q}) = 1$（即 $x \in Y_i$），参与方收到 0 的秘密分享，否则收到随机值的秘密分享。最后，$P_j$ 将 $x$ 拼接上全零字符串（用于区分元素与随机值），然后将该值加到自己的第 $b$ 个分享份额上，从而满足：如果 $x \in Y_i$，参与方持有 $x$ 的秘密分享。
 
 鉴于 $\{Y_1, \cdots, Y_s\}$ 构成 $Y$ 的一个划分，如果参与方对所有 $Q_1, \cdots, Q_s$ 执行上述过程，他们将持有 $Y$ 中所有元素的秘密分享（每个元素的秘密分享出现一次，其中混杂着不在 $Y$ 中的元素及重复元素对应的随机秘密分享），这些秘密分享按 $Y_1, \cdots, Y_s$ 的主序排列。在每个 $Y_i$ 内部，对应 $Y_i$ 中元素的秘密分享按 $P_j$ 的布谷鸟哈希位置的次序排列，该顺序取决于整个集合 $X_j$。如果参与方执行上述过程但不执行最后 $P_j$ 将元素加入分享的步骤，各方将在该元素对应的位置持有 0 的秘密分享。是否执行最后的追加元素步骤由 MPSO 框架的目标功能决定，该框架可实现的功能可分为三类：
 
@@ -479,47 +479,47 @@ $Q_i$ 的 $n$ 组秘密分享向量记作 $[\textbf{r}_i] = (\textbf{r}_{i,1},\c
 
 令 $C_{s,B,l}^1$ 和 $C_{N,l'}^2$ 为两个电路：
 \begin{itemize}[itemsep=2pt,topsep=5pt,parsep=0pt,leftmargin=10pt]
-\item $C_{s,B,l}^1$ 具有 $sB(m\log_2\lvert \mathbb{F} \rvert+ l)$ 条输入线，分为 $s$ 个部分，每部分有 $B(m\log_2\lvert \mathbb{F} \rvert + l)$ 条输入线，其中每 $B$ 个。在第 $i$ 个部分 ($1 \le i \le s$) 中，第 $k$ 组 的 $B$ 个在 $\mathbb{F}$ 上的输入与参与方 $P_k$ ($1 \le k \le m$) 相关联，将该组中的第 $b$ 个输入 ($1 \le b \le B$) 记为 $u_{i,k,b} \in \mathbb{F}$；最后 $B$ 个长度为 $l$ 的输入与特定参与方 $P_j$ ($1 \le j \le m$) 相关联，记其中的第 $b$ 个输入 ($1 \le b \le B$) 为 $z_{i,b} \in \{0,1\}^l$。该电路首先实现下面功能：如果 $u_{i,1,b} + \cdots + u_{i,m,b} = 0$，则产生比特 $w_{i,b} = 1$，否则为 0（针对 $1 \le i \le s, 1 \le b \le B$）。然后，该电路计算并输出 $f(Z)$，其中 $Z = \{z_{i,b} \vert w_{i,b} = 1\}_{1 \le i \le s, 1 \le b \le B}$，$f$ 是要在可构造集合 $Y$ 上计算的函数。
-\item $C_{N,l'}^2$ 具有 $m$ 组，每组 $N$ 个在 $\mathbb{F}$ 上的输入。第 $k$ 组与 $P_k$ ($1 \le k \le m$) 相关联，其中第 $i$ 个输入记为 $z_{k,i}$ ($1 \le i \le N$)。电路计算并输出 $f(Z)$，其中 $Z = \{z_i \vert z_{1,i} + \cdots + z_{m,i} = z_i \Vert 0^{l'}\}_{1 \le i \le N}$，$f$ 是要在 $Y$ 上计算的函数。
+\item $C_{s,B,l}^1$ 具有 $sB(m\log_2\lvert \mathbb{F} \rvert+ l)$ 条输入线，分为 $s$ 个部分，每部分有 $B(m\log_2\lvert \mathbb{F} \rvert + l)$ 条输入线，其中每 $B$ 个。在第 $i$ 个部分 ($i \in [s]$) 中，第 $k$ 组 的 $B$ 个在 $\mathbb{F}$ 上的输入与参与方 $P_k$ ($k \in [m]$) 相关联，将该组中的第 $b$ 个输入 ($b \in [B]$) 记为 $u_{i,k,b} \in \mathbb{F}$；最后 $B$ 个长度为 $l$ 的输入与特定参与方 $P_j$ ($j \in [m]$) 相关联，记其中的第 $b$ 个输入 ($b \in [B]$) 为 $z_{i,b} \in \{0,1\}^l$。该电路首先实现下面功能：如果 $u_{i,1,b} + \cdots + u_{i,m,b} = 0$，则产生比特 $w_{i,b} = 1$，否则为 0（针对 $i \in [s], b \in [B]$）。然后，该电路计算并输出 $f(Z)$，其中 $Z = \{z_{i,b} \vert w_{i,b} = 1\}_{i \in [s], b \in [B]}$，$f$ 是要在可构造集合 $Y$ 上计算的函数。
+\item $C_{N,l'}^2$ 具有 $m$ 组，每组 $N$ 个在 $\mathbb{F}$ 上的输入。第 $k$ 组与 $P_k$ ($k \in [m]$) 相关联，其中第 $i$ 个输入记为 $z_{k,i}$ ($i \in [N]$)。电路计算并输出 $f(Z)$，其中 $Z = \{z_i \vert z_{1,i} + \cdots + z_{m,i} = z_i \Vert 0^{l'}\}_{i \in [N]}$，$f$ 是要在 $Y$ 上计算的函数。
 \end{itemize}
 
 实现计算 $Y$ 的通用 MPSO 功能及其扩展的 MPSO-card 和 Circuit-MPSO 功能的具体协议构造见图~\ref{fig:proto-MPSO}。
 
 \begin{figure}[!hbtp]
 \begin{framed}
-\begin{minipage}[center]{\textwidth}
+\begin{minipage}[c]{\textwidth}
 \begin{trivlist}
 \item \textbf{参数：} $m$ 个参与方 $P_1, \cdots, P_m$。集合大小 $n$。元素长度 $l$。全零字符串长度 $l'$。有限域 $\mathbb{F}$。编码函数 $\mathsf{code}:\mathbb{F} \to \{0,1\}^{l+l'}$。可构造集合 $Y$ 的 CSPF 表示 $\psi(x,X_1,\cdots,X_m)$，$\psi = Q_1 \lor \cdots \lor Q_s$。布谷鸟哈希参数：哈希函数 $h_1, h_2, h_3$ 及桶数量 $B$。
 
 \item \textbf{输入：} 每个参与方 $P_i$ 持有私有集合 $X_i = \{x_i^1,\cdots, x_i^n\} \subseteq \{0,1\}^l$。
 
-1. \textbf{哈希分桶阶段.} 对于 $1 \le i \le m $，$P_i$ 执行布谷鸟哈希分桶 $\mathcal{C}_i^1, \cdots, \mathcal{C}_i^B \gets \Cuckoo_{h_1,h_2,h_3}^B(X_i)$ 以及简单哈希分桶 $\mathcal{T}_i^1, \cdots, \mathcal{T}_i^B \gets \Simple_{h_1,h_2,h_3}^B(X_i)$。
+1. \textbf{哈希分桶阶段.} 对于 $i \in [m] $，$P_i$ 执行布谷鸟哈希分桶 $\mathcal{C}_i^1, \cdots, \mathcal{C}_i^B \gets \Cuckoo_{h_1,h_2,h_3}^B(X_i)$ 以及简单哈希分桶 $\mathcal{T}_i^1, \cdots, \mathcal{T}_i^B \gets \Simple_{h_1,h_2,h_3}^B(X_i)$。
 
-2. \textbf{成员零分享阶段.} 对于 $\psi$ 中的第 $i$ 个子公式 $Q_i(x,X_{i_1},\cdots,X_{i_q})$ ($1 \le i \le s$)：
+2. \textbf{成员零分享阶段.} 对于 $\psi$ 中的第 $i$ 个子公式 $Q_i(x,X_{i_1},\cdots,X_{i_q})$ ($i \in [s]$)：
 \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
-    \item 若 $q = 1$（设 $i_1 = j$），则 $Q_i(x,X_j) = (x \in X_j)$。对于 $1 \le b \le B$，若 $\mathcal{C}_j^b$ 非空，$P_j$ 设置 $s_{i,j,b} = 0$，否则 $P_j$ 随机选取 $s_{i,j,b}$。$P_{j'}$ ($j' \neq j$) 设置 $s_{i,j',b} = 0$。
-    \item 若 $q > 1$，设 $Q_i$ 相对于 $X_j$ 是局部的，并且对应的 $X_j$-局部剩余公式为 $Q'_i$。所有输入集合涉及在 $Q_i$ 内的参与方调用 $\FuncbMZS^{Q'_i}$，其中 $P_j$ 作为 $P_{\mathsf{pivot}}$ 输入 $\mathcal{C}_j^1, \cdots, \mathcal{C}_j^B$，其余参与方 $P_{j'}$ ($j' \in \{{i_1},\cdots,{i_q}\} \setminus \{j\}$) 输入 $\mathcal{T}_{j'}^1, \cdots, \mathcal{T}_{j'}^B$。在协议执行结束后，每个涉及的参与方 $P_{i'}$ ($i' \in \{{i_1},\cdots,{i_q}\}$) 收到向量 $\textbf{s}_{i,i'}=(s_{i,i',1},\cdots,s_{i,i',B})$，其中每个分量作为自己对应的分享份额。其余未涉及的参与方 $P_k$ ($k \in \{1,\cdots,m\} \setminus \{{i_1},\cdots,{i_q}\}$) 对于每个 $1 \le b \le B$ 设置对应的分享份额 $s_{i,k,b} = 0$。
+    \item 若 $q = 1$（设 $i_1 = j$），则 $Q_i(x,X_j) = (x \in X_j)$。对于 $b \in [B]$，若 $\mathcal{C}_j^b$ 非空，$P_j$ 设置 $s_{i,j,b} = 0$，否则 $P_j$ 随机选取 $s_{i,j,b}$。$P_{j'}$ ($j' \neq j$) 设置 $s_{i,j',b} = 0$。
+    \item 若 $q > 1$，设 $Q_i$ 相对于 $X_j$ 是局部的，并且对应的 $X_j$-局部剩余公式为 $Q'_i$。所有输入集合涉及在 $Q_i$ 内的参与方调用 $\FuncbMZS^{Q'_i}$，其中 $P_j$ 作为 $P_{\mathsf{pivot}}$ 输入 $\mathcal{C}_j^1, \cdots, \mathcal{C}_j^B$，其余参与方 $P_{j'}$ ($j' \in \{{i_1},\cdots,{i_q}\} \setminus \{j\}$) 输入 $\mathcal{T}_{j'}^1, \cdots, \mathcal{T}_{j'}^B$。在协议执行结束后，每个涉及的参与方 $P_{i'}$ ($i' \in \{{i_1},\cdots,{i_q}\}$) 收到向量 $\textbf{s}_{i,i'}=(s_{i,i',1},\cdots,s_{i,i',B})$，其中每个分量作为自己对应的分享份额。其余未涉及的参与方 $P_k$ ($k \in \{1,\cdots,m\} \setminus \{{i_1},\cdots,{i_q}\}$) 对于每个 $b \in [B]$ 设置对应的分享份额 $s_{i,k,b} = 0$。
 \end{enumerate}
 
 参与方的后续动作取决于具体的目标功能：
 
 \item \textbf{MPSO：}
-    \textbf{3.} 对于 $1 \le i \le s, 1 \le b \le B$，$P_j$（步骤 2 中的 $j$）检查 $\mathcal{C}_j^b$：若非空，计算 $s'_{i,j,b} = \mathsf{code}(s_{i,j,b}) \oplus (x \Vert 0^{l'})$，其中 $x$ 为桶中元素；若为空，随机采样 $s'_{i,j,b} \gets \{0,1\}^{l+l'}$。\\
-    \textbf{4.} 各参与方 $P_k$ ($1 \le k \le m$) 构造向量 $\textbf{u}_k \in (\{0,1\}^{l+l'})^{sB}$，其中 对于$1 \le i \le s, 1 \le b \le B$，$u_{k,(i-1)B+b} = s'_{i,k,b}$。\\
-    \textbf{5.} 各参与方 $P_k$ ($1 \le k \le m$) 将 $\textbf{u}_k$ 输入到 $\FuncMS$，得到随机置换后的分享份额 $\textbf{u}_{k}'$。\\
+    \textbf{3.} 对于 $i \in [s], b \in [B]$，$P_j$（步骤 2 中的 $j$）检查 $\mathcal{C}_j^b$：若非空，计算 $s'_{i,j,b} = \mathsf{code}(s_{i,j,b}) \oplus (x \Vert 0^{l'})$，其中 $x$ 为桶中元素；若为空，随机采样 $s'_{i,j,b} \gets \{0,1\}^{l+l'}$。\\
+    \textbf{4.} 各参与方 $P_k$ ($k \in [m]$) 构造向量 $\textbf{u}_k \in (\{0,1\}^{l+l'})^{sB}$，其中 对于$i \in [s], b \in [B]$，$u_{k,(i-1)B+b} = s'_{i,k,b}$。\\
+    \textbf{5.} 各参与方 $P_k$ ($k \in [m]$) 将 $\textbf{u}_k$ 输入到 $\FuncMS$，得到随机置换后的分享份额 $\textbf{u}_{k}'$。\\
     \textbf{6.} $P_j$ ($1 < j \le m$) 将 $\textbf{u}_j'$ 发给 $P_1$。$P_1$ 计算 $\textbf{u}' = \sum \textbf{u}_j'$，识别出所有满足 $y \Vert 0^{l'}$ 形式的分量，截取 $y$ 组成 $Y$ 并输出。
 
 \item \textbf{MPSO-card：}
-        \textbf{3.} 各参与方 $P_k$ ($1 \le k \le m$) 构造向量 $\textbf{u}_k \in \mathbb{F}^{sB}$，其中对于 $1 \le i \le s, 1 \le b \le B$，$u_{k,(i-1)B+b} = s_{i,k,b}$。\\
-        \textbf{4.} 各参与方 $P_k$ ($1 \le k \le m$) 将 $\textbf{u}_k$ 输入到 $\FuncMS$，得到随机置换后的分享份额 $\textbf{u}_{k}'$。\\
-        \textbf{5.} $P_j$ ($1 < j \le m$) 将 $\textbf{u}_j'$ 发送给 $P_1$。$P_1$ 统计重构结果 $\sum_{1 \le j \le m} \textbf{u}_j'$ 中 0 的数量，将其作为 $Y$ 的基数并输出。
+        \textbf{3.} 各参与方 $P_k$ ($k \in [m]$) 构造向量 $\textbf{u}_k \in \mathbb{F}^{sB}$，其中对于 $i \in [s], b \in [B]$，$u_{k,(i-1)B+b} = s_{i,k,b}$。\\
+        \textbf{4.} 各参与方 $P_k$ ($k \in [m]$) 将 $\textbf{u}_k$ 输入到 $\FuncMS$，得到随机置换后的分享份额 $\textbf{u}_{k}'$。\\
+        \textbf{5.} $P_j$ ($1 < j \le m$) 将 $\textbf{u}_j'$ 发送给 $P_1$。$P_1$ 统计重构结果 $\sum_{j \in [m]} \textbf{u}_j'$ 中 0 的数量，将其作为 $Y$ 的基数并输出。
 
 \item \textbf{ Circuit-MPSO（方案 1）：}
-        \textbf{3.} 所有参与方调用电路为 $C_{s,B,l}^1$ 的 $m$ 方通用 MPC 协议。对于 $1 \le i \le s, 1 \le k \le m$，$P_k$ 将分享份额 $s_{i,k,1},\cdots,s_{i,k,B}$ 输入到第 $i$ 部分电路；此外，$P_j$（与步骤 2 中的 $j$ 对应）输入 $\mathcal{C}_j^1,\cdots,\mathcal{C}_j^B$ 中的元素。
+        \textbf{3.} 所有参与方调用电路为 $C_{s,B,l}^1$ 的 $m$ 方通用 MPC 协议。对于 $i \in [s], k \in [m]$，$P_k$ 将分享份额 $s_{i,k,1},\cdots,s_{i,k,B}$ 输入到第 $i$ 部分电路；此外，$P_j$（与步骤 2 中的 $j$ 对应）输入 $\mathcal{C}_j^1,\cdots,\mathcal{C}_j^B$ 中的元素。
 
 \item \textbf{ Circuit-MPSO（方案 2）：}
-        \textbf{3.} 对于 $1 \le i \le s, 1 \le b \le B$，$P_j$（步骤 2 中的 $j$）检查 $\mathcal{C}_j^b$：若非空，计算 $s'_{i,j,b} = \mathsf{code}(s_{i,j,b}) \oplus (x \Vert 0^{l'})$，其中 $x$ 为桶中元素；若为空，随机采样 $s'_{i,j,b} \gets \{0,1\}^{l+l'}$。\\
-        \textbf{4.} 所有参与方调用电路为 $C_{N,l'}^2$ 的 $m$ 方通用 MPC 协议。对于 $1 \le i \le s, 1 \le b \le B, 1 \le k \le m$，$P_k$ 将 $s'_{i,k,b}$ 作为其第 $((i-1)B+b)$ 个输入。
+        \textbf{3.} 对于 $i \in [s], b \in [B]$，$P_j$（步骤 2 中的 $j$）检查 $\mathcal{C}_j^b$：若非空，计算 $s'_{i,j,b} = \mathsf{code}(s_{i,j,b}) \oplus (x \Vert 0^{l'})$，其中 $x$ 为桶中元素；若为空，随机采样 $s'_{i,j,b} \gets \{0,1\}^{l+l'}$。\\
+        \textbf{4.} 所有参与方调用电路为 $C_{N,l'}^2$ 的 $m$ 方通用 MPC 协议。对于 $i \in [s], b \in [B], k \in [m]$，$P_k$ 将 $s'_{i,k,b}$ 作为其第 $((i-1)B+b)$ 个输入。
 \end{trivlist}
 \end{minipage}
 \end{framed}
@@ -531,13 +531,13 @@ $Q_i$ 的 $n$ 组秘密分享向量记作 $[\textbf{r}_i] = (\textbf{r}_{i,1},\c
 \end{theorem}
 
 \begin{trivlist}
-\item \textbf{正确性分析.} 协议的正确性源于定理~\ref{theorem:set2} 及定义~\ref{def:cspf} 中 CSPF 的性质，以及批量成员零分享的正确性。为确保所有批量成员零分享协议的正确性，有限域大小需满足 $\lvert \mathbb{F} \rvert \ge \lvert \mathsf{OR} \rvert \cdot B \cdot 2^\sigma$，其中 $\lvert \mathsf{OR} \rvert$ 是所有子公式 $Q_i$ ($1 \le i \le s$) 中 $\mathsf{OR}$ 操作的总数。
+\item \textbf{正确性分析.} 协议的正确性源于定理~\ref{theorem:set2} 及定义~\ref{def:cspf} 中 CSPF 的性质，以及批量成员零分享的正确性。为确保所有批量成员零分享协议的正确性，有限域大小需满足 $\lvert \mathbb{F} \rvert \ge \lvert \mathsf{OR} \rvert \cdot B \cdot 2^\sigma$，其中 $\lvert \mathsf{OR} \rvert$ 是所有子公式 $Q_i$ ($i \in [s]$) 中 $\mathsf{OR}$ 操作的总数。
 
 设 $Y_i$ 为 $Q_i$ 表示的集合。在 MPSO 和 Circuit-MPSO 协议（方案 2）中，对于每个 $Q_i$，参与方持有 $\lvert Y_i \rvert$ 个 $Y_i$ 元素的秘密分享和 $B-\lvert Y_i \rvert$ 个随机值的秘密分享。由于 $\{Y_1, \cdots, Y_s\}$ 是 $Y$ 的一个划分，各方总计持有 $\lvert Y \rvert$ 个 $Y$ 元素的秘密分享和 $sB-\lvert Y \rvert$ 个随机值的秘密分享。$P_1$ 或电路 $C_{sB,l'}^2$ 通过检查最后 $l'$ 位是否全为零来识别并截取所有集合元素。当某个随机值与 $0^{l'}$ 发生碰撞时会产生错误（假阳性），总的假阳性错误概率至多为 $sB \cdot 2^{-l'}$。为了使该失败概率可忽略，设置 $l' \ge \sigma + \log s + \log B$。在 MPSO-card 和 Circuit-MPSO（方案 1）中，参与方持有 $\lvert Y \rvert$ 个 0 的秘密分享，以及 $B-\lvert Y \rvert$ 个随机值的秘密分享。为了将总的假阳性错误概率限制在 $2^{-\sigma}$ 以内，我们设置 $\lvert \mathbb{F} \rvert \ge sB \cdot 2^\sigma$。
 
 \item \textbf{安全性分析.} 与之前对谓词零分享的隐私性证明类似，除 MPSO 与 MPSO-card 协议中最后发送给 $P_1$ 的重构消息外，所有交互均在对构建模块（即所有批量成员零分享协议和多方秘密分享洗牌协议）的调用内部完成。因此给定输出 $Y$，模拟器只需以反向链式的方式调用构建模块的子模拟器，即可模拟与诚实方之间的交互。模拟的核心难点在于当 $P_1$ 被腐化时对最后重构消息的模拟。在从通用 MPSO 理想功能获得 $Y$ 之后，模拟器利用 $Y$ 中元素生成 $\lvert Y \rvert$ 个秘密分享，然后均匀采样 $sB - \lvert Y \rvert$ 个随机秘密分享。最后，对全部 $sB$ 个秘密分享进行随机置换。由于成员零分享满足独立性要求，各随机秘密分享中的秘密独立于任意 $t \le m-1$ 个参与方的联合视图。此外，多方秘密分享洗牌功能确保了任何 $t \le m-1$ 个参与方的联盟都无法获知该置换。因此，模拟视图与真实视图是不可区分的。下面是完整的安全性证明：
 
-令 $\textbf{P}_{\mathcal{A}}$ 表示由敌手 $\mathcal{A}$ 控制的被腐化方集合。在 MPSO 协议中，模拟器从每个被腐化方 $P_c \in \textbf{P}_{\mathcal{A}}$ 处接收其输入 $X_c$，并且如果 $P_1 \in \textbf{P}_{\mathcal{A}}$，模拟器还会接收结果集 $Y$。对于每个 $P_c$，其视图由其输入 $X_c$、来自每个 $\FuncbMZS^{Q'_i}$ ($1 \le i \le s$) 的 $B$ 个秘密分享份额 $\textbf{s}_{i, c}$（如果 $P_c$ 属于 $Q_i$ 的涉及方集合 $\{P_{i_1},\cdots,P_{i_q}\}$）、来自 $\FuncMS$ 的洗牌后的秘密分享份额 $\textbf{u}_{c}'$ 组成；此外如果 $P_1 \in \textbf{P}_{\mathcal{A}}$，还包括来自 $P_j$ ($1 < j \le m$) 的重构消息 $\textbf{u}_j'$。
+令 $\textbf{P}_{\mathcal{A}}$ 表示由敌手 $\mathcal{A}$ 控制的被腐化方集合。在 MPSO 协议中，模拟器从每个被腐化方 $P_c \in \textbf{P}_{\mathcal{A}}$ 处接收其输入 $X_c$，并且如果 $P_1 \in \textbf{P}_{\mathcal{A}}$，模拟器还会接收结果集 $Y$。对于每个 $P_c$，其视图由其输入 $X_c$、来自每个 $\FuncbMZS^{Q'_i}$ ($i \in [s]$) 的 $B$ 个秘密分享份额 $\textbf{s}_{i, c}$（如果 $P_c$ 属于 $Q_i$ 的涉及方集合 $\{P_{i_1},\cdots,P_{i_q}\}$）、来自 $\FuncMS$ 的洗牌后的秘密分享份额 $\textbf{u}_{c}'$ 组成；此外如果 $P_1 \in \textbf{P}_{\mathcal{A}}$，还包括来自 $P_j$ ($1 < j \le m$) 的重构消息 $\textbf{u}_j'$。
 
 假设有 $s'$ 个子公式 $\textbf{Q}_{\mathcal{A}} = \{Q_{j_1},\cdots,Q_{j_{s'}}\} \subseteq \{Q_1,\cdots,Q_s\}$ 不涉及诚实方，而 $\textbf{Q}_{\mathcal{H}} = \{Q_1,\cdots,Q_s\} \setminus \textbf{Q}_{\mathcal{A}}$ 包含了至少涉及一个诚实方的子公式。模拟器通过诚实执行协议来模拟每个 $P_c$ 的视图，但进行以下修改：
 \begin{itemize}[itemsep=2pt,topsep=0pt,parsep=0pt]
@@ -556,28 +556,28 @@ $Q_i$ 的 $n$ 组秘密分享向量记作 $[\textbf{r}_i] = (\textbf{r}_{i,1},\c
 \end{gather*}
 其中 $\textbf{X} = \{X_1,\cdots,X_m\}$。$\textbf{P}_{\mathcal{A}}^h$ 表示参与 $Q_h$ 的被腐化方组成的集合，$\textbf{X}_{\mathcal{A}}^h$ 包含其所有的输入集合，$\textbf{X}^h$ 包含 $Q_h$ 中涉及的所有参与方的输入集合。$\mathsf{Sim}^{Q_h}$ 是由模拟器模拟出的 $\FuncbMZS^{Q'_h}$ 的视图，而 $\mathsf{View}_{\mathcal{A}}^{Q_h}$ 是批量成员零分享协议中敌手在 $Q_h$ 上的真实视图。带有上标 $\Pi$ 的项代表真实执行中的区分项，否则代表模拟中的项。由于被腐化方诚实地调用了 $\textbf{Q}_{\mathcal{A}}$ 中所有子公式的批量成员零分享协议，我们得到：
 \begin{gather*}
-\{\mathsf{Sim}^{Q_i}(\textbf{P}^i_{\mathcal{A}},\textbf{X}^i_{\mathcal{A}},\{\textbf{s}_{i, c}\}_{P_c \in \textbf{P}^i_{\mathcal{A}}})_{1 \le i \le s}, \{\textbf{s}_{i, c}\}_{1 \le i \le s, P_c \in \textbf{P}_{\mathcal{A}}}\}_\textbf{X} \\
-\overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^{Q_i}(X_{i_1},\cdots,X_{i_q})_{1 \le i \le s},\{\textbf{s}^{\Pi}_{i, c}\}_{1 \le i \le s, P_c \in \textbf{P}_{\mathcal{A}}}\}_\textbf{X}.
+\{\mathsf{Sim}^{Q_i}(\textbf{P}^i_{\mathcal{A}},\textbf{X}^i_{\mathcal{A}},\{\textbf{s}_{i, c}\}_{P_c \in \textbf{P}^i_{\mathcal{A}}})_{i \in [s]}, \{\textbf{s}_{i, c}\}_{i \in [s], P_c \in \textbf{P}_{\mathcal{A}}}\}_\textbf{X} \\
+\overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^{Q_i}(X_{i_1},\cdots,X_{i_q})_{i \in [s]},\{\textbf{s}^{\Pi}_{i, c}\}_{i \in [s], P_c \in \textbf{P}_{\mathcal{A}}}\}_\textbf{X}.
 \end{gather*}
 
 根据正确性，在为每个 $Q_h \in \textbf{Q}_{\mathcal{H}}$ 调用所有 $\FuncbMZS^{Q'_h}$ 之后，各方持有 $\lvert Y_{\mathcal{H}} \rvert$ 个 $Y_{\mathcal{H}}$ 中元素的秘密分享份额，以及 $(s-s')B-\lvert Y_{\mathcal{H}} \rvert$ 个随机值的秘密分享份额（这些随机秘密值的集合记为 $R^\Pi_{\mathcal{H}}$）。根据 $\FuncbMZS^{Q'_h}$ 的独立性要求，在批量成员零分享协议的真实执行中， $R^\Pi_{\mathcal{H}}$ 中的所有随机值均独立于任何 $m-1$ 个参与方的联合视图（即敌手视图）。在模拟中，$R_{\mathcal{H}}$ 中的随机值是使用独立的随机源采样的，因此它们也独立于为 $\FuncbMZS^{Q'_h}$ 模拟出的视图。在执行多方秘密分享洗牌后，$Y \cup R^\Pi_{\mathcal{H}} \cup R^\Pi_{\mathcal{A}}$ 中元素的顺序被随机打乱。根据 $\FuncMS$ 的功能，随机置换 $\pi^\Pi$ 是独立采样的。因此：
 \begin{gather*}
-\{\mathsf{Sim}^{Q_i}(\textbf{P}^i_{\mathcal{A}},\textbf{X}^i_{\mathcal{A}},\{\textbf{s}_{i, c}\}_{P_c \in \textbf{P}^i_{\mathcal{A}}})_{1 \le i \le s}, \{\textbf{s}_{i, c}\}_{1 \le i \le s, P_c \in \textbf{P}_{\mathcal{A}}}, \pi(Y \cup R_{\mathcal{H}} \cup R_{\mathcal{A}})\}_\textbf{X} \\
-\overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^{Q_i}(X_{i_1},\cdots,X_{i_q})_{1 \le i \le s}, \{\textbf{s}^{\Pi}_{i, c}\}_{1 \le i \le s, P_c \in \textbf{P}_{\mathcal{A}}}, \pi^\Pi(Y \cup R^\Pi_{\mathcal{H}} \cup R^\Pi_{\mathcal{A}})\}_\textbf{X}.
+\{\mathsf{Sim}^{Q_i}(\textbf{P}^i_{\mathcal{A}},\textbf{X}^i_{\mathcal{A}},\{\textbf{s}_{i, c}\}_{P_c \in \textbf{P}^i_{\mathcal{A}}})_{i \in [s]}, \{\textbf{s}_{i, c}\}_{i \in [s], P_c \in \textbf{P}_{\mathcal{A}}}, \pi(Y \cup R_{\mathcal{H}} \cup R_{\mathcal{A}})\}_\textbf{X} \\
+\overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^{Q_i}(X_{i_1},\cdots,X_{i_q})_{i \in [s]}, \{\textbf{s}^{\Pi}_{i, c}\}_{i \in [s], P_c \in \textbf{P}_{\mathcal{A}}}, \pi^\Pi(Y \cup R^\Pi_{\mathcal{H}} \cup R^\Pi_{\mathcal{A}})\}_\textbf{X}.
 \end{gather*}
 
 由于 $\textbf{u}_{1}', \cdots,\textbf{u}_{m}'$ 和 $\textbf{u}_{1}'^{\Pi}, \cdots,\textbf{u}_{m}'^{\Pi}$ 分别是 $\pi(Y \cup R_{\mathcal{H}} \cup R_{\mathcal{A}})$ 与 $\pi^\Pi(Y \cup R^\Pi_{\mathcal{H}} \cup R^\Pi_{\mathcal{A}})$ 的秘密分享，可推导出：
 \begin{gather*}
-\{\mathsf{Sim}^{Q_i}(\textbf{P}^i_{\mathcal{A}},\textbf{X}^i_{\mathcal{A}},\{\textbf{s}_{i, c}\}_{P_c \in \textbf{P}^i_{\mathcal{A}}})_{1 \le i \le s}, \{\textbf{s}_{i, c}\}_{1 \le i \le s, P_c \in \textbf{P}_{\mathcal{A}}}, \textbf{u}_{1}', \cdots,\textbf{u}_{m}'\}_\textbf{X} \\
-\overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^{Q_i}(X_{i_1},\cdots,X_{i_q})_{1 \le i \le s},\{\textbf{s}^{\Pi}_{i, c}\}_{1 \le i \le s, P_c \in \textbf{P}_{\mathcal{A}}}, \textbf{u}_{1}'^{\Pi}, \cdots,\textbf{u}_{m}'^{\Pi}\}_\textbf{X}.
+\{\mathsf{Sim}^{Q_i}(\textbf{P}^i_{\mathcal{A}},\textbf{X}^i_{\mathcal{A}},\{\textbf{s}_{i, c}\}_{P_c \in \textbf{P}^i_{\mathcal{A}}})_{i \in [s]}, \{\textbf{s}_{i, c}\}_{i \in [s], P_c \in \textbf{P}_{\mathcal{A}}}, \textbf{u}_{1}', \cdots,\textbf{u}_{m}'\}_\textbf{X} \\
+\overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^{Q_i}(X_{i_1},\cdots,X_{i_q})_{i \in [s]},\{\textbf{s}^{\Pi}_{i, c}\}_{i \in [s], P_c \in \textbf{P}_{\mathcal{A}}}, \textbf{u}_{1}'^{\Pi}, \cdots,\textbf{u}_{m}'^{\Pi}\}_\textbf{X}.
 \end{gather*}
 
 通过调用多方秘密分享洗牌协议的模拟器 $\mathsf{Sim}^{sh}$，得到
 \begin{gather*}
-\{\mathsf{Sim}^{Q_i}(\textbf{P}^i_{\mathcal{A}},\textbf{X}^i_{\mathcal{A}},\{\textbf{s}_{i, c}\}_{P_c \in \textbf{P}^i_{\mathcal{A}}})_{1 \le i \le s}, \{\textbf{s}_{i, c}\}_{1 \le i \le s, P_c \in \textbf{P}_{\mathcal{A}}}, \mathsf{Sim}^{sh}(\textbf{P}_{\mathcal{A}},\{\textbf{u}_c,\textbf{u}_c'\}_{P_c \in \textbf{P}_{\mathcal{A}}}), \textbf{u}_{1}', \cdots,\textbf{u}_{m}'\}_\textbf{X} \\
-\overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^{Q_i}(X_{i_1},\cdots,X_{i_q})_{1 \le i \le s},\{\textbf{s}^{\Pi}_{i, c}\}_{1 \le i \le s, P_c \in \textbf{P}_{\mathcal{A}}}, \mathsf{View}_{\mathcal{A}}^{sh}(\textbf{u}_{1}^{\Pi},\cdots,\textbf{u}_{m}^{\Pi}),\textbf{u}_{1}'^{\Pi},\cdots,\textbf{u}_{m}'^{\Pi}\}_\textbf{X},
+\{\mathsf{Sim}^{Q_i}(\textbf{P}^i_{\mathcal{A}},\textbf{X}^i_{\mathcal{A}},\{\textbf{s}_{i, c}\}_{P_c \in \textbf{P}^i_{\mathcal{A}}})_{i \in [s]}, \{\textbf{s}_{i, c}\}_{i \in [s], P_c \in \textbf{P}_{\mathcal{A}}}, \mathsf{Sim}^{sh}(\textbf{P}_{\mathcal{A}},\{\textbf{u}_c,\textbf{u}_c'\}_{P_c \in \textbf{P}_{\mathcal{A}}}), \textbf{u}_{1}', \cdots,\textbf{u}_{m}'\}_\textbf{X} \\
+\overset{c}{\approx} \{\mathsf{View}_{\mathcal{A}}^{Q_i}(X_{i_1},\cdots,X_{i_q})_{i \in [s]},\{\textbf{s}^{\Pi}_{i, c}\}_{i \in [s], P_c \in \textbf{P}_{\mathcal{A}}}, \mathsf{View}_{\mathcal{A}}^{sh}(\textbf{u}_{1}^{\Pi},\cdots,\textbf{u}_{m}^{\Pi}),\textbf{u}_{1}'^{\Pi},\cdots,\textbf{u}_{m}'^{\Pi}\}_\textbf{X},
 \end{gather*}
-其中 $\textbf{u}_k$ 由 $\{\textbf{s}_{i, k}\}_{1 \le i \le s}$ 计算得到。由此得出结论：敌手在真实执行中的视图与在模拟中的视图是不可区分的。
+其中 $\textbf{u}_k$ 由 $\{\textbf{s}_{i, k}\}_{i \in [s]}$ 计算得到。由此得出结论：敌手在真实执行中的视图与在模拟中的视图是不可区分的。
 
 Circuit-MPSO（方案2）的安全性证明相同。协议的安全性证明与之相同。MPSO-card 和 Circuit-MPSO（方案 1）协议的安全性证明与之类似，不同之处在于模拟器将模拟中的所有元素替换为 0，因为在 $P_1 \in \textbf{P}_{\mathcal{A}}$ 的情况下，模拟器只能获得基数而非集合本身。
 \end{trivlist}
@@ -587,12 +587,12 @@ Circuit-MPSO（方案2）的安全性证明相同。协议的安全性证明与�
 图~\ref{fig:proto-MPSO} 中的计算和通信复杂度均由所计算的可构造集合 $Y$ 的 CPSF 表示 $\psi(x, X_1, \cdots, X_m)$ 形式决定，其中 $\psi = Q_1 \lor \cdots \lor Q_s$。
 
 在成员零分享阶段，每个参与方 $P_j$ 的计算复杂度包括两部分：
-(1) $O(\sum_{1 \le i \le s}(i_q \cdot \lvert \mathsf{AND}_i + \mathsf{OR}_i \rvert \cdot n))$，其中 $Q_i$ 相对于 $X_j$ 是局部的（我们用 $Q'_i$ 表示 $Q_i$ 的 $X_j$-局部剩余公式），$i_q$ 是文字的数量，$\lvert \mathsf{AND}_i + \mathsf{OR}_i \rvert$ 是 $Q'_i$ 中 $\mathsf{AND}$ 和 $\mathsf{OR}$ 操作的总数；
-(2) $O(\sum_{1 \le i \le s}(\lvert \mathsf{AND}_i + \mathsf{OR}_i \rvert \cdot n))$，其中 $Q_i$ 相对于 $X_j$ 不是局部的但包含 $X_j$，且 $\lvert \mathsf{AND}_i + \mathsf{OR}_i \rvert$ 是 $Q_i$ 相对于其他某个集合的局部剩余公式中 $\mathsf{AND}$ 和 $\mathsf{OR}$ 操作的总数。
+(1) $O(\sum_{i \in [s]}(i_q \cdot \lvert \mathsf{AND}_i + \mathsf{OR}_i \rvert \cdot n))$，其中 $Q_i$ 相对于 $X_j$ 是局部的（我们用 $Q'_i$ 表示 $Q_i$ 的 $X_j$-局部剩余公式），$i_q$ 是文字的数量，$\lvert \mathsf{AND}_i + \mathsf{OR}_i \rvert$ 是 $Q'_i$ 中 $\mathsf{AND}$ 和 $\mathsf{OR}$ 操作的总数；
+(2) $O(\sum_{i \in [s]}(\lvert \mathsf{AND}_i + \mathsf{OR}_i \rvert \cdot n))$，其中 $Q_i$ 相对于 $X_j$ 不是局部的但包含 $X_j$，且 $\lvert \mathsf{AND}_i + \mathsf{OR}_i \rvert$ 是 $Q_i$ 相对于其他某个集合的局部剩余公式中 $\mathsf{AND}$ 和 $\mathsf{OR}$ 操作的总数。
 
 $P_j$ 的通信复杂度同样可以计算为两部分：
-(1) $O(\sum_{1 \le i \le s}(i_q \cdot \lvert \mathsf{OR}_i \rvert \cdot n))$，其中 $Q_i$ 相对于 $X_j$ 是局部的（我们用 $Q'_i$ 表示 $Q_i$ 的 $X_j$-局部剩余公式），$i_q$ 是文字的数量，$\lvert \mathsf{OR}_i \rvert$ 是 $Q'_i$ 中 $\mathsf{OR}$ 操作的数量；
-(2) $O(\sum_{1 \le i \le s}(\lvert \mathsf{OR}_i \rvert \cdot n))$，其中 $Q_i$ 相对于 $X_j$ 不是局部的但包含 $X_j$，且 $\lvert \mathsf{OR}_i \rvert$ 是 $Q_i$ 相对于其他某个集合的局部剩余公式中 $\mathsf{OR}$ 操作的数量。
+(1) $O(\sum_{i \in [s]}(i_q \cdot \lvert \mathsf{OR}_i \rvert \cdot n))$，其中 $Q_i$ 相对于 $X_j$ 是局部的（我们用 $Q'_i$ 表示 $Q_i$ 的 $X_j$-局部剩余公式），$i_q$ 是文字的数量，$\lvert \mathsf{OR}_i \rvert$ 是 $Q'_i$ 中 $\mathsf{OR}$ 操作的数量；
+(2) $O(\sum_{i \in [s]}(\lvert \mathsf{OR}_i \rvert \cdot n))$，其中 $Q_i$ 相对于 $X_j$ 不是局部的但包含 $X_j$，且 $\lvert \mathsf{OR}_i \rvert$ 是 $Q_i$ 相对于其他某个集合的局部剩余公式中 $\mathsf{OR}$ 操作的数量。
 
 在多方秘密分享洗牌与重构阶段，Leader 的计算复杂度和通信复杂度均为 $O(smn)$，而每个 Client 的计算复杂度和通信复杂度均为 $O(sn)$，其中 $s$ 为 CSPF 表示 $\psi$ 中子公式的数量。
 

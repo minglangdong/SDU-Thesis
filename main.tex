@@ -55,6 +55,7 @@
 \newcommand{\Dec}{\mathsf{Dec}}
 \newcommand{\Decode}{\mathsf{Decode_H}}
 \newcommand{\Elem}{\mathsf{Elem}}
+\newcommand{\bit}{\mathsf{bit}}
 \newcommand{\Enc}{\mathsf{Enc}}
 \newcommand{\Encode}{\mathsf{Encode_H}}
 \newcommand{\F}[1]{\mathbb{F}_{2^{#1}}}
@@ -66,6 +67,7 @@
 \newcommand{\FuncbOPPRF}{\mathcal{F}_\mathsf{bOPPRF}}
 \newcommand{\FuncbpMZE}{\mathcal{F}_\mathsf{bpMZE}}
 \newcommand{\FuncbpMZEp}{\mathcal{F}_\mathsf{bpMZEp}}
+\newcommand{\FuncbpNMZE}{\mathcal{F}_\mathsf{bpNMZE}}
 \newcommand{\FuncbpMZS}{\mathcal{F}_\mathsf{bpMZS}}
 \newcommand{\FuncbpMZSp}{\mathcal{F}_\mathsf{bpMZSp}}
 \newcommand{\FuncbpNMZS}{\mathcal{F}_\mathsf{bpNMZS}}
@@ -151,17 +153,45 @@
 \noindent
 \begin{longtable}{@{} >{\centering\arraybackslash}p{2.5cm} p{12cm} @{}}
         $m$ & 参与方的数量 \\
-        $P_i$ & 第 $i$ 个参与方 ($1 \le i \le m$) \\
-        $X_i$ & 第 $i$ 个参与方持有的私有集合 \\
-        $n$ & 参与方持有集合中的元素个数 \\
+        $n$ & 每个参与方持有集合中的元素个数 \\
         $l$ & 集合中元素的比特长度 \\
-        $[x]$ & $x$ 在 $m$ 个参与方之间的加法秘密分享 \\
+        $P_i$ & 第 $i$ 个参与方 ($1 \le i \le m$) \\
+        $X_i$ & 第 $i$ 个参与方持有的私有集合 ($1 \le i \le m$)\\
+        $[n]$ & 集合 $\{1,2, \cdots, n\}$ \\
+        $\lvert X \rvert$ & 集合 $X$ 中的元素个数 \\
+        $\mathsf{payload}(X)$ & 映射函数，将 $X$ 中每个元素映射到其关联载荷 \\
+        $\{0,1\}^l$ & 长为 $l$ 的比特串集合 \\
+        $\bit_j(x)$ & 元素 $x$ 中的第 $j$ 位比特 ($1 \le j \le l$) \\
+        $x \gets X$ & 从 $Ｘ$ 中均匀随机地选取元素 $x$ \\
+        $[\! [ x ] \!]$ & $x$ 在 $m$ 个参与方之间的加法秘密分享，每方持有分享份额 $x_i$\\
         $\lambda$ & 计算安全参数 \\
         $\sigma$ & 统计安全参数 \\
+        $\mathsf{negl}$ & 可忽略函数 \\
         $\overset{c}{\approx}$ & 两个分布在计算上不可区分 \\
         $\overset{s}{\approx}$ & 两个分布在统计上不可区分 \\
-        $\Vert$ & 字符串拼接符 \\
+        $\mathbb{Z}_q$ & 模 $q$ 的剩余系 \\
+        $\F{l}$ & 由所有长为 $l$ 的的比特串组成的有限域 \\
+        $\textbf{a} \in \mathbb{F}^n$ & 由 $n$ 个 $\mathbb{F}$ 上的分量组成的向量 \\
+        $a_i$ & 向量 $\textbf{a}$ 中的第 $i$ 个分量 \\ 
+        % $\textbf{a} = (a_1, a_2 \cdots, a_n)$
+        $\pi(\textbf{a})$ & 对向量 $\textbf{a}$ 中的元素按照 $\pi$ 进行置换得到 $(a_{\pi(1)}, \cdots, a_{\pi(n)})$ \\
         $\oplus$ & 两个向量按分量异或 \\
+        $\Sd$ & 协议中的发送方 \\
+        $\Rcv$ & 协议中的接收方 \\
+        $\Adv$ & 敌手 \\
+        $\mathsf{Sim}$ & 模拟器 \\
+        $\Honest$ & 诚实的参与方组成的集合 \\
+        $\Corr$ & 被敌手腐化的参与方组成的集合 \\
+        $\Simple_{h_1,h_2,h_3}^B$ & 用哈希函数 $h_1, h_2, h_3$ 在 $B$ 个桶中进行简单哈希 \\
+        $\Cuckoo_{h_1,h_2,h_3}^B$ & 用哈希函数 $h_1, h_2, h_3$ 在 $B$ 个桶中进行布谷鸟哈希 \\
+        $\Elem(X)$ & 表示桶 $X$ 中的元素 \\
+        $Pr[E]$ & 事件 $E$ 发生的概率 \\
+        $\Vert$ & 字符串拼接符 \\
+        $\bot$ & 错误指示符 \\
+        $\mathcal{SK}$ & 私钥空间 \\
+        $\mathcal{PK}$ & 公钥空间 \\
+        $\mathcal{M}$ & 明文空间 \\
+        $\mathcal{C}$ & 密文空间 \\
 \end{longtable}
 
 % 插图目录 和 表格目录

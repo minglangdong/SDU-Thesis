@@ -59,9 +59,9 @@ MKR-PKE 是一个满足 IND-CPA 安全性的 PKE 方案，并具备以下性质�
 
 在谓词零加密协议中，存在 $m$ ($m \ge 2$) 个持有私有输入的参与方，其中一方被指定为接收方。如果与协议相关联的一阶谓词公式 $Q$ 在各方输入上的真值为真，则接收方获得一个加密的 0；否则，接收方获得一个加密的均匀随机值。底层的加密方案采用明文空间构成域的 MKR-PKE（假设所有参与方已运行密钥生成算法并协作生成了公共公钥 $pk$）。谓词零加密的理想功能 $\FuncPZE^Q$ 的形式化定义如图~\ref{fig:func-pze} 所示。
 
-\begin{figure}[!hbtp]
+\begin{figure}[!htb]
 \begin{framed}
-\begin{minipage}[center]{\textwidth}
+\begin{minipage}[c]{\textwidth}
 \begin{trivlist}
 \item \textbf{参数：} $m$ 个参与方 $P_1, \cdots, P_m$，输入向量为 $\textbf{x} = (x_1, \cdots, x_m)$，其中 $P_1$ 为接收方。指定的一阶谓词公式 $Q$。一个明文空间为域 $\mathbb{F}$ 且拥有公共公钥 $pk$ 的 MKR-PKE 方案。
 \item \textbf{功能：} 收到每个参与方 $P_i$ 的输入 $x_i$ 后，若 $Q(\textbf{x}) = 1$，则将 $\Enc(pk,0)$ 发送给 $P_1$。否则，随机采样 $s \gets \mathbb{F}$ 并将 $\Enc(pk,s)$ 发送给 $P_1$。
@@ -96,12 +96,12 @@ MKR-PKE 是一个满足 IND-CPA 安全性的 PKE 方案，并具备以下性质�
 成员零加密是成员零分享在加密领域的对应物，其中 $P_\mathsf{pivot}$ 是持有元素 $x$ 的参与方（而其余各方持有集合），同时他也是接收方。如果关联的集合谓词公式 $Q(x,X_1,\cdots,X_{\mathsf{pivot}-1},X_{\mathsf{pivot}+1},\cdots, X_m) = 1$，$P_\mathsf{pivot}$ 将接收到一个加密的 0，否则 $P_\mathsf{pivot}$ 将接收到一个加密的均匀随机值。 
 批量成员零加密的理想功能 $\FuncbMZE^Q$ 在图~\ref{fig:func-bmze} 中给出。
 
-\begin{figure}[!hbtp]
+\begin{figure}[!htb]
 \begin{framed}
-\begin{minipage}[center]{\textwidth}
+\begin{minipage}[c]{\textwidth}
 \begin{trivlist}
 \item \textbf{参数：} $m$ 个参与方 $P_1, \cdots, P_m$，其中仅有 $P_\mathsf{pivot}$ 持有 $n$ 个元素（而非 $n$ 个集合），且 $P_\mathsf{pivot}$ 为接收方。集合成员谓词公式 $Q$。批量大小 $n$。明文空间为域 $\mathbb{F}$ 且拥有公共公钥 $pk$ 的 MKR-PKE 方案。
-\item \textbf{功能：} 收到来自 $P_\mathsf{pivot}$ 的输入 $\textbf{x} = (x_1, \cdots, x_n)$ 以及来自每个 $P_j$ ($j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}$) 的输入 $\textbf{X}_j = (X_{j,1}, \cdots, X_{j,n})$ 后，对于 $1 \le i \le n$，若 $Q(x_i,X_{1,i},X_{\mathsf{pivot}-1,i},X_{\mathsf{pivot}+1,i},\cdots,X_{m,i})=1$，则将 $\Enc(pk,0)$ 发送给 $P_\mathsf{pivot}$。否则，采样 $s_i \gets \mathbb{F}$ 并将 $\Enc(pk,s_i)$ 发送给 $P_\mathsf{pivot}$。
+\item \textbf{功能：} 收到来自 $P_\mathsf{pivot}$ 的输入 $\textbf{x} = (x_1, \cdots, x_n)$ 以及来自每个 $P_j$ ($j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}$) 的输入 $\textbf{X}_j = (X_{j,1}, \cdots, X_{j,n})$ 后，对于 $i \in [n]$，若 $Q(x_i,X_{1,i},X_{\mathsf{pivot}-1,i},X_{\mathsf{pivot}+1,i},\cdots,X_{m,i})=1$，则将 $\Enc(pk,0)$ 发送给 $P_\mathsf{pivot}$。否则，采样 $s_i \gets \mathbb{F}$ 并将 $\Enc(pk,s_i)$ 发送给 $P_\mathsf{pivot}$。
 \end{trivlist}
 \end{minipage}
 \end{framed}
@@ -115,36 +115,36 @@ MKR-PKE 是一个满足 IND-CPA 安全性的 PKE 方案，并具备以下性质�
     \item 带载荷的批量纯成员零加密（Batch pure membership zero-encryption with payloads, 图~\ref{fig:func-mzep}）。
 \end{itemize}
 
-\begin{figure}[!hbtp]
+\begin{figure}[!htb]
 \begin{framed}
-\begin{minipage}[center]{\textwidth}
+\begin{minipage}[c]{\textwidth}
 \begin{trivlist}
 \item \textbf{参数：} $m$ 个参与方 $P_1, \cdots P_m$，其中仅有 $P_\mathsf{pivot}$ 持有 $n$ 个元素，且 $P_\mathsf{pivot}$ 为接收方。批量大小 $n$。明文空间为域 $\mathbb{F}$ 且具有公钥 $pk$ 的 MKR-PKE 方案。
-\item \textbf{功能：} 收到输入 $\textbf{x} = (x_1, \cdots, x_n)$ 和每个 $P_j$ 的 $\textbf{X}_j = (X_{j,1}, \cdots, X_{j,n})$。对于 $1 \le i \le n$，若 $\bigwedge_{j \neq \mathsf{pivot}} (x_i \in X_{j,i}) = 1$，则给 $P_\mathsf{pivot}$ 发送 $\Enc(pk,0)$。否则，采样 $s_i \gets \mathbb{F}$ 并发送 $\Enc(pk,s_i)$ 给 $P_\mathsf{pivot}$。
+\item \textbf{功能：} 收到输入 $\textbf{x} = (x_1, \cdots, x_n)$ 和每个 $P_j$ 的 $\textbf{X}_j = (X_{j,1}, \cdots, X_{j,n})$。对于 $i \in [n]$，若 $\bigwedge_{j \neq \mathsf{pivot}} (x_i \in X_{j,i}) = 1$，则给 $P_\mathsf{pivot}$ 发送 $\Enc(pk,0)$。否则，采样 $s_i \gets \mathbb{F}$ 并发送 $\Enc(pk,s_i)$ 给 $P_\mathsf{pivot}$。
 \end{trivlist}
 \end{minipage}
 \end{framed}
 \caption{批量纯成员零加密的理想功能 $\FuncbpMZE$}\label{fig:func-bpmze}
 \end{figure}
 
-\begin{figure}[!hbtp]
+\begin{figure}[!htb]
 \begin{framed}
-\begin{minipage}[center]{\textwidth}
+\begin{minipage}[c]{\textwidth}
 \begin{trivlist}
 \item \textbf{参数：} $m$ 个参与方 $P_1, \cdots P_m$，其中仅有 $P_\mathsf{pivot}$ 持有 $n$ 个元素，且 $P_\mathsf{pivot}$ 为接收方。批量大小 $n$。明文空间为域 $\mathbb{F}$ 且具有公钥 $pk$ 的 MKR-PKE 方案。
-\item \textbf{功能：} 收到输入 $\textbf{x} = (x_1, \cdots, x_n)$ 和每个 $P_j$ 的 $\textbf{X}_j = (X_{j,1}, \cdots, X_{j,n})$。对于 $1 \le i \le n$，若 $\bigwedge_{j \neq \mathsf{pivot}} (x_i \notin X_{j,i}) = 1$，则给 $P_\mathsf{pivot}$ 发送 $\Enc(pk,0)$。否则，采样 $s_i \gets \mathbb{F}$ 并发送 $\Enc(pk,s_i)$ 给 $P_\mathsf{pivot}$。
+\item \textbf{功能：} 收到输入 $\textbf{x} = (x_1, \cdots, x_n)$ 和每个 $P_j$ 的 $\textbf{X}_j = (X_{j,1}, \cdots, X_{j,n})$。对于 $i \in [n]$，若 $\bigwedge_{j \neq \mathsf{pivot}} (x_i \notin X_{j,i}) = 1$，则给 $P_\mathsf{pivot}$ 发送 $\Enc(pk,0)$。否则，采样 $s_i \gets \mathbb{F}$ 并发送 $\Enc(pk,s_i)$ 给 $P_\mathsf{pivot}$。
 \end{trivlist}
 \end{minipage}
 \end{framed}
 \caption{批量纯非成员零加密的理想功能 $\FuncbpNMZE$}\label{fig:func-bpnmze}
 \end{figure}
 
-\begin{figure}[!hbtp]
+\begin{figure}[!htb]
 \begin{framed}
-\begin{minipage}[center]{\textwidth}
+\begin{minipage}[c]{\textwidth}
 \begin{trivlist}
 \item \textbf{参数：} $m$ 个参与方 $P_1, \cdots P_m$，其中仅有 $P_\mathsf{pivot}$ 持有 $n$ 个元素，且 $P_\mathsf{pivot}$ 为接收方。批量大小 $n$。映射函数 $\mathsf{payload}_j()$ 用于关联元素与载荷。明文空间为域 $\mathbb{F}$ 且具有公钥 $pk$ 的 MKR-PKE 方案。
-\item \textbf{功能：} 收到 $P_\mathsf{pivot}$ 的输入 $\textbf{x}$，以及每个 $P_j$ 的 $\textbf{X}_j$ 和 $\textbf{V}_j$。对于 $1 \le i \le n$，若 $\bigwedge_{j \neq \mathsf{pivot}} (x_i \in X_{j,i}) = 1$，则给 $P_\mathsf{pivot}$ 发送 $\Enc(pk,0)$ 和 $\Enc(pk, \sum_{j \neq \mathsf{pivot}} v_{j,i})$，其中 $v_{j,i} = \mathsf{payload}_j(x_i)$。否则，采样 $s_i \gets \mathbb{F}$ 和 $w_i \gets \mathbb{F}$，并发送 $\Enc(pk,s_i)$ 和 $\Enc(pk,w_i)$ 给 $P_\mathsf{pivot}$。
+\item \textbf{功能：} 收到 $P_\mathsf{pivot}$ 的输入 $\textbf{x}$，以及每个 $P_j$ 的 $\textbf{X}_j$ 和 $\textbf{V}_j$。对于 $i \in [n]$，若 $\bigwedge_{j \neq \mathsf{pivot}} (x_i \in X_{j,i}) = 1$，则给 $P_\mathsf{pivot}$ 发送 $\Enc(pk,0)$ 和 $\Enc(pk, \sum_{j \neq \mathsf{pivot}} v_{j,i})$，其中 $v_{j,i} = \mathsf{payload}_j(x_i)$。否则，采样 $s_i \gets \mathbb{F}$ 和 $w_i \gets \mathbb{F}$，并发送 $\Enc(pk,s_i)$ 和 $\Enc(pk,w_i)$ 给 $P_\mathsf{pivot}$。
 \end{trivlist}
 \end{minipage}
 \end{framed}
@@ -166,13 +166,13 @@ MKR-PKE 是一个满足 IND-CPA 安全性的 PKE 方案，并具备以下性质�
 
 \begin{figure}[!t]
 \begin{framed}
-\begin{minipage}[center]{\textwidth}
+\begin{minipage}[c]{\textwidth}
 \textbf{参数.} $m$ 个参与方 $P_1, \cdots, P_m$。集合大小 $n$。元素比特长度 $l$。布谷鸟哈希参数：哈希函数 $h_1, h_2, h_3$ 和桶数 $B$。明文空间为域 $\mathbb{F}$ 的 MKR-PKE 方案 $\mathcal{E} = (\Gen, \Enc, \ParDec, \Dec, \ReRand)$。
 
 \textbf{输入.} 每个参与方 $P_i$ 的输入集合为 $X_i = \{x_i^1,\cdots, x_i^n\} \subseteq \{0,1\}^l$。
 
 \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt]
-\item \textbf{MKR-PKE 密钥生成.}~\label{step:key-gen} 对于 $1 \le i \le m$，$P_i$ 运行 $(pk_i, sk_i) \gets \Gen(1^\lambda)$，并将其公钥 $pk_i$ 分发给其他参与方。定义私钥 $sk = sk_1 + \cdots + sk_m$，所有各方计算共同公钥 $pk= \prod_{i =1}^m pk_i$。
+\item \textbf{MKR-PKE 密钥生成.}~\label{step:key-gen} 对于 $i \in [m]$，$P_i$ 运行 $(pk_i, sk_i) \gets \Gen(1^\lambda)$，并将其公钥 $pk_i$ 分发给其他参与方。定义私钥 $sk = sk_1 + \cdots + sk_m$，所有各方计算共同公钥 $pk= \prod_{i =1}^m pk_i$。
 \item \textbf{哈希分桶.}~\label{step:hash} $P_1$ 执行布谷鸟哈希 $\mathcal{C}_1^1, \cdots, \mathcal{C}_1^B \gets \Cuckoo_{h_1,h_2,h_3}^B(X_1)$。对于 $1 < j  \le m$，$P_j$ 执行简单哈希 $\mathcal{T}_j^1, \cdots, \mathcal{T}_j^B \gets \Simple_{h_1,h_2,h_3}^B(X_j)$。
 \item \textbf{批量纯成员零加密.} 所有参与方调用批大小为 $B$ 的 $\FuncbpMZE$，$P_1$ 作为 $P_\mathsf{pivot}$ 输入 $\mathcal{C}_1^1, \cdots, \mathcal{C}_1^B$，每个 $P_j$ ($1 < j  \le m$) 输入 $\mathcal{T}_j^1, \cdots, \mathcal{T}_j^B$。$P_1$ 收到加密向量 $\textbf{e}_1=(e_{1,1},\cdots,e_{1,B})$。
 \end{enumerate}
@@ -182,13 +182,13 @@ MKR-PKE 是一个满足 IND-CPA 安全性的 PKE 方案，并具备以下性质�
     \textbf{MPSI.} 
     \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt] \addtocounter{enumi}{3}
     \item \textbf{协作解密.} $P_1$ 将 $\textbf{e}_1$ 发送给 $P_{2}$。对于 $1 < j \le m$， $P_j$ 计算 $\textbf{e}_j = (e_{j,1},\cdots,e_{j,B})$，其中 $e_{j,b} = \ParDec(sk_j,e_{j-1,b})$。若 $j \ne m$，$P_j$ 将 $\textbf{e}_{j}$ 发给 $P_{j+1}$，否则发回 $P_{1}$。
-    \item $P_{1}$ 设置 $Y = \emptyset$。对于 $1 \le b \le B$，$P_1$ 计算 $u_b = \Dec(sk_1,e_{m,b})$。若 $u_i = 0$，$P_1$ 将 $\mathcal{C}_1^b$ 中的元素加入 $Y$ 并输出。      
+    \item $P_{1}$ 设置 $Y = \emptyset$。对于 $b \in [B]$，$P_1$ 计算 $u_b = \Dec(sk_1,e_{m,b})$。若 $u_i = 0$，$P_1$ 将 $\mathcal{C}_1^b$ 中的元素加入 $Y$ 并输出。      
     \end{enumerate}
     \textbf{MPSI-card.} 
     \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt] \addtocounter{enumi}{3}
         \item \textbf{协作解密与洗牌.} $P_1$ 将 $\textbf{e}_1$ 发送给 $P_{2}$。对于 $1 < j \le m$： 
         \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt]
-        \item 对于 $1 \le b \le B$，$P_j$ 计算 $e'_{j,b} = \ParDec(sk_j,e_{j-1,b})$，累积公钥 $pk_{A_j} = pk_1 \cdot \prod_{d = j+1}^m pk_d$，并重随机化 $e''_{j,b} = \ReRand(pk_{A_j},e'_{j,b})$。 
+        \item 对于 $b \in [B]$，$P_j$ 计算 $e'_{j,b} = \ParDec(sk_j,e_{j-1,b})$，累积公钥 $pk_{A_j} = pk_1 \cdot \prod_{d = j+1}^m pk_d$，并重随机化 $e''_{j,b} = \ReRand(pk_{A_j},e'_{j,b})$。 
         \item $P_j$ 采样随机置换 $\pi_j:[B] \to [B]$。$P_j$ 将向量打乱为 $\textbf{e}_{j} = {\pi_j}(\textbf{e}''_{j})$。若 $j \ne m$，$P_j$ 发送 $\textbf{e}_{j}$ 给 $P_{j+1}$，否则发回 $P_{1}$。
         \end{enumerate}
         \item $P_{1}$ 定义解密向量 $\textbf{u} = (u_1, \cdots, u_{B})$，其中 $u_b = \Dec(sk_1,e_{m,b})$。$P_1$ 统计并输出 0 的数量 $\Zero(\textbf{u})$。
@@ -200,7 +200,7 @@ MKR-PKE 是一个满足 IND-CPA 安全性的 PKE 方案，并具备以下性质�
 
 \begin{figure}[!t]
 \begin{framed}
-\begin{minipage}[center]{\textwidth}
+\begin{minipage}[c]{\textwidth}
 \begin{trivlist}
 \item \textbf{参数.} 同图 \ref{fig:proto-MPSI} 中的参数。
 \item \textbf{输入.} 每个参与方 $P_i$ 的输入集合为 $X_i = \{x_i^1,\cdots, x_i^n\} \subseteq \{0,1\}^l$，载荷集合为 $V_i = \{v_i^1,\cdots, v_i^n\}$，并具有从元素到载荷的映射函数 $\mathsf{payload}_i()$。
@@ -208,10 +208,10 @@ MKR-PKE 是一个满足 IND-CPA 安全性的 PKE 方案，并具备以下性质�
     \item \textbf{MKR-PKE 密钥生成.} 同图 \ref{fig:proto-MPSI} 步骤 1。
     \item \textbf{哈希分桶.} 同图 \ref{fig:proto-MPSI} 步骤 2，此外 $P_j$ 构建对应的载荷哈希桶 $\mathcal{V}_j^1, \cdots, \mathcal{V}_j^B$。
     \item \textbf{带载荷的批量纯成员零加密.} 所有参与方调用批大小为 $B$ 的 $\FuncbpMZEp$。$P_1$ 收到加密状态向量 $\textbf{e}_1=(e_{1,1},\cdots,e_{1,B})$ 以及加密载荷向量 $\textbf{w}_1=(w_{1,1},\cdots,w_{1,B})$。
-    \item 对于 $1 \le b \le B$，若 $\mathcal{C}_1^b$ 非空，$P_1$ 同态累加自身的本地载荷 $w_{1,b} = w_{1,b} \boxplus \Enc(pk,v)$。
+    \item 对于 $b \in [B]$，若 $\mathcal{C}_1^b$ 非空，$P_1$ 同态累加自身的本地载荷 $w_{1,b} = w_{1,b} \boxplus \Enc(pk,v)$。
     \item \textbf{协作解密与洗牌.} $P_1$ 将 $\textbf{e}_1$ 和 $\textbf{w}_1$ 发送给 $P_{2}$。对于 $1 < j \le m$： 
         \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt]
-        \item 对于 $1 \le b \le B$，$P_j$ 计算 $e'_{j,b} = \ParDec(sk_j,e_{j-1,b})$，累积公钥 $pk_{A_j}$，并重随机化 $e''_{j,b} = \ReRand(pk_{A_j},e'_{j,b})$ 且 $w'_{j,b} = \ReRand(pk,w_{j-1,b})$（载荷仅重随机化，求解密留至最后）。 
+        \item 对于 $b \in [B]$，$P_j$ 计算 $e'_{j,b} = \ParDec(sk_j,e_{j-1,b})$，累积公钥 $pk_{A_j}$，并重随机化 $e''_{j,b} = \ReRand(pk_{A_j},e'_{j,b})$ 且 $w'_{j,b} = \ReRand(pk,w_{j-1,b})$（载荷仅重随机化，求解密留至最后）。 
         \item $P_j$ 使用相同的随机置换 $\pi_j$ 并行打乱 $\textbf{e}''_{j}$ 和 $\textbf{w}'_{j}$。将结果传递给下一方。
         \end{enumerate}
     \item $P_{1}$ 计算状态向量 $\textbf{u}$ 并输出基数 $\Zero(\textbf{u})$。随后，$P_1$ 同态聚合所有合法元素的载荷密文：$s_1 = \boxplus_{u_b = 0} w_{m,b}$，并将 $s_1$ 发送给 $P_2$。
@@ -224,9 +224,9 @@ MKR-PKE 是一个满足 IND-CPA 安全性的 PKE 方案，并具备以下性质�
 \caption{基于公钥体制的 MPSI-card-sum 协议}\label{fig:proto-MPSI-Sum}
 \end{figure}
 
-\begin{figure}[!hbtp]
+\begin{figure}[!htb]
 \begin{framed}
-\begin{minipage}[center]{\textwidth}
+\begin{minipage}[c]{\textwidth}
 \begin{trivlist}
 \item \textbf{参数.} $m$ 个参与方。全零字符串长度 $l'$。哈希参数 $B$。MKR-PKE 方案 $\mathcal{E}$。
 \item \textbf{输入.} 每个参与方 $P_i$ 的输入集合为 $X_i \subseteq \{0,1\}^l$。
@@ -257,9 +257,9 @@ MKR-PKE 是一个满足 IND-CPA 安全性的 PKE 方案，并具备以下性质�
 \caption{基于公钥体制的 MPSU/MPSU-card 协议}\label{fig:proto-MPSU}
 \end{figure}
 
-\begin{figure}[!hbtp]
+\begin{figure}[!htb]
 \begin{framed}
-\begin{minipage}[center]{\textwidth}
+\begin{minipage}[c]{\textwidth}
 \begin{trivlist}
 \item \textbf{参数.} $m$ 个参与方。全零字符串长度 $l'$。可构造集合 $Y$ 对应的 CSPF 表示 $\psi = Q_1 \lor \cdots \lor Q_s$。MKR-PKE 方案 $\mathcal{E}$。
 \item \textbf{输入.} 每个参与方 $P_i$ 有输入 $X_i \subseteq \{0,1\}^l$。

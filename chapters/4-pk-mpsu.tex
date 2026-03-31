@@ -61,7 +61,7 @@
 设共有 $m$ 个参与方 $P_1,\dots,P_m$，各自输入集合 $X_1,\dots,X_m$。定义第 $j$ 个参与方的差集为 $Y_j = X_j \setminus (X_1 \cup \cdots \cup X_{j-1}), \quad 2 \le j \le m$，则有 $X_1 \cup \cdots \cup X_m = X_1 \cup Y_2 \cup \cdots \cup Y_m$，即所有的差集构成全集的一个划分。因此，只要 Leader（以下指定为 $P_1$）能够获得所有差集元素的 MKR-PKE 密文，并在最终阶段由所有参与方共同协作解密，即可得到并集结果。该框架具体可分为以下两个阶段：
 
 \begin{enumerate}
-    \item \textbf{并集的密文计算.} 该阶段涉及 $m-1$ 次差集的密文计算，其中对于第 $j$ 次密文计算过程（$2 \le j \le m$）， $P_j$ 先加密其集合 $X_j$ 中的元素，随后依次与每个前序参与方 $P_i$ ($1 < i < j$) 进行交互，使得：若元素 $x \in X_j$ 亦属于 $X_i$，其密文将被“不经意地”替换为无意义消息（dummy message）\footnote{无意义消息是指取值范围在集合定义域之外的特殊标识符，通常预设为全零字符串 $\bot$。}的密文。
+    \item \textbf{并集的密文计算.} 该阶段涉及 $m-1$ 次差集的密文计算，其中对于第 $j$ 次密文计算过程（$2 \le j \le m$）， $P_j$ 先加密其集合 $X_j$ 中的元素，随后依次与每个前序参与方 $P_i$ ($1 < i < j$) 进行交互，使得：若元素 $x \in X_j$ 亦属于 $X_i$，其密文将被“不经意地”替换为无意义消息（dummy message）\footnote{无意义消息是指取值范围在集合定义域之外的特殊标识符，通常用错误符号 $\bot$ 表示。}的密文。
     经过与所有前序参与方的交互后，$P_j$ 获得加密后的差集 $Y_j = X_j \setminus (X_1 \cup \dots \cup X_{j-1})$ 并将其发送给 $P_1$。
     \item \textbf{协作解密与洗牌.} 如果 $P_1$ 能够直接按照原始顺序获得所有密文解密后的明文，它将能够利用密文排布的线性位置特征推断出每个元素的来源方。例如，若 $P_1$ 得到的某个解密元素位于第一个长度为 $n$ 的区块（即 $Y_2$ 的位置），则 $P_1$ 可断定该元素来自 $P_2$ 的输入。这种对应关系会导致隐私泄露。为了解决这一问题，各参与方共同完成多方协作解密与洗牌（collaborative decryption and shuffle）过程，使得 $P_1$ 仅能获得随机置换后的解密结果，且任何 $m-1$ 方共谋都无法获知洗牌的置换映射，从而掩盖了明文中的元素与各差集 $Y_j$ 之间的对应关系。最后，$P_1$ 将所有明文中的无意义消息剔除，得到最终并集。
 \end{enumerate}
@@ -71,7 +71,7 @@
 \subsection{基于 batch ssPMT 和  MKR-PKE 的 PK-MPSU 协议}
 
 为实现上述目标，本节利用第三章介绍的批量秘密分享隐私成员测试（batch ssPMT）和双选择比特不经意传输（two-choice-bit OT）对基于 MKR-PKE 的 MPSU 框架中的第一阶段进行重新设计，其中差集 $Y_j$ 的密文计算过程的具体构造如下：
-令 $P_j$ 通过布谷鸟哈希预处理其集合 $X_j$，其余 $P_{i<j}$ 通过简单哈希预处理其集合 $X_i$。$P_j$ 作为接收方与每个 $P_i$ 执行 batch ssPMT。对于每个桶，$P_j$ 和 $P_i$ 分别获得桶中元素 $x$ 关于输入集合的成员关系比特的秘密分享 $e_{j,i}$ 和 $e_{i,j}$。当迭代开始时（$i=2$），$P_j$ 构造候选消息对 $(m_0, m_1)$，其中 $m_0 = \text{Enc}(pk, x)$ 为元素密文，$m_1 = \text{Enc}(pk, \bot)$ 为无意义消息密文。$P_j$ 和 $P_i$ 执行双选择比特 OT，其中 $P_j$ 与 $P_i$ 分别以 $e_{j,i}$ 与 $e_{i,j}$ 作为选择比特，$P_j$ 作为发送方输入 $(m_0, m_1)$，而 $P_i$ 作为接收方获得密文 $\ct = m_{e_{j,i} \oplus e_{i,j}}$。根据双选择比特 OT 的功能：若 $x \notin X_i$，则 $\ct$ 是 $x$ 的密文；反之则为无意义消息的密文。交互结束后，$P_i$ 对 $\ct$ 执行重随机化（rerandomize）得到 $\ct'$ 并返还给 $P_j$。随后，$P_j$ 同样重随机化 $\ct'$ 并更新 $m_0 \leftarrow \ct'$，同时重随机化 $m_1$，然后继续与下一参与方 $P_{i+1}$ 重复上述交互过程。
+令 $P_j$ 通过布谷鸟哈希预处理其集合 $X_j$，其余 $P_{i<j}$ 通过简单哈希预处理其集合 $X_i$。$P_j$ 作为接收方与每个 $P_i$ 执行 batch ssPMT。对于每个桶，$P_j$ 和 $P_i$ 分别获得桶中元素 $x$ 关于输入集合的成员关系比特的秘密分享 $e_{j,i}$ 和 $e_{i,j}$。当迭代开始时（$i=2$），$P_j$ 构造候选消息对 $(m_0, m_1)$，其中 $m_0 = \text{Enc}(pk, x)$ 为元素密文，$m_1 = \text{Enc}(pk, \bot)$ 为无意义消息密文。$P_j$ 和 $P_i$ 执行双选择比特 OT，其中 $P_j$ 与 $P_i$ 分别以 $e_{j,i}$ 与 $e_{i,j}$ 作为选择比特，$P_j$ 作为发送方输入 $(m_0, m_1)$，而 $P_i$ 作为接收方获得密文 $c = m_{e_{j,i} \oplus e_{i,j}}$。根据双选择比特 OT 的功能：若 $x \notin X_i$，则 $c$ 是 $x$ 的密文；反之则为无意义消息的密文。交互结束后，$P_i$ 对 $c$ 执行重随机化（rerandomize）得到 $c'$ 并返还给 $P_j$。随后，$P_j$ 同样重随机化 $c'$ 并更新 $m_0 \leftarrow c'$，同时重随机化 $m_1$，然后继续与下一参与方 $P_{i+1}$ 重复上述交互过程。
 
 在完成与所有 $P_i$ ($1 < i < j$) 的交互后，当且仅当对于所有 $i$ 均满足 $x \notin X_i$ 时，$P_j$ 最终持有的 $m_0$ 才保留 $x$ 的加密信息。由此，$P_j$ 获得集合 $X_j \setminus (X_2 \cup \dots \cup X_{j-1})$ 中全部元素的密文。最后，$P_j$ 与 $P_1$ 执行类似的交互过程替换掉该集合中属于 $X_1$ 的元素的密文，$P_j$ 即可获得差集 $Y_j = X_j \setminus (X_1 \cup \dots \cup X_{j-1})$ 的密文。$P_j$ 将获得的差集密文发送给 $P_1$。
 上述构造能够实现线性复杂度，主要得益于两个关键因素：
@@ -86,22 +86,22 @@
 
 本节将介绍如何利用 batch ssPMT 和 MKR-PKE 构造 PK-MPSU 协议。该构造遵循引言中概述的基于公钥加密的 MPSU 框架：
 
-在第一阶段，在第一阶段中，每个 $P_j$（$2 \le j \le m$）执行差集 $Y_j$ 的密文计算过程。具体地，$P_j$ 首先与每个 $P_i$ ($1 < i < j$) 交互实现密文的条件“不经意”替换：(1) $P_j$ 通过布谷鸟哈希将 $X_j$ 分配至 $B$ 个桶中，$P_i$ 通过简单哈希将 $X_i$ 分配至 $B$ 个桶中。$P_j$ 作为接收方 $\Rcv$ 与 $P_i$ 执行 batch ssPMT，双方获得份额 $e_{j,i}$ 和 $e_{i,j}$。(2) 若 $i=2$，$P_j$ 将桶中元素 $x \in X_j$ 加密作为 $m_0$ 的初始值，并将无意义消息加密作为 $m_1$ 的初始值。(3) $P_j$ 作为发送方 $\Sd$ 与 $P_i$ 执行双选择比特 OT（该 OT 等价于标准的 1-out-of-2 ROT，其中 $\Sd$ 的选择比特用于决定是否交换 $m_0$ 和 $m_1$ 的顺序）。$P_i$ 获得 $\ct = m_{e_{j,i} \oplus e_{i,j}}$：若 $x \notin X_i$，则 $\ct$ 为 $x$ 的密文；否则为无意义消息的密文。(4) $P_i$ 重随机化 $\ct$ 并返回给 $P_j$。(5) $P_j$ 再次重随机化并更新 $m_0$，重复此过程。与所有前序参与方交互后，仅当 $x$ 排除在所有 $X_i$ 之外时，$P_j$ 才保留其加密信息。由此，$P_j$ 持有了 $X_j \setminus (X_2 \cup \cdots \cup X_{j-1})$ 的加密形式。为了让 Leader $P_1$ 获得 $X_j \setminus (X_1 \cup \cdots \cup X_{j-1})$ 的密文，双方执行类似过程。这从加密集合中剔除了属于 $X_1$ 的元素，并使 $P_1$ 获得最终密文。
+在第一阶段，在第一阶段中，每个 $P_j$（$2 \le j \le m$）执行差集 $Y_j$ 的密文计算过程。具体地，$P_j$ 首先与每个 $P_i$ ($1 < i < j$) 交互实现密文的条件“不经意”替换：(1) $P_j$ 通过布谷鸟哈希将 $X_j$ 分配至 $B$ 个桶中，$P_i$ 通过简单哈希将 $X_i$ 分配至 $B$ 个桶中。$P_j$ 作为接收方 $\Rcv$ 与 $P_i$ 执行 batch ssPMT，双方获得份额 $e_{j,i}$ 和 $e_{i,j}$。(2) 若 $i=2$，$P_j$ 将桶中元素 $x \in X_j$ 加密作为 $m_0$ 的初始值，并将无意义消息加密作为 $m_1$ 的初始值。(3) $P_j$ 作为发送方 $\Sd$ 与 $P_i$ 执行双选择比特 OT（该 OT 等价于标准的 1-out-of-2 ROT，其中 $\Sd$ 的选择比特用于决定是否交换 $m_0$ 和 $m_1$ 的顺序）。$P_i$ 获得 $c = m_{e_{j,i} \oplus e_{i,j}}$：若 $x \notin X_i$，则 $c$ 为 $x$ 的密文；否则为无意义消息的密文。(4) $P_i$ 重随机化 $c$ 并返回给 $P_j$。(5) $P_j$ 再次重随机化并更新 $m_0$，重复此过程。与所有前序参与方交互后，仅当 $x$ 排除在所有 $X_i$ 之外时，$P_j$ 才保留其加密信息。由此，$P_j$ 持有了 $X_j \setminus (X_2 \cup \cdots \cup X_{j-1})$ 的加密形式。为了让 Leader $P_1$ 获得 $X_j \setminus (X_1 \cup \cdots \cup X_{j-1})$ 的密文，双方执行类似过程。这从加密集合中剔除了属于 $X_1$ 的元素，并使 $P_1$ 获得最终密文。
 
 第二阶段的协作解密与洗牌运作如下：$P_1$ 对密文进行重随机化与随机置换 $\pi_1$，随后发给 $P_2$。$P_2$ 执行部分解密、重随机化与置换 $\pi_2$ 后传给 $P_3$。此过程循环至最后一名参与方 $P_m$。最后，$P_1$ 执行最终解密，过滤掉无意义元素，得到并集结果。
 
 图 \ref{fig:proto-mpsu4} 形式化地描述了 PK-MPSU 协议的具体执行步骤。
 
-\begin{figure*}[!hbtp]
+\begin{figure*}[!htb]
 \begin{framed}
-\begin{minipage}[center]{\textwidth}
+\begin{minipage}[c]{\textwidth}
 \begin{trivlist}
 \item \textbf{参数.} $m$ 个参与方 $P_1, \cdots, P_m$。输入集合的大小为 $n$。集合元素的比特长度为 $l$。布谷鸟哈希参数：哈希函数 $h_1, h_2, h_3$ 和桶数 $B$。一个 MKR-PKE 方案 $\mathcal{E} = (\Gen, \Enc, \ParDec, \Dec, \ReRand)$。
 \item \textbf{输入.} 每个参与方 $P_i$ 拥有输入 $X_i = \{x_i^1,\cdots, x_i^n\} \subseteq \{0,1\}^l$。
 % \item \textbf{协议.}
 \begin{enumerate} [itemsep=2pt,topsep=0pt,parsep=0pt]
 \setcounter{enumi}{-1} % 从0开始
-\item 对于 $1 \le i \le m$，$P_i$ 运行 $(pk_i, sk_i) \gets \Gen(1^\lambda)$，并将其公钥 $pk_i$ 分发给其他参与方。定义 $sk = sk_1 + \cdots + sk_m$，所有参与方均可计算关联公钥 $pk= \prod_{i =1}^m pk_i$。
+\item 对于 $i \in [m]$，$P_i$ 运行 $(pk_i, sk_i) \gets \Gen(1^\lambda)$，并将其公钥 $pk_i$ 分发给其他参与方。定义 $sk = sk_1 + \cdots + sk_m$，所有参与方均可计算关联公钥 $pk= \prod_{i =1}^m pk_i$。
 \item $P_1$ 执行 $\mathcal{T}_1^1, \cdots, \mathcal{T}_1^B \gets \Simple_{h_1,h_2,h_3}^B(X_1)$。对于 $1 < j \le m $，$P_j$ 执行 $\mathcal{C}_j^1, \cdots, \mathcal{C}_j^B \gets \Cuckoo_{h_1,h_2,h_3}^B(X_j)$ 和 $\mathcal{T}_j^1, \cdots, \mathcal{T}_j^B \gets \Simple_{h_1,h_2,h_3}^B(X_j)$。
 \item 对于 $1 < j \le m$：
 \begin{itemize} [itemsep=1pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
@@ -109,7 +109,7 @@
 \end{itemize} 
 \item 对于 $1 < j \le m$，针对每个桶 $b \in [B]$：
     \begin{itemize} [itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt] 
-    \item[-] $P_j$ 定义 $\vec{c}_j$ 并设置 $c_j^b = \Enc(pk, \Elem(\mathcal{C}_j^b))$。$\Elem(\mathcal{C}_j^b)$ 表示 $\mathcal{C}_j^b$ 中的元素。
+    \item[-] $P_j$ 定义 $\textbf{c}_j$ 并设置 $c_j^b = \Enc(pk, \Elem(\mathcal{C}_j^b))$。$\Elem(\mathcal{C}_j^b)$ 表示 $\mathcal{C}_j^b$ 中的元素。
     \item[-] 对于 $1 < i < j$：
     \begin{itemize} [itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt] 
     \item[-] $P_i$ 和 $P_j$ 调用 $\FuncROT$，其中 $P_i$ 是接收方，输入 $e_{i,j}^b$，收到 $r_{i,j}^b = r_{j,i,e_{i,j}^b}^b \in \{0,1\}^ \lambda$。$P_j$ 是发送方，收到 $r_{j,i,0}^b, r_{j,i,1}^b \in \{0,1\}^ \lambda$。$P_j$ 计算 $u_{j,i,e_{j,i}^b}^b = r_{j,i,e_{j,i}^b}^b \oplus c_j^b$，$u_{j,i,e_{j,i}^b \oplus 1}^b = r_{j,i,e_{j,i}^b \oplus 1}^b \oplus \Enc(pk, \perp)$，然后发送 $u_{j,i,0}^b, u_{j,i,1}^b$ 给 $P_i$。 
@@ -119,15 +119,15 @@
 \item 对于 $1 < j \le m$，针对每个桶 $b \in [B]$：
 \begin{itemize} [itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
 \item[-] $P_1$ 和 $P_j$ 调用 $\FuncROT$，其中 $P_1$ 作为接收方，输入为 $e_{1,j}^b$，$P_j$ 作为发送方。$P_1$ 收到 $r_{1,j}^b = r_{j,1,e_{1,j}^b}^b \in \{0,1\}^ \lambda$。$P_j$ 收到 $r_{j,1,0}^b, r_{j,1,1}^b \in \{0,1\}^ \lambda$。$P_j$ 计算 $u_{j,1,e_{j,1}^b}^b = r_{j,1,e_{j,1}^b}^b \oplus c_j^b$，$u_{j,1,e_{j,1}^b \oplus 1}^b = r_{j,1,e_{j,1}^b \oplus 1}^b \oplus \Enc(pk, \perp)$，然后将 $u_{j,1,0}^b, u_{j,1,1}^b$ 发送给 $P_1$。 
-\item[-] $P_1$ 定义 $\vec{\ct}_1' \in (\{0,1\}^{\lambda})^{(m-1)B}$，并设置 ${\ct}_1'^{(j-2)B+b} = \ReRand(pk,u_{j,1,e_{1,j}^b}^b \oplus r_{1,j}^b)$。
+\item[-] $P_1$ 定义 $\textbf{c}_1' \in (\{0,1\}^{\lambda})^{(m-1)B}$，并设置 ${c}_1'^{(j-2)B+b} = \ReRand(pk,u_{j,1,e_{1,j}^b}^b \oplus r_{1,j}^b)$。
 \end{itemize}
-\item $P_1$ 采样 $\pi_1:[(m-1)B] \to [(m-1)B]$，计算 $\vec{\ct}_1'' = \pi_1(\vec{{\ct}_1'})$ 并发送给 $P_{2}$。
+\item $P_1$ 采样 $\pi_1:[(m-1)B] \to [(m-1)B]$，计算 $\textbf{c}_1'' = \pi_1(\textbf{c}_1')$ 并发送给 $P_{2}$。
 \item 对于 $1 < j \le m$： 
     \begin{itemize} [itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
-    \item[-] 对于 $1 \le i \le (m-1)B$：$P_j$ 计算 ${\ct}_{j}^i = \ParDec(sk_j,{\ct}_{j-1}''^i)$，$pk_{A_j} = pk_1 \cdot \prod_{d = j+1}^m pk_d$，以及 ${\ct}_{j}'^i = \ReRand(pk_{A_j},{\ct}_{j}^i)$。 
-    \item[-] $P_j$ 采样 $\pi_j:[(m-1)B] \to [(m-1)B]$。 令 $\vec{\ct}_j' = ({\ct}_{j}'^1,\cdots,{\ct}_{j}'^{(m-1)B})$，计算 $\vec{\ct}_{j}'' = {\pi_j}(\vec{\ct}_{j}')$。如果 $j \ne m$，$P_j$ 发送 $\vec{\ct}_{j}''$ 给 $P_{j+1}$；否则，$P_m$ 发送 $\vec{\ct}_{m}''$ 给 $P_{1}$。
+    \item[-] 对于 $1 \le i \le (m-1)B$：$P_j$ 计算 ${c}_{j}^i = \ParDec(sk_j,{c}_{j-1}''^i)$，$pk_{A_j} = pk_1 \cdot \prod_{d = j+1}^m pk_d$，以及 ${c}_{j}'^i = \ReRand(pk_{A_j},{c}_{j}^i)$。 
+    \item[-] $P_j$ 采样 $\pi_j:[(m-1)B] \to [(m-1)B]$。 令 $\textbf{c}_j' = ({c}_{j}'^1,\cdots,{c}_{j}'^{(m-1)B})$，计算 $\textbf{c}_{j}'' = {\pi_j}(\textbf{c}_{j}')$。如果 $j \ne m$，$P_j$ 发送 $\textbf{c}_{j}''$ 给 $P_{j+1}$；否则，$P_m$ 发送 $\textbf{c}_{m}''$ 给 $P_{1}$。
     \end{itemize}
-\item $P_{1}$ 设置 $Y = \emptyset$。对于 $1 \le i \le (m-1)B$，$P_1$ 计算 $\mathsf{pt}_i = \Dec(sk_1,{\ct}_{m}''^i)$。如果 $\mathsf{pt}_i \ne \perp$，则更新 $Y = Y \cup \{\mathsf{pt}_i\}$。输出 $Y$。
+\item $P_{1}$ 设置 $Y = \emptyset$。对于 $1 \le i \le (m-1)B$，$P_1$ 计算 $\mathsf{pt}_i = \Dec(sk_1,{c}_{m}''^i)$。如果 $\mathsf{pt}_i \ne \perp$，则更新 $Y = Y \cup \{\mathsf{pt}_i\}$。输出 $Y$。
 \end{enumerate}
 \end{trivlist}
 \end{minipage}
@@ -142,62 +142,62 @@
 \begin{proof}
 根据 $P_1$ 是否被腐化，本证明分为两种情况。模拟器接收被腐化方 $P_c \in \Corr$ 的输入 $X_c$；若 $P_1 \in \Corr$，模拟器还接收 MPSU 协议的输出 $\bigcup_{i=1}^m X_i$。模拟器需要根据其接受的输出模拟被腐化方的视图。
 
-对于每个被腐化方 $P_c$，其视图由其输入 $X_c$、$\FuncbssPMT$ 和 $\FuncROT$ 的输出、协议消息 $\{u_{j,c,0}^b\}_{c < j \le m}, \{u_{j,c,1}^b\}_{c < j \le m}$、重随机化消息 $\{{v}_{c,i}'^b\}_{1 < i < c}$、随机置换 $\pi_c$ 以及来自 $P_{c-1}$ 置换后的部分解密消息 $\vec{\ct}_{c-1}''$（若 $c>1$）或来自 $P_m$ 的消息 $\vec{\ct}_{m}''$（若 $c=1$）组成。模拟器扮演诚实方的角色按照协议与 $P_c$ 交互来模拟其视图，除了对协议进行如下修改：
+对于每个被腐化方 $P_c$，其视图由其输入 $X_c$、$\FuncbssPMT$ 和 $\FuncROT$ 的输出、协议消息 $\{u_{j,c,0}^b\}_{c < j \le m}, \{u_{j,c,1}^b\}_{c < j \le m}$、重随机化消息 $\{{v}_{c,i}'^b\}_{1 < i < c}$、随机置换 $\pi_c$ 以及来自 $P_{c-1}$ 置换后的部分解密消息 $\textbf{c}_{c-1}''$（若 $c>1$）或来自 $P_m$ 的消息 $\textbf{c}_{m}''$（若 $c=1$）组成。模拟器扮演诚实方的角色按照协议与 $P_c$ 交互来模拟其视图，除了对协议进行如下修改：
 \begin{itemize}
     \item \textbf{步骤 2.} 若 $P_i, P_j \in \Honest$，随机生成 $\FuncbssPMT$ 的均匀输出 $\{e_{c,j}^b\}_{c < j \le m}$ 和 $\{e_{c,i}^b\}_{1 \le i < c}$。
     \item \textbf{步骤 3.} 若 $P_i, P_j \in \Honest$，随机生成 $\FuncROT$ 的均匀输出 $\{r_{c,i,0}^b, r_{c,i,1}^b\}_{1 \le i < c}$ 以及 $\{r_{j,c,e_{c,j}^b}^b\}_{c < j \le m}$。对于 $c < j \le m$，若 $P_j \in \Honest$，模拟器计算 $u_{j,c,e_{c,j}^b}^b = r_{j,c,e_{c,j}^b}^b \oplus \Enc(pk, \perp)$ 并随机生成 $u_{j,c,e_{c,j}^b \oplus 1}^b$。对于 $1 < i < c$，若 $P_i \in \Honest$，模拟器计算 ${v}_{c,i}'^b = \Enc(pk, \perp)$。
-    \item \textbf{步骤 6.} （在 $P_1 \notin \Corr$ 的情况下）若 $P_{c-1} \in \Honest$，对于 $1 \le i \le (m-1)B$，计算 ${\ct}_{c-1}'^i = \Enc(pk, \perp)$，然后使用随机采样的置换 $\pi$ 打乱来自 $P_{c-1}$ 的向量 $\vec{\ct}_{c-1}'$，即计算 $\vec{\ct}_{c-1}'' = {\pi}(\vec{\ct}_{c-1}')$。
+    \item \textbf{步骤 6.} （在 $P_1 \notin \Corr$ 的情况下）若 $P_{c-1} \in \Honest$，对于 $1 \le i \le (m-1)B$，计算 ${c}_{c-1}'^i = \Enc(pk, \perp)$，然后使用随机采样的置换 $\pi$ 打乱来自 $P_{c-1}$ 的向量 $\textbf{c}_{c-1}'$，即计算 $\textbf{c}_{c-1}'' = {\pi}(\textbf{c}_{c-1}')$。
 \end{itemize}
 
-现在先讨论 $P_1 \in \Corr$ 的情况。在步骤 6 中，假设 $d$ 是诚实方中最大的编号，即 $P_{d+1}, \dots, P_m \in \Corr$。模拟器按照如下步骤构造部分解密消息 $\vec{\ct}_{d}''$：
+现在先讨论 $P_1 \in \Corr$ 的情况。在步骤 6 中，假设 $d$ 是诚实方中最大的编号，即 $P_{d+1}, \dots, P_m \in \Corr$。模拟器按照如下步骤构造部分解密消息 $\textbf{c}_{d}''$：
 \begin{itemize}
-    \item 对于所有属于并集 $Y = \bigcup_{j=1}^m X_j$ 的元素 $x_i \in Y$，令 ${\ct}_{d}'^i = \Enc(pk_{A}, x_i)$，其中 $1 \leq i \leq \lvert Y \rvert$。
-    \item 对于 $\lvert Y \rvert <i \le (m-1)B$，设置 ${\ct}_{d}'^i = \Enc(pk_{A}, \perp)$。
+    \item 对于所有属于并集 $Y = \bigcup_{j=1}^m X_j$ 的元素 $x_i \in Y$，令 ${c}_{d}'^i = \Enc(pk_{A}, x_i)$，其中 $1 \leq i \leq \lvert Y \rvert$。
+    \item 对于 $\lvert Y \rvert <i \le (m-1)B$，设置 ${c}_{d}'^i = \Enc(pk_{A}, \perp)$。
 \end{itemize}
-其中 $pk_{A_d} = pk_1 \cdot \prod_{j= d+1}^m pk_j$。然后采样随机置换 $\pi$ 并计算 $\vec{\ct}_{d}'' = \pi(\vec{\ct}_{d}')$。
+其中 $pk_{A_d} = pk_1 \cdot \prod_{j= d+1}^m pk_j$。然后采样随机置换 $\pi$ 并计算 $\textbf{c}_{d}'' = \pi(\textbf{c}_{d}')$。
 
-对于其他被腐化方 $P_{d'+1} \in \{P_2, \dots, P_{d-1}\}$，若 $P_{d'} \in \Honest$，模拟器为 $1 \le i \le (m-1)B$ 模拟每个部分解密消息 ${\ct}_{d'}'^i = \Enc(pk, \perp)$，并采样均匀随机的 $\pi_{d'}$ 计算来自 $P_{d'}$ 的向量 $\vec{\ct}_{d'}'' = {\pi}(\vec{\ct}_{d'}')$。最后将 $\vec{\ct}_{d'}''$ 添加至 $P_{d'+1}$ 的视图中。
+对于其他被腐化方 $P_{d'+1} \in \{P_2, \dots, P_{d-1}\}$，若 $P_{d'} \in \Honest$，模拟器为 $1 \le i \le (m-1)B$ 模拟每个部分解密消息 ${c}_{d'}'^i = \Enc(pk, \perp)$，并采样均匀随机的 $\pi_{d'}$ 计算来自 $P_{d'}$ 的向量 $\textbf{c}_{d'}'' = {\pi}(\textbf{c}_{d'}')$。最后将 $\textbf{c}_{d'}''$ 添加至 $P_{d'+1}$ 的视图中。
 
 上述对 $\FuncbssPMT$ 和 $\FuncROT$ 输出的修改不会影响被腐化方 $P_c$ 的视图，其原因与定理 \ref{theorem:ske} 的证明类似；而模拟器随机生成的 $u_{j,c,e_{c,j}^b \oplus 1}^b$ 与真实协议的敌手视图中相同：$u_{j,c,e_{c,j}^b \oplus 1}^b$ 在真实执行中是均匀随机分布的，因为其中用于掩码加密消息的份额 $r_{j,c,e_{c,j}^b \oplus 1}^b$（即 $P_j$ 来自 $\FuncROT$ 的输出之一）对 $P_c$ 来说是均匀随机分布的，并且独立于 $r_{j,c,e_{c,j}^b}^b$。
 
 根据协议规范和模拟过程，在满足 $e_{c,j}^b \oplus e_{j,c}^b = 1$ 的条件下，模拟器生成的 $u_{j,c,e_{c,j}^b}^b$ 与真实协议的敌手视图中的分布完全一致。而对于 $e_{c,j}^b \oplus e_{j,c}^b = 0$ 的情况，分析可进一步分为 $c \ne 1$ 和 $c = 1$ 两个子情况。首先论证当 $c \ne 1$ 时，模拟器构造的 $u_{j,c,e_{c,j}^b}^b$ 与真实过程中的消息是不可区分的：
-在真实执行中，对于 $1 < c < j \le m$ 且 $1 \le b \le B$：若 $\Elem(\mathcal{C}_j^b) \in X_j \setminus (X_2 \cup \dots \cup X_{c-1})$，则 $c_j^b = \Enc(pk, \Elem(\mathcal{C}_j^b))$ 且 $u_{j,c,e_{c,j}^b}^b = r_{j,c,e_{c,j}^b}^b \oplus \Enc(pk, \Elem(\mathcal{C}_j^b))$；否则，$c_j^b = \Enc(pk, \perp)$ 且 $u_{j,c,e_{c,j}^b}^b = r_{j,c,e_{c,j}^b}^b \oplus \Enc(pk, \perp)$。而在模拟过程中，对于 $1 < c < j \le m, 1 \le b \le B$，$u_{j,c,e_{c,j}^b}^b = r_{j,c,e_{c,j}^b}^b \oplus \Enc(pk, \perp)$。如果存在能够区分这两个过程的算法，那么存在一个算法可以在不知道 $sk$ 的情况下区分两组加密消息列表（由于 $sk$ 在 $m$ 个参与方之间进行秘密分享，对于任何由 $m-1$ 个参与方组成的联盟，其分布都是均匀随机的）。因此，这将导致存在一个敌手可以攻破 $\mathcal{E}$ 的多次加密不可区分性（其中 $q = (m-1)B$）；当 $c = 1$ 时，基于与上述 $c > 1$ 情况相似的理由，模拟器构造的 $u_{j,e_{1,j}^b}^b$ 与真实过程也是不可区分的。
+在真实执行中，对于 $1 < c < j \le m$ 且 $b \in [B]$：若 $\Elem(\mathcal{C}_j^b) \in X_j \setminus (X_2 \cup \dots \cup X_{c-1})$，则 $c_j^b = \Enc(pk, \Elem(\mathcal{C}_j^b))$ 且 $u_{j,c,e_{c,j}^b}^b = r_{j,c,e_{c,j}^b}^b \oplus \Enc(pk, \Elem(\mathcal{C}_j^b))$；否则，$c_j^b = \Enc(pk, \perp)$ 且 $u_{j,c,e_{c,j}^b}^b = r_{j,c,e_{c,j}^b}^b \oplus \Enc(pk, \perp)$。而在模拟过程中，对于 $1 < c < j \le m, b \in [B]$，$u_{j,c,e_{c,j}^b}^b = r_{j,c,e_{c,j}^b}^b \oplus \Enc(pk, \perp)$。如果存在能够区分这两个过程的算法，那么存在一个算法可以在不知道 $sk$ 的情况下区分两组加密消息列表（由于 $sk$ 在 $m$ 个参与方之间进行秘密分享，对于任何由 $m-1$ 个参与方组成的联盟，其分布都是均匀随机的）。因此，这将导致存在一个敌手可以攻破 $\mathcal{E}$ 的多次加密不可区分性（其中 $q = (m-1)B$）；当 $c = 1$ 时，基于与上述 $c > 1$ 情况相似的理由，模拟器构造的 $u_{j,e_{1,j}^b}^b$ 与真实过程也是不可区分的。
 
 接下来，通过一系列混合实验证明模拟器生成的 ${v}_{c,i}'^b = \Enc(pk, \perp)$ 与真实协议中的密文不可区分：
 \begin{itemize}
-    \item $\mathsf{Hyb}_{0}$：真实协议中的交互。对于 $1 < i < c$ 且 $1 \le b \le B$：若 $\Elem(\mathcal{C}_c^b) \in X_c \setminus (X_1 \cup \dots \cup X_i)$，则 ${v}_{c,i}^b = \Enc(pk, \Elem(\mathcal{C}_c^b))$；否则 ${v}_{c,i}^b = \Enc(pk, \perp)$。随后计算 ${v}_{c,i}'^b = \ReRand(pk, {v}_{c,i}^b)$。
-    \item $\mathsf{Hyb}_{1}$：对于 $1 < i < c$ 且 $1 \le b \le B$：若 $\Elem(\mathcal{C}_c^b) \in X_c \setminus (X_1 \cup \dots \cup X_i)$，则 ${v}_{c,i}'^b = \Enc(pk, \Elem(\mathcal{C}_c^b))$；否则 ${v}_{c,i}'^b = \Enc(pk, \perp)$。根据 $\mathcal{E}$ 的可重随机化性质，这一改变相对于 $\mathsf{Hyb}_{0}$ 是不可区分的。
-    \item $\mathsf{Hyb}_{2}$：对于 $1 < i < c$ 且 $1 \le b \le B$，令 ${v}_{c,i}'^b = \Enc(pk, \perp)$。根据 $\mathcal{E}$ 的多次加密不可区分性，这一改变相对于 $\mathsf{Hyb}_{1}$ 是不可区分的。
+    \item $\mathsf{Hyb}_{0}$：真实协议中的交互。对于 $1 < i < c$ 且 $b \in [B]$：若 $\Elem(\mathcal{C}_c^b) \in X_c \setminus (X_1 \cup \dots \cup X_i)$，则 ${v}_{c,i}^b = \Enc(pk, \Elem(\mathcal{C}_c^b))$；否则 ${v}_{c,i}^b = \Enc(pk, \perp)$。随后计算 ${v}_{c,i}'^b = \ReRand(pk, {v}_{c,i}^b)$。
+    \item $\mathsf{Hyb}_{1}$：对于 $1 < i < c$ 且 $b \in [B]$：若 $\Elem(\mathcal{C}_c^b) \in X_c \setminus (X_1 \cup \dots \cup X_i)$，则 ${v}_{c,i}'^b = \Enc(pk, \Elem(\mathcal{C}_c^b))$；否则 ${v}_{c,i}'^b = \Enc(pk, \perp)$。根据 $\mathcal{E}$ 的可重随机化性质，这一改变相对于 $\mathsf{Hyb}_{0}$ 是不可区分的。
+    \item $\mathsf{Hyb}_{2}$：对于 $1 < i < c$ 且 $b \in [B]$，令 ${v}_{c,i}'^b = \Enc(pk, \perp)$。根据 $\mathcal{E}$ 的多次加密不可区分性，这一改变相对于 $\mathsf{Hyb}_{1}$ 是不可区分的。
 \end{itemize}
 
-当 $P_1 \in \Corr$ 时，通过以下混合实验证明，模拟器生成的 $\vec{\ct}_{d}''$ 与真实协议的敌手视图中的分布不可区分：
+当 $P_1 \in \Corr$ 时，通过以下混合实验证明，模拟器生成的 $\textbf{c}_{d}''$ 与真实协议的敌手视图中的分布不可区分：
 \begin{itemize}
-    \item $\mathsf{Hyb}_{0}$：真实协议中的交互。$\vec{\ct}_{1}'' = {\pi_{1}}(\vec{\ct}_{1}')$。对于 $2 \le j \le d$ 且 $1 \le i \le (m - 1)B$：计算 ${\ct}_{j}^i = \ParDec(sk_{j}, {\ct}_{j-1}''^i)$，${\ct}_{j}'^i = \ReRand(pk_{A_{j}}, {\ct}_{j}^i)$，以及 $\vec{\ct}_{j}'' = {\pi_{j}}(\vec{\ct}_{j}')$。
-    \item $\mathsf{Hyb}_{1}$：对于 $2 \le j \le d$ 且 $1 \le i \le (m - 1)B$，令 ${\ct}_{j}^i = \ParDec(sk_{j}, {\ct}_{j-1}^i)$。计算 $\vec{\ct}_{d}' = \ReRand(pk_{A_{d}},\vec{\ct}_{d})$ 以及 $\vec{\ct}_{d}'' = {\pi}(\vec{\ct}_{d}')$，其中 $\pi = \pi_1 \circ \dots \circ \pi_{d}$。显然，$\mathsf{Hyb}_{1}$ 与 $\mathsf{Hyb}_{0}$ 的分布是相同的。
-    \item $\mathsf{Hyb}_{2}$：将 $\vec{\ct}_{1}$ 替换为如下向量：
+    \item $\mathsf{Hyb}_{0}$：真实协议中的交互。$\textbf{c}_{1}'' = {\pi_{1}}(\textbf{c}_{1}')$。对于 $2 \le j \le d$ 且 $1 \le i \le (m - 1)B$：计算 ${c}_{j}^i = \ParDec(sk_{j}, {c}_{j-1}''^i)$，${c}_{j}'^i = \ReRand(pk_{A_{j}}, {c}_{j}^i)$，以及 $\textbf{c}_{j}'' = {\pi_{j}}(\textbf{c}_{j}')$。
+    \item $\mathsf{Hyb}_{1}$：对于 $2 \le j \le d$ 且 $1 \le i \le (m - 1)B$，令 ${c}_{j}^i = \ParDec(sk_{j}, {c}_{j-1}^i)$。计算 $\textbf{c}_{d}' = \ReRand(pk_{A_{d}},\textbf{c}_{d})$ 以及 $\textbf{c}_{d}'' = {\pi}(\textbf{c}_{d}')$，其中 $\pi = \pi_1 \circ \dots \circ \pi_{d}$。显然，$\mathsf{Hyb}_{1}$ 与 $\mathsf{Hyb}_{0}$ 的分布是相同的。
+    \item $\mathsf{Hyb}_{2}$：将 $\textbf{c}_{1}$ 替换为如下向量：
     \begin{itemize}
-        \item 对于 $\forall x_i \in Y = \bigcup_{j=1}^m X_j$，$\ct_1^i = \Enc(pk, x_i)$，其中 $1 \leq i \leq \lvert Y \rvert$。
-        \item 对于 $\lvert Y \rvert < i \le (m-1)B$，设置 $\ct_1^i = \Enc(pk, \perp)$。
+        \item 对于 $\forall x_i \in Y = \bigcup_{j=1}^m X_j$，$c_1^i = \Enc(pk, x_i)$，其中 $1 \leq i \leq \lvert Y \rvert$。
+        \item 对于 $\lvert Y \rvert < i \le (m-1)B$，设置 $c_1^i = \Enc(pk, \perp)$。
     \end{itemize}
-    由于敌手并不知道置换 $\pi_{d}$，$\vec{\ct}_{1}$ 中元素的顺序对 $\vec{\ct}_{d}''$ 的结果没有影响，故 $\mathsf{Hyb}_{2}$ 与 $\mathsf{Hyb}_{1}$ 在视图上是相同的。
-    \item $\mathsf{Hyb}_{3}$：将 $\vec{\ct}_{d}$ 替换为如下向量：
+    由于敌手并不知道置换 $\pi_{d}$，$\textbf{c}_{1}$ 中元素的顺序对 $\textbf{c}_{d}''$ 的结果没有影响，故 $\mathsf{Hyb}_{2}$ 与 $\mathsf{Hyb}_{1}$ 在视图上是相同的。
+    \item $\mathsf{Hyb}_{3}$：将 $\textbf{c}_{d}$ 替换为如下向量：
     \begin{itemize}
-        \item 对于 $\forall x_i \in Y = \bigcup_{j=1}^m X_j$，$\ct_d^i = \Enc(pk_{A_{d}}, x_i)$，其中 $1 \leq i \leq \lvert Y \rvert$。
-        \item 对于 $\lvert Y \rvert < i \le (m-1)B$，设置 $\ct_d^i = \Enc(pk_{A_{d}}, \perp)$。
+        \item 对于 $\forall x_i \in Y = \bigcup_{j=1}^m X_j$，$c_d^i = \Enc(pk_{A_{d}}, x_i)$，其中 $1 \leq i \leq \lvert Y \rvert$。
+        \item 对于 $\lvert Y \rvert < i \le (m-1)B$，设置 $c_d^i = \Enc(pk_{A_{d}}, \perp)$。
     \end{itemize}
     $\mathsf{Hyb}_{3}$ 与 $\mathsf{Hyb}_{2}$ 的不可区分性由 $\mathcal{E}$ 的部分解密性质所保证。
-    \item $\mathsf{Hyb}_{4}$：将 $\vec{\ct}_{d}'$ 替换为如下向量：
+    \item $\mathsf{Hyb}_{4}$：将 $\textbf{c}_{d}'$ 替换为如下向量：
     \begin{itemize}
-        \item 对于 $\forall x_i \in Y = \bigcup_{j=1}^m X_j$，${\ct}_{d}'^i = \Enc(pk_{A_{d}}, x_i)$，其中 $1 \leq i \leq \lvert Y \rvert$。
-        \item 对于 $\lvert Y \rvert < i \le (m-1)B$，设置 ${\ct}_{d}'^i = \Enc(pk_{A_{d}}, \perp)$。
+        \item 对于 $\forall x_i \in Y = \bigcup_{j=1}^m X_j$，${c}_{d}'^i = \Enc(pk_{A_{d}}, x_i)$，其中 $1 \leq i \leq \lvert Y \rvert$。
+        \item 对于 $\lvert Y \rvert < i \le (m-1)B$，设置 ${c}_{d}'^i = \Enc(pk_{A_{d}}, \perp)$。
     \end{itemize}
     基于 $\mathcal{E}$ 的可重随机化性质，$\mathsf{Hyb}_{4}$ 与 $\mathsf{Hyb}_{3}$ 是不可区分的。
-    \item $\mathsf{Hyb}_{5}$：唯一的改变是由模拟器均匀随机采样 $\pi$。由于 $\pi_{d}$ 在敌手视角下是均匀随机分布的，$\pi$ 同样满足均匀随机分布，因此 $\mathsf{Hyb}_{5}$ 与模拟过程生成的 $\vec{\ct}_{d}''$ 是相同的。
+    \item $\mathsf{Hyb}_{5}$：唯一的改变是由模拟器均匀随机采样 $\pi$。由于 $\pi_{d}$ 在敌手视角下是均匀随机分布的，$\pi$ 同样满足均匀随机分布，因此 $\mathsf{Hyb}_{5}$ 与模拟过程生成的 $\textbf{c}_{d}''$ 是相同的。
 \end{itemize}
 
-当 $P_1 \notin \Corr$ 时，由于模拟器不知道最终并集，因此必须在 $P_{c}$ 的视图中将部分解密消息 $\vec{\ct}_{c-1}''$ 修改为置换后的 $\Enc(pk, \perp)$。对比上述混合实验，我们只需在 $\mathsf{Hyb}_{4}$ 之后增加一个额外的混合实验，将所有重随机化后的部分解密消息 $\vec{\ct}_{c-1}'$ 替换为 $\Enc(pk,\perp)$。由于敌手不知道诚实方 $P_1$ 的私钥 $sk_1$，因此无法获得部分私钥 $sk_{A_{c-1}} = sk_1 + sk_c + \dots + sk_m$的任何信息，基于 $\mathcal{E}$ 的多次加密不可区分性，其无法区分两组不同的密文列表，综上，该修改是不可区分的。
+当 $P_1 \notin \Corr$ 时，由于模拟器不知道最终并集，因此必须在 $P_{c}$ 的视图中将部分解密消息 $\textbf{c}_{c-1}''$ 修改为置换后的 $\Enc(pk, \perp)$。对比上述混合实验，我们只需在 $\mathsf{Hyb}_{4}$ 之后增加一个额外的混合实验，将所有重随机化后的部分解密消息 $\textbf{c}_{c-1}'$ 替换为 $\Enc(pk,\perp)$。由于敌手不知道诚实方 $P_1$ 的私钥 $sk_1$，因此无法获得部分私钥 $sk_{A_{c-1}} = sk_1 + sk_c + \dots + sk_m$的任何信息，基于 $\mathcal{E}$ 的多次加密不可区分性，其无法区分两组不同的密文列表，综上，该修改是不可区分的。
 
-上述分析同样适用于 $P_1 \in \Corr$ 时，被腐化方 $P_{d'+1}$ ($d' \ne d$) 视图中部分解密消息 $\vec{\ct}_{d'}''$ 的模拟，即 $\vec{\ct}_{d'}''$ 也利用置换后的 $\Enc(pk,\perp)$ 进行类似的计算。为避免冗余，在此省略具体分析。
+上述分析同样适用于 $P_1 \in \Corr$ 时，被腐化方 $P_{d'+1}$ ($d' \ne d$) 视图中部分解密消息 $\textbf{c}_{d'}''$ 的模拟，即 $\textbf{c}_{d'}''$ 也利用置换后的 $\Enc(pk,\perp)$ 进行类似的计算。为避免冗余，在此省略具体分析。
 \end{proof}
 
 \section{复杂度分析与对比}
