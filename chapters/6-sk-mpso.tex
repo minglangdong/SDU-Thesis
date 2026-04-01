@@ -32,7 +32,7 @@
 \subsection{全成员零分享}
 
 当成员零分享关联的集合谓词公式 $Q$ 形如 $P_\mathsf{pivot}$ 的输入元素 $x$ 和其他每个参与方 $P_j$ 的输入集合 $X_j$ 组成的集合成员谓词的合取，即 $\bigwedge_{j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}} x \in X_j$时，称该协议为全成员零分享（Full Membership Zero-Sharing）。如果输入元素 $x$ 与各输入集合在集合谓词公式 $Q$ 上的取值为真，即当且仅当元素 $x$ 属于所有其他参与方的集合时，各方获得 $0$ 的秘密分享；否则获得随机值的秘密分享。该功能完美契合交集计算的需求。
-批量版本的全成员零分享（Batch Full Membership Zero-Sharing）的理想功能 $\FuncbpMZS$ 在图 \ref{fig:func-bpmzs} 中给出，其协议构造遵循第\ref{sec:compound-mzs}中成员零分享协议中的构造范式：首先，对于 $Q$ 中所有的原子命题 $x \in X_j$，$P_\mathsf{pivot}$ 和 $P_j$ 调用 batch OPPRF 实现第\ref{zs-PNMT}节中给出的针对集合非成员谓词的松弛成员零分享（Relaxed Predicative Zero-Sharing）协议，其他参与方将对应的分享份额设置为 $0$；随后，所有参与方将所有松弛成员零分享生成的秘密分享在本地相加，实现所有松弛成员零分享协议通过 $\mathsf{AND}$ 组合得到与 $Q$ 相关联的松弛成员零分享协议；最后，参与方利用 Beaver 三元组执行一次安全乘法，将松弛成员零分享转化为满足标准半诚实安全的成员零分享。完整的构造过程在图 \ref{fig:proto-bpmzs} 中描述。
+批量版本的全成员零分享的理想功能 $\FuncbpMZS$ 在图 \ref{fig:func-bpmzs} 中给出，其协议构造遵循第\ref{sec:compound-mzs}中成员零分享协议中的构造范式：首先，对于 $Q$ 中所有的原子命题 $x \in X_j$，$P_\mathsf{pivot}$ 和 $P_j$ 调用 batch OPPRF 实现第\ref{zs-PNMT}节中给出的针对集合非成员谓词的松弛成员零分享（Relaxed Predicative Zero-Sharing）协议，其他参与方将对应的分享份额设置为 $0$；随后，所有参与方将所有松弛成员零分享生成的秘密分享在本地相加，实现所有松弛成员零分享协议通过 $\mathsf{AND}$ 组合得到与 $Q$ 相关联的松弛成员零分享协议；最后，参与方利用 Beaver 三元组执行一次安全乘法，将松弛成员零分享转化为满足标准半诚实安全的成员零分享。完整的构造过程在图 \ref{fig:proto-bpmzs} 中描述。
 
 \begin{figure}[!hbtp]
 \begin{framed}
@@ -76,9 +76,9 @@
 
 \subsection{带载荷的全成员零分享}
 
-在真实的商业协作与数据共享场景中，参与方所持有的数据往往不仅仅是单一的标识符（如用户 ID、设备指纹等），每个标识符通常还深度绑定了具有极高业务价值的属性数据（即载荷，Payload）。例如，在金融机构的联合风控中，各银行除了需要找出共同的欺诈客户（计算交集），更期望统计这些客户在全网的累计逾期金额总和；在跨平台的广告归因分析中，广告商不仅关心有多少受众同时观看了广告并完成了购买，还迫切需要计算这些转化用户的总消费金额。
+在真实的商业协作与数据共享场景中，参与方所持有的数据往往不仅仅是单一的实体标识符（如用户 ID、设备指纹等），每个标识符通常还深度绑定了具有极高业务价值的属性数据（即载荷，Payload）。例如，在联合风控中，客户标识不仅代表其身份，还关联着逾期金额或信用评分；在广告归因分析中，转化用户的标识背后往往附带着其购买金额或活跃时长。
 
-这种“在交集上进行关联数据求和”的需求（即 MPSI-card-sum），对底层的密码学原语提出了新的挑战。为了在 MPSO 框架中原生地支持此类丰富的统计分析，我们需要将核心的零分享组件向外延伸。为此，本节正式引入全成员零分享的一种功能变体——\textbf{带载荷的全成员零分享（Full Membership Zero-Sharing with Payloads）}。本节引入全成员零分享的一种变体，称为“带载荷的全成员零分享（Full Membership Zero-Sharing with Payloads）”。 $P_\mathsf{pivot}$ 持有元素 $x$，其他参与方持有元素集合及关联的载荷（Payload）集合。如果公式 $Q$ 取值为真，即 $x$ 属于所有集合时，参与方不仅获得 0 的秘密分享，同时获得 $x$ 的所有关联载荷之和的秘密分享；否则获得两个随机值的分享。
+面对此类普遍存在的复合数据结构，如果隐私计算协议仅仅能判定元素的成员关系（即“在或不在”），将难以满足深度的业务分析需求。为了使 MPSO 框架能够原生地支持对属性数据的联合统计分析，我们需要将核心的零分享组件从“单一的状态判定”向外延伸，实现“状态与数据的联合分享”。为此，本节正式引入全成员零分享的一种功能变体 —— 带载荷的全成员零分享（Full Membership Zero-Sharing with Payloads）。本节引入全成员零分享的一种变体，称为“带载荷的全成员零分享（Full Membership Zero-Sharing with Payloads）”。 $P_\mathsf{pivot}$ 持有元素 $x$，其他参与方持有元素集合及关联的载荷（Payload）集合。如果公式 $Q$ 取值为真，即 $x$ 属于所有集合时，参与方不仅获得 0 的秘密分享，同时获得 $x$ 的所有关联载荷之和的秘密分享；否则获得两个随机值的分享。
 
 带载荷的批量全成员零分享协议的构造与图~\ref{fig:proto-bpmzs} 中的批量全成员零分享协议相似。核心思想是在每个松弛全成员载荷分享的两方协议中，以某种方式将载荷集合编码到 OPPRF 的发送方输入中。具体而言，我们首先在两方设定下实现带载荷的松弛全成员零分享。接下来，我们展示如何将该原语扩展到多方设定。
 
@@ -120,7 +120,7 @@
 
 当成员零分享关联的集合谓词公式 $Q$ 形如 $P_\mathsf{pivot}$ 的输入元素 $x$ 和其他每个参与方 $P_j$ 的输入集合 $X_j$ 组成的集合非成员谓词的合取，即 $\bigwedge_{j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}} x \notin X_j$ 时，称该协议为全非成员零分享（Full Non-Membership Zero-Sharing）。如果输入元素 $x$ 与各输入集合在集合谓词公式 $Q$ 上的取值为真，即当且仅当元素 $x$ 不属于任何其他参与方的集合时，各方获得 $0$ 的秘密分享；否则获得随机值的秘密分享。该功能完美契合并集（MPSU）计算中差集提取的需求。
 
-批量版本的全非成员零分享（Batch Full Non-Membership Zero-Sharing）的理想功能 $\FuncbpNMZS$ 在图 \ref{fig:func-bpnmzs} 中给出，其协议构造同样遵循本章中成员零分享协议的构造范式：首先，对于 $Q$ 中所有的原子命题 $x \notin X_j$，$P_\mathsf{pivot}$ 和 $P_j$ 调用 batch ssPMT 与 ROT，实现第五章中给出的针对集合非成员谓词的松弛成员零分享协议，其他参与方将对应的分享份额设置为 $0$；随后，所有参与方将所有松弛成员零分享生成的秘密分享在本地相加，实现所有松弛成员零分享协议通过 $\mathsf{AND}$ 组合得到与 $Q$ 相关联的松弛成员零分享协议；最后，参与方利用 Beaver 三元组执行一次安全乘法，将松弛成员零分享转化为满足标准半诚实安全的成员零分享。完整的构造过程在图 \ref{fig:proto-bpnmzs} 中描述。
+批量版本的全非成员零分享的理想功能 $\FuncbpNMZS$ 在图 \ref{fig:func-bpnmzs} 中给出，其协议构造同样遵循本章中成员零分享协议的构造范式：首先，对于 $Q$ 中所有的原子命题 $x \notin X_j$，$P_\mathsf{pivot}$ 和 $P_j$ 调用 batch ssPMT 与 ROT，实现第五章中给出的针对集合非成员谓词的松弛成员零分享协议，其他参与方将对应的分享份额设置为 $0$；随后，所有参与方将所有松弛成员零分享生成的秘密分享在本地相加，实现所有松弛成员零分享协议通过 $\mathsf{AND}$ 组合得到与 $Q$ 相关联的松弛成员零分享协议；最后，参与方利用 Beaver 三元组执行一次安全乘法，将松弛成员零分享转化为满足标准半诚实安全的成员零分享。完整的构造过程在图 \ref{fig:proto-bpnmzs} 中描述。
 
 \begin{figure}[!htb]
 \begin{framed}
@@ -153,60 +153,58 @@
 \end{figure}
 
 \begin{trivlist}
-\item \textbf{复杂度分析.} 在协议中，$P_\mathsf{pivot}$ 与每个 $P_j$ 执行 $\FuncbssPMT$。基于本文第三章的结论，该操作具有线性的计算和通信复杂度。后续的 ROT 操作也可在离线阶段预处理，使得在线阶段 $P_\mathsf{pivot}$ 仅需发送掩码后的选择比特。最后的三元组乘法同样保持线性开销。因此，在线阶段 $P_\mathsf{pivot}$ 的复杂度为 $O(mn)$，每个 Client $P_j$ 为 $O(n)$。
+\item \textbf{复杂度分析.} 在协议中，$P_\mathsf{pivot}$ 与每个 $P_j$ 执行 $\FuncbssPMT$。基于本文第三章的结论，该操作具有线性的计算和通信复杂度。后续的 ROT 操作也可在离线阶段预处理，使得在线阶段 $P_\mathsf{pivot}$ 仅需发送掩码后的选择比特。最后的三元组乘法同样保持线性开销。因此，在线阶段 $P_\mathsf{pivot}$ 的复杂度为 $O(mn)$，每个 $P_j$ 为 $O(n)$。
 \end{trivlist}
 
 \section{MPSO 框架实例化协议的优化与构造}
 
-在第五章中，本文提出了一个能够计算任意集合公式对应的可构造集合 $Y$ 的通用 MPSO 框架，本节将对该框架下实例化的 MPSO 协议进行优化，给出优化后的 MPSI / MPCSI 协议和 MPSU / MPCSU 协议的具体构造。
+在第五章中，本文提出了一个能够计算由任意集合公式导出的可构造集合 $Y$ 的通用 MPSO 框架。然而，通用性往往伴随着特定场景下的性能冗余。本节将结合具体集合运算的代数结构特性，对该框架下实例化的 MPSO 协议进行深度优化，并给出优化后的 MPSI/MPCSI 协议与 MPSU/MPCSU 协议的具体构造。
 
 \subsection{多方隐私集合求交与交集计算协议优化}
 
 在第五章的通用 MPSO 框架的设计中，为了消除按照 CSPF 中子公式的顺序生成秘密分享的位置与重构出的元素所属局部子集和在布谷鸟哈希表中的位置的之间的关联，以防止秘密分享重构阶段造成信息泄露，必须强制要求所有参与方在重构前执行一个多方秘密分享洗牌协议。然而，考虑计算目标 $Y$ 的规范集合谓词公式 $\psi$ 相对于 $X_1$ 是局部的情况。（例如 $X_1 \cap X_2 \cap X_3$ 相对于 $X_1$ 是局部的，其局部剩余公式为 $x \in X_2 \land x \in X_3$。）在这种情况下，$Y$ 的所有元素必然属于 $P_1$（即 $Y \subseteq X_1$）。这意味着秘密分享的排列顺序完全由 $X_1$ 决定。由于 $P_1$ 最终将获得结果集，这种原本会被视为泄露的“顺序信息”对 $P_1$ 而言不再构成真实的隐私泄露。
 % 例如多方隐私集合求交（Multi-party Private Set Intersection, MPSI）协议中，由于交集必然是 Leader 输入集合的子集，因此重构出的秘密的位置完全由其输入集合决定，这对其而言不再构成额外的信息泄露。
 
-基于上述的子集属性，我们可以直接在 MPSI 协议中省去多方秘密分享洗牌这一步骤，优化实例化出的 MPSI 协议的效率。
-具体地，当 $P_1$（作为 $P_{\mathsf{pivot}}$）与其他各方调用完批量全成员零分享后，各方可以直接向 $P_1$ 重构秘密。如果重构的秘密为 0，则说明 $P_1$ 对应的元素属于交集。
-（注意：对于 MPSI-card，为了防止 $P_1$ 知道具体哪些元素在交集内，仍然需要执行洗牌操作）。
+基于上述的“子集属性”，我们可以直接在 MPSI 协议中省去多方秘密分享洗牌这一步骤，优化实例化出的 MPSI 协议的效率。
+具体地，当 $P_1$（作为 $P_{\mathsf{pivot}}$）与其他各方调用完批量全成员零分享后，各方可以直接将份额发送给 $P_1$ 进行重构。如果某位置重构的秘密为 0，则说明 $P_1$ 对应哈希桶内的元素属于交集。需要注意的是，对于仅输出基数的 MPSI-card 协议，为了防止 $P_1$ 借此推断出具体哪些元素位于交集中，洗牌操作仍然是不可省略的。
 
-此外，在这种针对性优化下，协议开销不再依赖于元素的比特长度 $l$，因为参与方可以提前在本地对元素进行哈希压缩。为了保证正确性，必须确保哈希过程在 $P_1$ 和其他参与方的元素之间不引入冲突，因此哈希函数的输出长度至少为 $\sigma + \log_2 (m-1) + 2 \log_2 n$。
-
-MPSI、MPSI-card 以及 Circuit-MPSI 的完整优化协议描述在图 \ref{fig:proto-mpsi} 中给出。
-值得注意的是，现有的最先进 MPSI 协议 \cite{WuYC24,ChenDGB22} 通常需要参与方之间两两在线交互（Pairwise Interaction），这导致 Client 的复杂度依赖于参与方数量或腐化阈值 $t$。而我们的协议引入了\textbf{星型通信拓扑（Star Topology）}，使得 Leader 的计算和通信复杂度为 $O(mn)$，每个 Client 仅为 $O(n)$。这达到了与不安全的朴素哈希方案相同的最优复杂度。据我们所知，这是首次在标准半诚实模型下同时实现 MPSI 和 MPSI-card 最优复杂度的构造。
+此外，在 $Y \subseteq X_1$ 这一前提下，$P_1$ 已经持有了所有候选元素，他不需要通过协议重构获取任何外来元素，而仅需获得一个指示 $X_1$ 中哪些元素属于交集的布尔向量。因此，所有参与方可以在协议初期，直接在本地对输入元素进行哈希压缩预处理。为了保证正确性，必须确保该哈希过程在 $P_1$ 和其他参与方的元素之间不引入虚假碰撞，因此哈希函数的输出长度至少需设定为 $\sigma + \log_2 (m-1) + 2 \log_2 n$。这一优化使得 MPSI 和 MPCSI 协议的计算与通信开销彻底摆脱了对原始元素比特长度 $l$ 的依赖。MPSI、MPSI-card 以及 Circuit-MPSI 的完整优化构造描述在图 \ref{fig:proto-mpsi} 中给出（其中电路 $C_{s,B,l}^1$ 的定义参考第 \ref{sec:mpso} 节）。
 
 \begin{figure}[!htb]
 \begin{framed}
 \begin{minipage}[c]{\textwidth}
-\textbf{参数：} $m$ 个参与方。集合大小 $n$。有限域 $\mathbb{F}$。哈希参数 $B$。
+\begin{trivlist}
+\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots, P_m$。集合大小 $n$。元素长度 $l$。有限域 $\mathbb{F}$。布谷鸟哈希参数：哈希函数 $h_1, h_2, h_3$ 及桶数 $B$。
+\item \textbf{输入：} 每个参与方 $P_i$ 持有私有集合 $X_i = \{x_i^1,\cdots, x_i^n\} \subseteq \{0,1\}^l$。
 
-\textbf{输入：} $P_i$ 输入集合 $X_i$。
-
+% \item \textbf{协议：}
 \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=15pt]
-\item \textbf{哈希分桶.} $P_1$ 使用布谷鸟哈希 $\mathcal{C}_1^b \gets \Cuckoo(X_1)$。$P_j$ ($j>1$) 使用简单哈希 $\mathcal{T}_j^b \gets \Simple(X_j)$。
-\item \textbf{批量全成员零分享.} 所有参与方调用 $\FuncbpMZS$，$P_1$ 作为 $P_\mathsf{pivot}$ 输入 $\mathcal{C}_1$。$P_i$ 获得份额 $\textbf{s}_i$。
+\item \textbf{哈希分桶阶段.} $P_1$ 执行布谷鸟哈希分桶 $\mathcal{C}_1^1, \cdots, \mathcal{C}_1^B \gets \Cuckoo_{h_1,h_2,h_3}^B(X_1)$。对于 $1 < j  \le m$，$P_j$ 执行简单哈希分桶 $\mathcal{T}_j^1, \cdots, \mathcal{T}_j^B \gets \Simple_{h_1,h_2,h_3}^B(X_j)$。
+\item \textbf{全成员零分享阶段.} 所有参与方调用批量大小为 $B$ 的 $\FuncbpMZS$，$P_1$ 作为 $P_\mathsf{pivot}$ 输入 $\mathcal{C}_1^1, \cdots, \mathcal{C}_1^B$，每个 $P_j$ ($1 < j  \le m$) 输入 $\mathcal{T}_j^1, \cdots, \mathcal{T}_j^B$。对于 $j \in [m]$，$P_i$ 收到向量 $\textbf{s}_i=(s_{i,1},\cdots,s_{i,B})$。
 \end{enumerate}
 
-后续操作依功能而定：
+参与方的后续动作取决于具体的目标功能：
 
-    \textbf{MPSI.} 
+    \item \textbf{MPSI.} 
     \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=15pt] \addtocounter{enumi}{2}
-        \item $P_j$ 发送 $\textbf{s}_j$ 给 $P_1$。$P_1$ 重构秘密 $\textbf{s} = \sum \textbf{s}_i$。对于每个 $b$，若 $s_b = 0$，则将 $\mathcal{C}_1^b$ 中的元素加入输出结果 $Y$ 中。
+        \item 对于 $1 < j  \le m$，$P_j$ 将 $\textbf{s}_j$ 发送给 $P_1$。$P_1$ 计算 $\textbf{s} = \sum_{1 < j  \le m} \textbf{s}_j$ 并设置 $Y = \emptyset$。对于 $1 \le b \le B$，如果 $s_b = 0$，$P_1$ 将 $\mathcal{C}_1^b$ 中的元素加入 $Y$ 中。输出 $Y$。
     \end{enumerate}
-    \textbf{MPSI-card.} 
+    \item \textbf{MPSI-card.} 
     \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=15pt] \addtocounter{enumi}{2}
-        \item $P_i$ 将 $\textbf{s}_i$ 输入 $\FuncMS$ 获得打乱后的 $\textbf{s}_{i}'$。
-        \item $P_j$ 发送 $\textbf{s}_j'$ 给 $P_1$。$P_1$ 统计 $\sum \textbf{s}_i'$ 中 0 的数量作为基数输出。
+        \item 对于 $1 \le i \le m$，$P_i$ 将 $\textbf{s}_i$ 输入到 $\FuncMS$ 中，得到随机置换后的分享份额 $\textbf{s}_{i}'$。
+        \item 对于 $1 < j  \le m$，$P_j$ 将 $\textbf{s}_j'$ 发送给 $P_1$。$P_1$ 统计重构结果 $\sum_{1 < j  \le m} \textbf{s}_j'$ 中 0 的数量，将其作为交集的基数并输出。
     \end{enumerate}
-    \textbf{Circuit-MPSI.}
+    \item \textbf{Circuit-MPSI（方案 1）.}
     \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=15pt] \addtocounter{enumi}{2}
-        \item 参与方将分享份额 $s_{i,b}$ 输入到通用 MPC 电路中，电路在内部进行相等性判断与后续逻辑运算。
+        \item 所有参与方调用包含电路 $C_{1,B,l}^1$ 的 $m$ 方通用 MPC 协议。对于 $1 \le b \le B, 1 \le i \le m$，$P_i$ 将 $s_{i,b}$ 作为其第 $b$ 个输入，而 $P_1$ 输入 $\mathcal{C}_1^b$ 中的元素。
     \end{enumerate}
+\end{trivlist}
 \end{minipage}
 \end{framed}
 \caption{MPSI / MPSI-card / Circuit-MPSI 协议}\label{fig:proto-mpsi}
 \end{figure} 
 
-MPSI-card-sum 协议通过利用 6.2 节中“带载荷的批量全成员零分享”原语实现。在此过程中，各方获得指示交集的零分享以及载荷的秘密分享。随后经过两次洗牌操作（分别对零分享和载荷分享进行打乱），$P_1$ 统计零分享计算基数，并基于零分享构建的指示向量汇总载荷求和。其渐进复杂度同样保持在最优水平（即与 MPSI 一致）。该协议的完整流程在图 \ref{fig:proto-mpsi-sum} 中给出。
+MPSI-card-sum 协议通过“带载荷的批量全成员零分享”原语实现。在此过程中，各方获得指示交集的零分享以及载荷的秘密分享。随后经过两次洗牌操作（分别对零分享和载荷分享进行打乱），$P_1$ 统计零分享计算基数，并基于零分享构建的指示向量汇总载荷求和。该协议的完整流程在图 \ref{fig:proto-mpsi-sum} 中给出。
 
 \begin{figure}[!htb]
 \begin{framed}
@@ -216,11 +214,11 @@ MPSI-card-sum 协议通过利用 6.2 节中“带载荷的批量全成员零分�
 \item \textbf{输入：} 每个参与方 $P_i$ 拥有输入集合 $X_i = \{x_i^1,\cdots, x_i^n\} \subseteq \{0,1\}^l$ 及载荷集合 $V_i = \{v_i^1,\cdots, v_i^n\}$，并具有从元素到关联载荷的映射函数 $\mathsf{payload}_i()$。
 
 \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=15pt]
-    \item \textbf{哈希分桶.} $P_1$ 执行布谷鸟哈希 $\mathcal{C}_1^1, \cdots, \mathcal{C}_1^B \gets \mathsf{Cuckoo}_{h_1,h_2,h_3}^B(X_1)$。对于 $1 < j \le m$，$P_j$ 执行简单哈希 $\mathcal{T}_j^1, \cdots, \mathcal{T}_j^B \gets \mathsf{Simple}_{h_1,h_2,h_3}^B(X_j)$。$P_j$ 进一步定义载荷桶 $\mathcal{V}_j^1, \cdots, \mathcal{V}_j^B$，其中对于 $b \in [B]$，$\mathcal{V}_j^b$ 包含 $\mathcal{T}_j^b$ 中元素的关联载荷。
-    \item \textbf{带载荷的批量全成员零分享.} 所有参与方调用批大小为 $B$ 的带载荷的批量全成员零分享功能 $\mathcal{F}_{\mathsf{bpMZSp}}$，其中 $P_1$ 作为 $P_\mathsf{pivot}$ 输入 $\mathcal{C}_1^1, \cdots, \mathcal{C}_1^B$，其余每个 $P_j$ 输入 $(\mathcal{T}_j^1, \cdots, \mathcal{T}_j^B)$ 和 $(\mathcal{V}_j^1, \cdots, \mathcal{V}_j^B)$。对于 $i \in [m]$，$P_i$ 获得输出份额 $(\textbf{s}_i, \textbf{w}_i)$。
+    \item \textbf{哈希分桶阶段.} $P_1$ 执行布谷鸟哈希分桶 $\mathcal{C}_1^1, \cdots, \mathcal{C}_1^B \gets \mathsf{Cuckoo}_{h_1,h_2,h_3}^B(X_1)$。对于 $1 < j \le m$，$P_j$ 执行简单哈希分桶 $\mathcal{T}_j^1, \cdots, \mathcal{T}_j^B \gets \mathsf{Simple}_{h_1,h_2,h_3}^B(X_j)$。$P_j$ 进一步定义载荷桶 $\mathcal{V}_j^1, \cdots, \mathcal{V}_j^B$，其中对于 $b \in [B]$，$\mathcal{V}_j^b$ 包含 $\mathcal{T}_j^b$ 中元素的关联载荷。
+    \item \textbf{带载荷的全成员零分享阶段.} 所有参与方调用批大小为 $B$ 的带载荷的批量全成员零分享功能 $\mathcal{F}_{\mathsf{bpMZSp}}$，其中 $P_1$ 作为 $P_\mathsf{pivot}$ 输入 $\mathcal{C}_1^1, \cdots, \mathcal{C}_1^B$，其余每个 $P_j$ 输入 $(\mathcal{T}_j^1, \cdots, \mathcal{T}_j^B)$ 和 $(\mathcal{V}_j^1, \cdots, \mathcal{V}_j^B)$。对于 $i \in [m]$，$P_i$ 获得输出份额 $(\textbf{s}_i, \textbf{w}_i)$。
     \item 对于 $b \in [B]$，若 $\mathcal{C}_1^b$ 不是空桶，$P_1$ 设置 $w_{1,b} = w_{1,b} + v$，其中 $v$ 是 $\mathcal{C}_1^b$ 中元素的关联载荷。
     \item 对于 $i \in [m]$，$P_i$ 分别将 $\textbf{s}_i$ 和 $\textbf{w}_i$ 输入到多方秘密分享洗牌功能 $\mathcal{F}_{\mathsf{shuffle}}$ 中。$P_i$ 接收到打乱后的份额 $\textbf{s}_{i}' = (s_1', \cdots, s_B')$ 和 $\textbf{w}_{i}' = (w_1', \cdots, w_B')$。
-    \item 对于 $1 < j  \le m$，$P_j$ 将 $\textbf{s}_j'$ 发送给 $P_1$。$P_1$ 计算重构的指示向量 $\textbf{s}' = \sum_{1 < j  \le m} \textbf{s}_j'$，并定义一个布尔向量 $\textbf{e} = (e_1, \cdots, e_B)$，规则为：若 $s_b' = 0$，则 $e_b = 1$；否则 $e_b = 0$。$P_1$ 将 $\textbf{e}$ 分发给所有 $P_j$。对于 $i \in [m]$，$P_i$ 输出向量 $\textbf{e}$ 的汉明重量 $\mathsf{HW}(\textbf{e})$ 作为交集基数。
+    \item 对于 $1 < j  \le m$，$P_j$ 将 $\textbf{s}_j'$ 发送给 $P_1$。$P_1$ 计算重构的指示向量 $\textbf{s}' = \sum_{1 < j  \le m} \textbf{s}_j'$，并定义一个布尔向量 $\textbf{e} = (e_1, \cdots, e_B)$，规则为：若 $s_b' = 0$，则 $e_b = 1$；否则 $e_b = 0$。$P_1$ 将 $\textbf{e}$ 分发给所有 $P_j$。对于 $i \in [m]$，$P_i$ 输出向量 $\textbf{e}$ 的汉明重量作为交集基数。
     \item 对于 $i \in [m]$，$P_i$ 在本地计算载荷份额之和 $u_i = \sum_{b \in [B] \text{ s.t. } e_b = 1} w_{i,b}'$。对于 $1 < j  \le m$，$P_j$ 将 $u_j$ 发送给 $P_1$。$P_1$ 计算并输出最终的载荷总和 $u = \sum_{i \in [m]} u_i$。
 \end{enumerate}
 \end{trivlist}
@@ -231,13 +229,10 @@ MPSI-card-sum 协议通过利用 6.2 节中“带载荷的批量全成员零分�
 
 \subsection{多方隐私集合求并与并集计算协议构造} 
 
-考虑并集计算 $Y = X_1 \cup \cdots \cup X_m$，其对应的规范集合谓词公式（CSPF）为若干子公式的析取，其中某些子公式直接就是某个原子命题 $x \in X_i$（对于某个 $i \in [m]$）。例如，$X_1 \cup \cdots \cup X_m$ 可以表示为 $(x \in X_1) \lor ((x \notin X_1) \land (x \in X_2)) \lor \cdots \lor ((x \notin X_1) \land \cdots \land (x \notin X_{m-1}) \land (x \in X_m))$。在这种情况下，子公式 $x \in X_i$ 仅涉及 $P_i$ 自身，因此 $P_i$ 可以直接在本地对其元素生成秘密分享。特别地，如果 $i = 1$，由于 $P_1$ 是最终接收并集的一方，该子公式甚至可以直接被忽略，只要 $P_1$ 在最终重建的集合中简单地追加自己原本的输入集合 $X_1$ 即可，这避免了大量冗余操作。
+考虑并集计算 $Y = X_1 \cup \cdots \cup X_m$，其对应的规范集合谓词公式（CSPF）通常表现为若干互不相交的子公式的析取。根据其代数结构，某些子公式直接退化为单一的原子命题 $x \in X_i$（对于某个 $i \in [m]$）。例如，并集公式可以标准地展开为 $(x \in X_1) \lor ((x \notin X_1) \land (x \in X_2)) \lor \cdots \lor ((x \notin X_1) \land \cdots \land (x \notin X_{m-1}) \land (x \in X_m))$。在这种情况下，首个子公式 $x \in X_1$ 仅涉及 $P_1$ 自身的成员关系判定，而不依赖于任何其他参与方的私有输入。
 
-基于上述思路，MPSU 及相关变体的完整优化协议在图 \ref{fig:proto-mpsu} 中给出。
-
-本文的 MPSU 协议遵循了 Liu 和 Gao \cite{LG-ASIACRYPT-2023} 提出的基于秘密分享的 MPSU 范式（该范式的原始设计依赖非共谋假设）。虽然在第三章中，我们通过引入多方秘密分享随机不经意传输（mss-ROT）消除了这一安全缺陷，但 mss-ROT 引入了大量的参与方两两交互（Pairwise Interaction），使得协议的复杂度受到一定影响。
-
-与之形成鲜明对比的是，本章基于通用框架实例化的 MPSU 协议，利用全非成员零分享及其转化技术（结合 Beaver 三元组），成功\textbf{保留了星型通信拓扑（Star Topology）}。这使得本协议不仅能够抵御任意共谋攻击，而且在维持 Leader 为 $O(m^2 n)$ 复杂度的同时，将每个 Client 的计算与通信复杂度压低至 $O(mn)$，首次实现了该基于秘密分享的 MPSU 范式下的最优渐进复杂度。
+基于上述的“局部原子属性”，考虑到 $P_1$ 是并集结果的最终接收方，针对子公式 $x \in X_1$ 的交互式秘密分享生成步骤显得完全多余。在协议执行中，该子公式可以直接被安全忽略。参与方仅需对剩余的差集序列进行零分享判定与洗牌，并在协议的最终重建阶段，由 $P_1$ 在明文层面上简单地追加其原本的输入集合 $X_1$ 即可。这种针对性优化有效避免了 Leader 节点处理自身私有数据时产生的大量计算与通信冗余。
+基于上述思路，优化后的 MPSU、MPSU-card 以及 Circuit-MPSU的完整协议描述在图 \ref{fig:proto-mpsu} 中给出。
 
 \begin{figure}[!htb]
 \begin{framed}
@@ -283,36 +278,36 @@ MPSI-card-sum 协议通过利用 6.2 节中“带载荷的批量全成员零分�
 
 \section{实例化协议的复杂度分析与对比}
 
+本节将对优化后的实例化协议进行严格的渐近复杂度分析，并与各领域的 SOTA 方案进行理论对比。在下文的分析中，我们主要关注协议开销对集合大小 $n$ 和参与方数量 $m$ 的依赖关系，并适度省略安全参数带来的常数影响。
+
 \subsection{多方隐私集合求交与交集计算的复杂度分析} 
 
-在以下的渐近复杂度分析中，我们仅考虑对集合大小 $n$ 和参与方数量 $m$ 的依赖，忽略安全参数的影响。
+在图 \ref{fig:proto-mpsi} 中，各参与方（以 $P_1$ 作为 $P_\mathsf{pivot}$）共同调用批量大小为 $B = O(n)$ 的批量全成员零分享协议。由于采用星型拓扑，在该阶段，Leader $P_1$ 的计算和通信复杂度均为 $O(mn)$，而每个 Client $P_j$ ($1 < j \le m$) 的计算和通信复杂度被严格控制在 $O(n)$。
+在 MPSI 与 Circuit-MPSI 协议中，由于洗牌步骤被裁撤，每个 $P_j$ 直接将其分享份额发送给 $P_1$。因此，协议的总体计算和通信复杂度保持在：$P_1$ 为 $O(mn)$，每个 $P_j$ 为 $O(n)$。
+在 MPSI-card 协议中，参与方在重构前调用了多方秘密分享洗牌协议。我们采用文献 \cite{EB22} 中高效的洗牌构造并指定 $P_1$ 作为洗牌 Leader。在该阶段，$P_1$ 的计算和通信复杂度为 $O(mn)$，而每个 $P_j$ 依然为 $O(n)$。综上所述，MPSI-card 的总体渐近复杂度与 MPSI / Circuit-MPSI 完全相同。
 
-在图 \ref{fig:proto-mpsi} 中，各参与方（$P_1$ 作为 $P_\mathsf{pivot}$）调用批量大小为 $B = O(n)$ 的批量全成员零分享协议。在该阶段，Leader $P_1$ 的计算和通信复杂度均为 $O(mn)$，而每个 Client $P_j$ ($1 < j \le m$) 的计算和通信复杂度均为 $O(n)$。
-在 MPSI 与 Circuit-MPSI 中，每个 $P_j$ 直接将其分享份额发送给 $P_1$，因此，$P_1$ 的总计算和通信复杂度为 $O(mn)$，而每个 $P_j$ 的总计算和通信复杂度为 $O(n)$。
-在 MPSI-card 中，参与方在直接重构前调用了多方秘密分享洗牌协议。我们采用文献 \cite{EB22} 中的多方秘密分享洗牌协议并指定 $P_1$ 作为 Leader。在该阶段，$P_1$ 的计算和通信复杂度为 $O(mn)$，而每个 $P_j$ 的计算和通信复杂度为 $O(n)$。综上所述，MPSI-card 的总体计算和通信复杂度与 MPSI / Circuit-MPSI 完全相同。
+在图 \ref{fig:proto-mpsi-sum} 的 MPSI-card-sum 协议中各参与方调用批量大小为 $B = O(n)$ 的带载荷的批量全成员零分享协议。在该阶段，$P_1$ 的计算和通信复杂度为 $O(mn)$，而每个 $P_j$ ($1 < j \le m$) 的计算和通信复杂度为 $O(n)$。随后，参与方调用两次多方秘密分享洗牌协议，$P_j$ 向 $P_1$ 重构基数部分，并且 $P_1$ 广播针对洗牌后载荷的指示向量。总体而言，MPSI-card-sum 的计算和通信复杂度同样与 MPSI / MPSI-card / Circuit-MPSI 保持一致。
 
-在图 \ref{fig:proto-mpsi-sum} 中，各参与方调用批量大小为 $B = O(n)$ 的带载荷的批量全成员零分享协议。在该阶段，$P_1$ 的计算和通信复杂度为 $O(mn)$，而每个 $P_j$ ($1 < j \le m$) 的计算和通信复杂度为 $O(n)$。随后，参与方调用两次多方秘密分享洗牌协议，$P_j$ 向 $P_1$ 重构基数部分，并且 $P_1$ 广播针对洗牌后载荷的指示向量。总体而言，MPSI-card-sum 的计算和通信复杂度同样与 MPSI / MPSI-card / Circuit-MPSI 保持一致。
-
-值得注意的是，在不考虑隐私安全的朴素（Naive）解决方案中，各 Client 直接将其输入集合发送给 Leader，由 Leader 在本地计算结果。在该方案中，Leader 的计算和通信复杂度为 $O(mn)$，每个 Client 的计算和通信复杂度为 $O(n)$。因此，我们的 MPSI / MPSI-card / Circuit-MPSI / MPSI-card-sum 构造在确保安全性的同时，成功实现了与朴素方案相匹配的**最优复杂度**。
+现有的最先进 MPSI 协议 \cite{WuYC24,ChenDGB22} 通常需要参与方之间两两在线交互，这导致 Client 的复杂度依赖于参与方数量或腐化阈值 $t$。这不可避免地导致 Client 的复杂度依赖于参与方数量 $m$ 或腐化阈值 $t$。而本章优化后的 MPSI 系列协议，通过设计成星型通信拓扑（Star Topology），使得 Leader 的计算和通信复杂度为 $O(mn)$，每个 Client 仅为 $O(n)$，达到了与不考虑隐私安全的朴素方案（各 Client 直接将其输入集合发送给 Leader，由 Leader 在本地计算结果）相同量级的复杂度。据我们所知，这是 MPSI / MPSI-card / MPSI-card-sum / Circuit-MPSI 首次在标准半诚实模型下实现这一理论最优复杂度。
 
 \subsection{多方隐私集合求并与并集计算的复杂度分析} 
-
-在以下的渐近复杂度分析中，我们同样仅考虑对 $n$ 和 $m$ 的依赖，省略安全参数。
 
 在图 \ref{fig:proto-mpsu} 中，对于 $1 < j \le m$，参与方 $P_1, \cdots, P_j$（其中 $P_j$ 作为 $P_\mathsf{pivot}$）调用批量大小为 $B = O(n)$ 的批量全非成员零分享协议。每个 $P_j$ 共参与 $m-j+1$ 次批量全非成员零分享协议的调用，并在第一次调用中担任 $P_\mathsf{pivot}$。$P_1$ 参与 $m-1$ 次调用，但从不担任 $P_\mathsf{pivot}$。在该阶段，每个参与方的计算和通信复杂度均为 $O(mn)$。此后，各参与方持有 $(m-1)B$ 个秘密分享。
 接着，他们将这 $(m-1)B = O(mn)$ 个分享份额输入到多方秘密分享洗牌协议（以 $P_1$ 为 Leader）中，最后每个 $P_j$ 将洗牌后的份额发送给 $P_1$。因此，在该步骤中，$P_1$ 的计算和通信复杂度为 $O(m^2n)$，而每个 $P_j$ 的计算和通信复杂度为 $O(mn)$。
 综合来看，Leader $P_1$ 的总体计算和通信复杂度为 $O(m^2n)$，而每个 Client $P_j$ 的总体计算和通信复杂度为 $O(mn)$。
 
-我们的 MPSU 协议遵循了基于秘密分享的 MPSU 范式，其中 Leader 的最优计算和通信复杂度为 $O(m^2 n)$，每个 Client 的最优计算和通信复杂度为 $O(m n)$。这一最优复杂度边界是由该范式下“在 $m$ 个参与方之间对 $O(mn)$ 个元素进行秘密分享”的核心设计所决定的，因为必不可少的重构步骤本身就需要达到这一复杂度。因此，我们的 MPSU 构造成功达到了该 MPSU 范式下的**最优计算和通信复杂度**。
+本章优化后的 MPSU 协议遵循了 Liu 和 Gao \cite{LG-ASIACRYPT-2023} 提出的基于秘密分享的 MPSU 范式。在该范式下，“在 $m$ 个参与方之间对 $O(mn)$ 个元素进行秘密分享并重构”的底层架构，决定了其复杂度下界必然是 Leader $O(m^2 n)$ 与 Client $O(m n)$。
+为了实现这一复杂下界度，LG 协议在安全性上做出了妥协，脆弱地依赖于非共谋假设（即假设 $P_1$ 不与 Client 共谋），从而无法抵抗 $P_1$ 与其他参与方之间的共谋攻击。在本书的第三章中，我们通过引入多方秘密分享随机不经意传输（multi-party secret-shared ROT, mss-ROT）消除了这一安全缺陷，但代价是 mss-ROT 内部引入了大量的两两在线交互，导致 Client 的渐近复杂度相对于参与方个数 $m$ 成二次增长。
+而本章基于通用 MPSO 框架实例化的全新 MPSU 协议，利用全非成员零分享及其转化技术（结合 Beaver 三元组），成功保留了协议设计中的星型通信拓扑。这使得本协议不仅能够抵御任意共谋攻击，而且在维持 Leader 为 $O(m^2 n)$ 复杂度的同时，将每个 Client 的计算与通信复杂度压低至 $O(mn)$，首次在标准半诚实安全模型下实现了该 MPSU 范式的理论最优渐近复杂度。
 
-\subsection{与现有 SOTA 工作的理论对比}
+\subsection{与各 SOTA 协议的复杂度对比}
 \esubsection{Comparison with Prior Works}
 
-表 \ref{tab:mpsi-comparisons} 和表 \ref{tab:mpsi-offline-comparisons} 分别展示了各种 MPSI 协议在在线阶段与离线阶段的理论计算与通信复杂度对比，其中 $n$ 为集合大小，$m$ 为参与方数量，$t$ 为共谋参与方数量。$U$ 为元素定义域。``PK'' 表示基于公钥操作的协议，``SK'' 表示基于 OT 和对称密钥操作的协议。$\lambda, \sigma$ 分别为计算和统计安全参数。``增强半诚实/恶意''表示该恶意协议隐含了增强半诚实安全性，但在标准半诚实模型下不安全。文献 \cite{BNOP-AsiaCCS-2022} 是目前唯一区分了离线和在线阶段的现有 MPSI 工作，因此我们省略了其他无离线阶段的方案。不同的 Beaver 三元组生成方式导致了本文协议具有不同的离线复杂度：``BGV'' 表示各方使用带有分布式解密的加法同态加密（AHE）生成 Beaver 三元组，其中 AHE 采用 BGV 加密实例化；``OT'' 表示各方利用两两 OT 交互（使用 SoftSpokenOT 实例化）生成 Beaver 三元组。为简化表达，我们省略了部分小常数（如密文膨胀常数和域大小位数）。
+表 \ref{tab:mpsi-comparisons} 和表 \ref{tab:mpsi-offline-comparisons} 分别展示了相关工作提出的 MPSI 协议与本章实例化协议在在线阶段与离线阶段的理论计算与通信复杂度对比，其中文献 \cite{BNOP-AsiaCCS-2022} 是目前唯一区分了离线和在线阶段的现有 MPSI 工作。在表格中：$n$ 为集合大小，$m$ 为参与方数量，$t$ 为腐化阈值。$U$ 为元素定义域。``PK'' 表示基于公钥操作的协议，``SK'' 表示基于 OT 和对称密钥操作的协议。$\lambda, \sigma$ 分别为计算和统计安全参数。``增强半诚实/恶意''表示该恶意安全协议隐含了增强半诚实安全性，但在标准半诚实模型下却不安全。此外，不同的 Beaver 三元组生成方式会带来不同的离线复杂度：``BGV'' 表示使用允许分布式解密的加法同态加密（Additively Homomorphic Encryption, AHE）生成 Beaver 三元组，其中 AHE 采用 BGV 加密实例化；``OT'' 表示各方利用两两 OT 交互生成 Beaver 三元组，其中 OT 使用 SoftSpokenOT 实例化。为简化表达式，我们省略了部分小常数（如密文膨胀常数和域大小位数）。
 
-表 \ref{tab:mpcsi-comparisons} 和表 \ref{tab:mpcsi-offline-comparisons} 分别展示了相关的 MPSI-card / MPSI-card-sum 协议与本文协议在在线阶段与离线阶段的理论对比，其中 $n$ 为集合大小，$m$ 为参与方数量，$t$ 为共谋参与方数量。``SK'' 表示基于 OT 和对称密钥操作的协议。$\lambda, \sigma$ 分别为计算和统计安全参数。Beaver 三元组与秘密分享相关性（Share correlation）生成方式的不同组合导致了文献 \cite{ChenDGB22} 和本文协议在离线阶段具有不同的复杂度。``BGV + BGV'' 表示这两者均使用带有分布式解密的加法同态加密（基于 BGV 实例化）生成。``BGV + ST'' 表示三元组使用同态加密生成，而分享相关性通过运行两两交互的分享转换（Share Translation）协议生成。``OT + BGV/ST'' 表示三元组使用两两的 SoftSpokenOT 交互生成（在此情况下，采用不同的分享相关性生成方式复杂度相同）。
+表 \ref{tab:mpcsi-comparisons} 和表 \ref{tab:mpcsi-offline-comparisons} 分别展示了相关工作提出的 MPSI-card / MPSI-card-sum 协议与本章实例化协议在在线阶段与离线阶段的理论对比，其中 Beaver 三元组与秘密分享相关性（Share correlation）生成方式的不同组合决定了不同的离线复杂度：``BGV + BGV'' 表示这两者均使用允许分布式解密的 AHE（基于 BGV 实例化）生成。``BGV + ST'' 表示 Beaver 三元组使用 AHE 生成，而分享相关性通过运行两两交互的分享转换（Share Translation）协议生成。``OT + BGV/ST'' 表示 Beaver 三元组使用两两的 SoftSpokenOT 交互生成（在此情况下，采用不同的分享相关性生成方式复杂度相同）。其他符号释义与上述表格保持一致。
 
-表 \ref{tab:mpsu-comparisons} 和表 \ref{tab:mpsu-offline-comparisons} 分别展示了相关的 MPSU 协议与本文协议在在线阶段与离线阶段的理论对比，其中 $n$ 为集合大小，$m$ 为参与方数量，$l$ 为元素的长度。``PK'' 表示基于公钥操作的协议。``SK'' 表示基于 OT 和对称密钥操作的协议。$\lambda, \sigma$ 分别为计算和统计安全参数。文献 \cite{GaoNT24} 中的协议无离线阶段。不同 Beaver 三元组与分享相关性生成方式的组合对应了本文协议的不同离线复杂度。符号释义与表 \ref{tab:mpcsi-offline-comparisons} 相同。
+表 \ref{tab:mpsu-comparisons} 和表 \ref{tab:mpsu-offline-comparisons} 分别展示了相关工作提出的 MPSU 协议与与本章实例化协议在在线阶段与离线阶段的理论对比，其中文献 \cite{GaoNT24} 中的协议无离线阶段。在表格中： $l$ 为元素的比特长度。其他符号释义与上述表格保持一致。
 
 \begin{table}[htbp]
 \centering
@@ -528,12 +523,14 @@ MPSI-card-sum 协议通过利用 6.2 节中“带载荷的批量全成员零分�
 \vspace*{\fill}
 \end{figure}
 
-\begin{sidewaysfigure}
+\begin{table}[p]
+\centering
+\vspace*{\fill}
+
+\begin{adjustbox}{angle=90,center}
+\begin{minipage}{\textheight}
 \centering
 
-% ===== 表1 =====
-\begin{minipage}{\textwidth}
-\centering
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{|>{\centering\arraybackslash}p{1cm}|ccccccccccccccc|ccccc|}
 \hline
@@ -546,15 +543,13 @@ MPSI-card-sum 协议通过利用 6.2 节中“带载荷的批量全成员零分�
 5 & \multicolumn{1}{c|}{0.027} & \multicolumn{1}{c|}{0.094} & \multicolumn{1}{c|}{0.474} & \multicolumn{1}{c|}{3.150} & \multicolumn{1}{c|}{15.49} & \multicolumn{1}{c|}{3.650} & \multicolumn{1}{c|}{5.729} & \multicolumn{1}{c|}{7.288} & \multicolumn{1}{c|}{13.17} & \multicolumn{1}{c|}{43.06} & \multicolumn{1}{c|}{3.843} & \multicolumn{1}{c|}{6.526} & \multicolumn{1}{c|}{12.10} & \multicolumn{1}{c|}{36.71} & \multicolumn{1}{c|}{133.6} & \multicolumn{1}{c|}{2.486} & \multicolumn{1}{c|}{9.890} & \multicolumn{1}{c|}{39.56} & \multicolumn{1}{c|}{158.6} & 636.2 \\ \hline
 10 & \multicolumn{1}{c|}{0.039} & \multicolumn{1}{c|}{0.120} & \multicolumn{1}{c|}{0.632} & \multicolumn{1}{c|}{3.610} & \multicolumn{1}{c|}{16.65} & \multicolumn{1}{c|}{6.474} & \multicolumn{1}{c|}{10.93} & \multicolumn{1}{c|}{13.79} & \multicolumn{1}{c|}{23.56} & \multicolumn{1}{c|}{71.36} & \multicolumn{1}{c|}{6.781} & \multicolumn{1}{c|}{12.76} & \multicolumn{1}{c|}{24.96} & \multicolumn{1}{c|}{78.64} & \multicolumn{1}{c|}{287.1} & \multicolumn{1}{c|}{5.493} & \multicolumn{1}{c|}{21.85} & \multicolumn{1}{c|}{87.37} & \multicolumn{1}{c|}{350.2} & 1405 \\ \hline
 \end{tabular}}
-\captionof{table}{本文的 MPSI-card-sum 协议的运行时间与通信开销}
+% ================= 第 1 个表格：MPSI-card-sum =================
+\captionof{table}{各 MPSI-card-sum 协议的运行时间与通信开销对比}
 \label{tab:mpsi-card-sum}
-\end{minipage}
 
 \vspace{1em}
 
-% ===== 表2 =====
-\begin{minipage}{\textwidth}
-\centering
+% ================= 第 2 个表格：MPSU =================
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{|c|c|ccccccccccccccc|ccccc|}
 \hline
@@ -573,8 +568,10 @@ MPSI-card-sum 协议通过利用 6.2 节中“带载荷的批量全成员零分�
 \captionof{table}{各 MPSU 协议的运行时间与通信开销对比}
 \label{tab:mpsu}
 \end{minipage}
+\end{adjustbox}
 
-\end{sidewaysfigure}
+\vspace*{\fill}
+\end{table}
 
 \section{本章小结}
 \esection{Summary}

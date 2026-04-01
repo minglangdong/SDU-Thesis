@@ -475,7 +475,7 @@ $Q_i$ 的 $n$ 组秘密分享向量记作 $[\! [ \textbf{r}_i ] \!] = (\textbf{r
   \item \textbf{方案 2：} 参与方执行所有的追加元素步骤。他们将秘密分享输入到一个通用 MPC 协议中。该通用 MPC 协议实现如下电路：首先通过是否拼接有全零字符串区分元素与随机值，然后截取出所有的元素值组成集合 $Y$，最后计算 $Y$ 上的任意函数。
 \end{itemize}
 
-\subsection{框架构造及安全性证明}
+\subsection{框架构造及安全性证明}\label{sec:mpso}
 
 令 $C_{s,B,l}^1$ 和 $C_{N,l'}^2$ 为两个电路：
 \begin{itemize}[itemsep=2pt,topsep=5pt,parsep=0pt,leftmargin=10pt]
@@ -496,7 +496,7 @@ $Q_i$ 的 $n$ 组秘密分享向量记作 $[\! [ \textbf{r}_i ] \!] = (\textbf{r
 1. \textbf{哈希分桶阶段.} 对于 $i \in [m] $，$P_i$ 执行布谷鸟哈希分桶 $\mathcal{C}_i^1, \cdots, \mathcal{C}_i^B \gets \Cuckoo_{h_1,h_2,h_3}^B(X_i)$ 以及简单哈希分桶 $\mathcal{T}_i^1, \cdots, \mathcal{T}_i^B \gets \Simple_{h_1,h_2,h_3}^B(X_i)$。
 
 2. \textbf{成员零分享阶段.} 对于 $\psi$ 中的第 $i$ 个子公式 $Q_i(x,X_{i_1},\cdots,X_{i_q})$ ($i \in [s]$)：
-\begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt]
+\begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt,leftmargin=10pt,label=(\alph*)]
     \item 若 $q = 1$（设 $i_1 = j$），则 $Q_i(x,X_j) = (x \in X_j)$。对于 $b \in [B]$，若 $\mathcal{C}_j^b$ 非空，$P_j$ 设置 $s_{i,j,b} = 0$，否则 $P_j$ 随机选取 $s_{i,j,b}$。$P_{j'}$ ($j' \neq j$) 设置 $s_{i,j',b} = 0$。
     \item 若 $q > 1$，设 $Q_i$ 相对于 $X_j$ 是局部的，并且对应的 $X_j$-局部剩余公式为 $Q'_i$。所有输入集合涉及在 $Q_i$ 内的参与方调用 $\FuncbMZS^{Q'_i}$，其中 $P_j$ 作为 $P_{\mathsf{pivot}}$ 输入 $\mathcal{C}_j^1, \cdots, \mathcal{C}_j^B$，其余参与方 $P_{j'}$ ($j' \in \{{i_1},\cdots,{i_q}\} \setminus \{j\}$) 输入 $\mathcal{T}_{j'}^1, \cdots, \mathcal{T}_{j'}^B$。在协议执行结束后，每个涉及的参与方 $P_{i'}$ ($i' \in \{{i_1},\cdots,{i_q}\}$) 收到向量 $\textbf{s}_{i,i'}=(s_{i,i',1},\cdots,s_{i,i',B})$，其中每个分量作为自己对应的分享份额。其余未涉及的参与方 $P_k$ ($k \in \{1,\cdots,m\} \setminus \{{i_1},\cdots,{i_q}\}$) 对于每个 $b \in [B]$ 设置对应的分享份额 $s_{i,k,b} = 0$。
 \end{enumerate}
@@ -504,22 +504,22 @@ $Q_i$ 的 $n$ 组秘密分享向量记作 $[\! [ \textbf{r}_i ] \!] = (\textbf{r
 参与方的后续动作取决于具体的目标功能：
 
 \item \textbf{MPSO：}
-    \textbf{3.} 对于 $i \in [s], b \in [B]$，$P_j$（步骤 2 中的 $j$）检查 $\mathcal{C}_j^b$：若非空，计算 $s'_{i,j,b} = \mathsf{code}(s_{i,j,b}) \oplus (x \Vert 0^{l'})$，其中 $x$ 为桶中元素；若为空，随机采样 $s'_{i,j,b} \gets \{0,1\}^{l+l'}$。\\
-    \textbf{4.} 各参与方 $P_k$ ($k \in [m]$) 构造向量 $\textbf{u}_k \in (\{0,1\}^{l+l'})^{sB}$，其中 对于$i \in [s], b \in [B]$，$u_{k,(i-1)B+b} = s'_{i,k,b}$。\\
+    3. 对于 $i \in [s], b \in [B]$，$P_j$（步骤 2 中的 $j$）检查 $\mathcal{C}_j^b$：若非空，计算 $s'_{i,j,b} = \mathsf{code}(s_{i,j,b}) \oplus (x \Vert 0^{l'})$，其中 $x$ 为桶中元素；若为空，随机采样 $s'_{i,j,b} \gets \{0,1\}^{l+l'}$。\\
+    4. 各参与方 $P_k$ ($k \in [m]$) 构造向量 $\textbf{u}_k \in (\{0,1\}^{l+l'})^{sB}$，其中 对于$i \in [s], b \in [B]$，$u_{k,(i-1)B+b} = s'_{i,k,b}$。\\
     \textbf{5.} 各参与方 $P_k$ ($k \in [m]$) 将 $\textbf{u}_k$ 输入到 $\FuncMS$，得到随机置换后的分享份额 $\textbf{u}_{k}'$。\\
     \textbf{6.} $P_j$ ($1 < j \le m$) 将 $\textbf{u}_j'$ 发给 $P_1$。$P_1$ 计算 $\textbf{u}' = \sum \textbf{u}_j'$，识别出所有满足 $y \Vert 0^{l'}$ 形式的分量，截取 $y$ 组成 $Y$ 并输出。
 
 \item \textbf{MPSO-card：}
-        \textbf{3.} 各参与方 $P_k$ ($k \in [m]$) 构造向量 $\textbf{u}_k \in \mathbb{F}^{sB}$，其中对于 $i \in [s], b \in [B]$，$u_{k,(i-1)B+b} = s_{i,k,b}$。\\
-        \textbf{4.} 各参与方 $P_k$ ($k \in [m]$) 将 $\textbf{u}_k$ 输入到 $\FuncMS$，得到随机置换后的分享份额 $\textbf{u}_{k}'$。\\
-        \textbf{5.} $P_j$ ($1 < j \le m$) 将 $\textbf{u}_j'$ 发送给 $P_1$。$P_1$ 统计重构结果 $\sum_{j \in [m]} \textbf{u}_j'$ 中 0 的数量，将其作为 $Y$ 的基数并输出。
+        3. 各参与方 $P_k$ ($k \in [m]$) 构造向量 $\textbf{u}_k \in \mathbb{F}^{sB}$，其中对于 $i \in [s], b \in [B]$，$u_{k,(i-1)B+b} = s_{i,k,b}$。\\
+        4. 各参与方 $P_k$ ($k \in [m]$) 将 $\textbf{u}_k$ 输入到 $\FuncMS$，得到随机置换后的分享份额 $\textbf{u}_{k}'$。\\
+        5. $P_j$ ($1 < j \le m$) 将 $\textbf{u}_j'$ 发送给 $P_1$。$P_1$ 统计重构结果 $\sum_{j \in [m]} \textbf{u}_j'$ 中 0 的数量，将其作为 $Y$ 的基数并输出。
 
 \item \textbf{ Circuit-MPSO（方案 1）：}
-        \textbf{3.} 所有参与方调用电路为 $C_{s,B,l}^1$ 的 $m$ 方通用 MPC 协议。对于 $i \in [s], k \in [m]$，$P_k$ 将分享份额 $s_{i,k,1},\cdots,s_{i,k,B}$ 输入到第 $i$ 部分电路；此外，$P_j$（与步骤 2 中的 $j$ 对应）输入 $\mathcal{C}_j^1,\cdots,\mathcal{C}_j^B$ 中的元素。
+        3. 所有参与方调用电路为 $C_{s,B,l}^1$ 的 $m$ 方通用 MPC 协议。对于 $i \in [s], k \in [m]$，$P_k$ 将分享份额 $s_{i,k,1},\cdots,s_{i,k,B}$ 输入到第 $i$ 部分电路；此外，$P_j$（与步骤 2 中的 $j$ 对应）输入 $\mathcal{C}_j^1,\cdots,\mathcal{C}_j^B$ 中的元素。
 
 \item \textbf{ Circuit-MPSO（方案 2）：}
-        \textbf{3.} 对于 $i \in [s], b \in [B]$，$P_j$（步骤 2 中的 $j$）检查 $\mathcal{C}_j^b$：若非空，计算 $s'_{i,j,b} = \mathsf{code}(s_{i,j,b}) \oplus (x \Vert 0^{l'})$，其中 $x$ 为桶中元素；若为空，随机采样 $s'_{i,j,b} \gets \{0,1\}^{l+l'}$。\\
-        \textbf{4.} 所有参与方调用电路为 $C_{N,l'}^2$ 的 $m$ 方通用 MPC 协议。对于 $i \in [s], b \in [B], k \in [m]$，$P_k$ 将 $s'_{i,k,b}$ 作为其第 $((i-1)B+b)$ 个输入。
+        3. 对于 $i \in [s], b \in [B]$，$P_j$（步骤 2 中的 $j$）检查 $\mathcal{C}_j^b$：若非空，计算 $s'_{i,j,b} = \mathsf{code}(s_{i,j,b}) \oplus (x \Vert 0^{l'})$，其中 $x$ 为桶中元素；若为空，随机采样 $s'_{i,j,b} \gets \{0,1\}^{l+l'}$。\\
+        4. 所有参与方调用电路为 $C_{N,l'}^2$ 的 $m$ 方通用 MPC 协议。对于 $i \in [s], b \in [B], k \in [m]$，$P_k$ 将 $s'_{i,k,b}$ 作为其第 $((i-1)B+b)$ 个输入。
 \end{trivlist}
 \end{minipage}
 \end{framed}
