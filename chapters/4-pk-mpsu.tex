@@ -92,7 +92,7 @@
 
 图 \ref{fig:proto-mpsu4} 形式化地描述了 PK-MPSU 协议的具体执行步骤。
 
-\begin{figure*}[!htb]
+\begin{figure*}[!htbp]
 \begin{framed}
 \begin{minipage}[c]{\textwidth}
 \begin{trivlist}
@@ -197,7 +197,7 @@
 
 当 $P_1 \notin \Corr$ 时，由于模拟器不知道最终并集，因此必须在 $P_{c}$ 的视图中将部分解密消息 $\textbf{c}_{c-1}''$ 修改为置换后的 $\Enc(pk, \perp)$。对比上述混合实验，我们只需在 $\mathsf{Hyb}_{4}$ 之后增加一个额外的混合实验，将所有重随机化后的部分解密消息 $\textbf{c}_{c-1}'$ 替换为 $\Enc(pk,\perp)$。由于敌手不知道诚实方 $P_1$ 的私钥 $sk_1$，因此无法获得部分私钥 $sk_{A_{c-1}} = sk_1 + sk_c + \dots + sk_m$的任何信息，基于 $\mathcal{E}$ 的多次加密不可区分性，其无法区分两组不同的密文列表，综上，该修改是不可区分的。
 
-上述分析同样适用于 $P_1 \in \Corr$ 时，被腐化方 $P_{d'+1}$ ($d' \ne d$) 视图中部分解密消息 $\textbf{c}_{d'}''$ 的模拟，即 $\textbf{c}_{d'}''$ 也利用置换后的 $\Enc(pk,\perp)$ 进行类似的计算。为避免冗余，在此省略具体分析。
+上述分析同样适用于 $P_1 \in \Corr$ 时，被腐化方 $P_{d'+1}$ ($d' \ne d$) 视图中部分解密消息 $\textbf{c}_{d'}''$ 的模拟，即 $\textbf{c}_{d'}''$ 也利用置换后的 $\Enc(pk,\perp)$ 进行类似的计算。为避免冗余，在此省略 $P_1 \in \Corr$ 时的具体分析。
 \end{proof}
 
 \section{复杂度分析与对比}
@@ -270,42 +270,48 @@
 
 % 尽管存在局限性，我们的 EC-元素空间 PK-MPSU 在许多场景中仍然非常有用。例如，我们在附录~\ref{sec:mpid} 中提出了第一个多方隐私 ID（Private ID）协议，其中我们的 EC-元素空间 PK-MPSU 作为核心子协议。我们的多方隐私 ID 利用了 PK-MPSU 的优势，实现了线性计算和通信复杂度，以及较低的通信成本。
 
-\section{MPSU 协议的实现与性能评估}
+\section{MPSU 协议的实现与性能评估}\label{sec:mpsu-test}
 \esection{MPSU Implementations and Performance Evaluation}
 
-为了全面评估本章提出的 PK-MPSU 协议以及第三章提出的 SK-MPSU 协议的实际表现，本文对这两个协议进行了实现，并与目前实际性能最好的 LG 协议~\cite{LG-ASIACRYPT-2023} 进行了多维度的性能对比与基准测试。需要指出的是，大多数早期 MPSU 工作 \cite{KS-CRYPTO-2005,Frikken-ACNS-2007,BA-ASIACCS-2012,GNT-eprint-2023} 均未提供公开代码实现，LG 协议的公开实现可从 \url{https://github.com/lx-1234/MPSU} 获取，而本文实现的代码已开源于 \url{https://github.com/real-world-cryptography/MPSU}。本节首先介绍协议实现的具体细节，然后给出实验环境与参数设置，最后分析实验结果。
+为了全面评估第三章提出的 SK-MPSU 协议以及本章提出的 PK-MPSU 协议的实际表现，本文对这两个协议进行了系统级实现，相关代码已开源于 \url{https://github.com/real-world-cryptography/MPSU}。由于早期 MPSU 工作 \cite{KS-CRYPTO-2005,Frikken-ACNS-2007,BA-ASIACCS-2012,GNT-eprint-2023} 均未提供公开的代码实现，本文选择目前实际性能最优的 LG 协议~\cite{LG-ASIACRYPT-2023} 作为基准对比方案，其开源实现可从 \url{https://github.com/lx-1234/MPSU} 获取。我们在相同的实验环境下对上述协议进行了多维度的性能对比与基准测试。本节将详细介绍具体的实现细节与参数设置、实验环境，并对实验测试结果进行深入分析。
 
-\subsection{实现细节}
+\subsection{实现细节与参数设置}
 
-本文基于 \texttt{C++} 实现了完整的 SK-MPSU 协议和 PK-MPSU 协议。实现过程中严格遵循协议设计，并对各个核心组件进行了模块化实现。在底层库的选择上：
+本文基于 \texttt{C++} 实现了完整的 SK-MPSU 协议和 PK-MPSU 协议。实现过程中严格遵循了协议的理论设计，并对各个核心组件（包括 batch ssPMT、mss-ROT、ROT、多方秘密分享洗牌以及 MKR-PKE）进行了高度模块化的封装。
+
+为了保证对比实验的公平性，实验统一采用以下参数设置：
 \begin{itemize}
-\item \textbf{VOLE.} 本文使用 \textsf{libOTe} \cite{libOTe} 提供的 VOLE 实现，并采用 Expand-Convolute codes \cite{RRT23} 实例化相关编码族。
-
-\item \textbf{OKVS 与 GMW.} 本文使用文献 \cite{RR-CCS-2022} 中提出的优化 OKVS 构造，并复用了 \cite{lib-volepsi} 中提供的 OKVS 实现。同时，本文复用 \cite{lib-volepsi} 中的 GMW 实现以构造 ssPEQT 协议。
-
-\item \textbf{ROT.} 随机不经意传输采用 \textsf{libOTe} 中实现的 SoftSpokenOT \cite{Roy22}，并将有限域大小设置为 5 比特以在计算与通信之间取得平衡。
-
-\item \textbf{Share Correlation.} 本文复用了 \cite{lib-psu} 中实现的 Permute+Share 方法 \cite{MS13,CGP-ASIACRYPT-2020} 来构造 SK-MPSU 与 LG 协议所需的 share correlation generation 过程。
-
-\item \textbf{MKR-PKE.} 在 PK-MPSU 协议中，多密钥重随机化公钥加密（MKR-PKE）基于 \textsf{openssl} \cite{lib-openssl} 提供的椭圆曲线实现进行构建，并采用曲线 \texttt{NIST P-256}（亦称 \texttt{secp256r1} 或 \texttt{prime256v1}）。
-
-\item 此外，本文使用 \textsf{cryptoTools} \cite{lib-cryptoTools} 实现哈希函数与伪随机数生成，并通过 \textsf{Coproto} \cite{lib-coproto} 实现网络通信。
+\item 本文将计算安全参数设定为 $\lambda = 128$，统计安全参数设定为 $\sigma = 40$。
+\item 基准测试评估了平衡数据场景（Balanced Scenario），即设定所有 $m$ 个参与方的输入集合大小相等。在 LG 协议与本文的 SK-MPSU 协议中，每个参与方持有 $n$ 个 64 比特的字符串元素；在本文的 PK-MPSU 协议中，每个参与方持有 $n$ 个编码为椭圆曲线压缩形式（Compressed Form）的元素。
+\item 在线程调度方面，每个参与方分配 $m - 1$ 个工作线程，以便同时与其他所有参与方进行网络交互。此外，分配 4 个后台线程用于执行具体的密码学操作，包括：生成分享相关性（适用于 LG 与 SK-MPSU 协议）、生成 Beaver 三元组（适用于所有协议）、执行并行对称加密（适用于 LG 协议）以及执行密文重随机化与部分解密（适用于 PK-MPSU 协议）。
 \end{itemize}
 
-\subsection{实验结果分析}
-
-我们测试了参与方数量 $m \in \{3, \dots, 10\}$ 以及集合规模 $n \in \{2^6, \dots, 2^{20}\}$ 的多种组合。结果显示，我们的协议在所有测试场景下均优于 LG 协议。
-
+在底层密码学原语的构建上，本文的具体选择如下：
 \begin{itemize}
-    \item \textbf{线性复杂度的优越性}：理论对比（表 \ref{tab:comparisons}）显示，PK-MPSU 是首个在标准半诚实模型下同时实现线性计算和通信复杂度的协议。实验数据进一步验证了这种优势，尤其是在参与方数量 $m$ 较多时，PK-MPSU 的开销增长远比非线性协议平缓。
-    \item \textbf{广域网环境下的表现}：PK-MPSU 在带宽受限的情况下表现尤为突出。在 50 Mbps 的 WAN 网络中，对于 9 个参与方、每方 $2^{18}$ 个元素的大规模场景，LG 协议耗时长达 6.6 小时，而本章 PK-MPSU 仅需 47 分钟。
-    \item \textbf{扩展性}：由于具备线性复杂度，PK-MPSU 是实验中唯一能够支持 10 个参与方、每方 $2^{18}$ 个元素规模运行的协议，充分证明了其“双线性”特征的实用价值。
+\item \textbf{batch ssPMT}：本文遵循第三章中对 batch ssPMT 的构造，基于两个轻量级的组件 —— 批量不经意可编程伪随机函数（batch oblivious programmable pseudorandom function, batch OPPRF）和秘密分享隐私等值测试（secret-shared private equality test, ssPEQT）实例化 batch ssPMT。其中，batch OPPRF 利用向量不经意线性求值（Vector Oblivious Linear Evaluation, VOLE）~\cite{BCGIKRS19,BCGIKS19,RRT23} 和不经意键值存储（oblivious key-value store, OKVS） \cite{PRTY20,GPRTY-CRYPTO-2021,RR-CCS-2022,BPSY-USENIX-2023} 来实例化。
+\item \textbf{ROT}：本文采用 SoftSpokenOT \cite{Roy22} 实例化 ROT，并将有限域大小设置为 5 比特以在计算与通信之间取得平衡。
+\item \textbf{VOLE}：本文采用基于带固定权重和正则噪声的对偶 LPN（Dual LPN with Fixed Weight and Regular Noise） \cite{BCGIKRS19,BCGIKS19} 构造 VOLE，并使用 Expand-Convolute 码 \cite{RRT23} 以实现近线性的伴随式计算（syndrome computation）。
+\item \textbf{多方秘密分享洗牌}：本文利用各参与方之间两两调用两方秘密分享洗牌协议 \cite{MS13,CGP-ASIACRYPT-2020} 来构造多方秘密分享洗牌协议的离线阶段中分享相关性（share correlations）的生成过程。
+\end{itemize}
+
+我们在系统实现上述原语构造的过程中调用了以下开源密码学库：
+\begin{itemize}
+\item \textbf{VOLE}：本文使用 \textsf{libOTe} \cite{libOTe} 提供的 VOLE 实现。
+\item \textbf{OKVS 与 GMW}：本文使用文献 \cite{RR-CCS-2022} 中提出的优化 OKVS 构造，并复用了 \cite{lib-volepsi} 中提供的 OKVS 实现。同时，本文复用 \cite{lib-volepsi} 中的 GMW 实现以构建 ssPEQT 模块。
+\item \textbf{ROT}：本文复用了 \textsf{libOTe} 中实现的 SoftSpokenOT \cite{Roy22}。
+\item \textbf{Share Correlation}：本文复用了 \cite{lib-psu} 中实现的两方秘密分享洗牌协议 \cite{MS13,CGP-ASIACRYPT-2020}。
+\item \textbf{MKR-PKE}：在 PK-MPSU 协议中，多密钥重随机化公钥加密（MKR-PKE）基于 \textsf{openssl} \cite{lib-openssl} 提供的椭圆曲线实现进行构建，并采用曲线 \texttt{NIST P-256}（亦称 \texttt{secp256r1} 或 \texttt{prime256v1}）。
+\item \textbf{其他支持库}：本文使用 \textsf{cryptoTools} \cite{lib-cryptoTools} 实现哈希函数与伪随机数生成，并通过 \textsf{Coproto} \cite{lib-coproto} 实现网络通信。
 \end{itemize}
 
 \subsection{实验结果与分析}
 
+本文的实验部署在阿里云虚拟机集群上，硬件配置为 Intel(R) Xeon(R) 2.70GHz CPU（32 个物理核心）和 128 GB 内存。网络环境通过 Linux 的 \texttt{tc} 命令进行模拟与控制。在局域网（LAN）设置中，带宽配置为 10 Gbps，往返时间（RTT）延迟设定为 0.1 ms。在广域网（WAN）设置中，本文测试了 400 Mbps 和 50 Mbps 两种网络带宽环境，RTT 延迟统一设定为 80 ms。
+在性能测量指标上，本文将运行时间定义为从协议启动到结束的最大耗时，其中包括消息在网络中的传输时间；将通信开销定义为 Leader 节点发送与接收的数据量总和。
+
 本文在不同参与方数量 $m \in \{3,4,5,7,9,10\}$ 以及不同集合规模 
-$n \in \{2^6,2^8,2^{10},2^{12},\\ 2^{14},2^{16},2^{18},2^{20}\}$ 的设置下对上述 MSPU 协议进行了大量的对比实验，并分别在 LAN 与 WAN 网络环境中测试协议性能。实验从四个维度评估协议效率：在线运行时间、总运行时间、在线通信开销以及总通信开销。实验结果如表 \ref{tab:time_lan} - \ref{tab:time_50mbps} 和 \ref{tab:comm} 所示，其中$m$ 表示参与方数量。本文中的 SK / PK 分别表示SK-MPSU 协议/ PK-MPSU 协议。带有 $*$ 的单元格表示在该实验中原始 LG 代码会产生错误结果。带有 $-$ 的单元格表示实验运行时内存耗尽。在同一实验设置中性能最优的协议用加粗字体标记。
+$n \in \{2^6,2^8,2^{10},2^{12},\\ 2^{14},2^{16},2^{18},2^{20}\}$ 的设置下对上述 MSPU 协议进行了大量的对比实验，并分别在 LAN 与 WAN 网络环境中测试协议性能。实验从四个维度评估协议效率：在线运行时间、总运行时间、在线通信开销以及总通信开销。
+实验结果如表 \ref{tab:time_lan} - \ref{tab:time_50mbps} 和 \ref{tab:comm} 所示，其中 $m$ 表示参与方数量。本文中的 SK / PK 分别表示SK-MPSU 协议/ PK-MPSU 协议。带有 $*$ 的单元格表示在该实验中原始 LG 代码会产生错误结果。带有 $-$ 的单元格表示实验运行时内存耗尽。在同一实验设置中性能最优的协议用加粗字体标记。
 
 % ================= 表格 1：LAN 环境 =================
 \begin{table}[p]
@@ -494,33 +500,29 @@ $n \in \{2^6,2^8,2^{10},2^{12},\\ 2^{14},2^{16},2^{18},2^{20}\}$ 的设置下对
 \label{tab:comm}
 \end{table}
 
-从实验结果可以观察到，在所有测试场景中，本文提出的 SK-MPSU 与 PK-MPSU 协议均优于 LG 协议。具体性能提升如下：
+综合分析实验数据，可以得出以下核心结论：在所有维度的测试场景中，本文提出的 SK-MPSU 与 PK-MPSU 协议均表现出优于 LG 协议的显著优势。具体性能提升详析如下：
 
 \begin{trivlist}
-\item \textbf{在线计算性能提升。}
-在 LAN 环境下，SK-MPSU 协议相比 LG 实现了 $3.9-10.0 \times$ 的加速；在 400 / 50 Mbps 网络环境下，相比 LG 分别实现了 $1.1-2.1 \times$ / $1.1-2.6 \times$ 的加速。例如，在在线阶段计算 3 个参与方、每方集合规模为 $2^{20}$ 的并集时，SK-MPSU 协议仅需 4.4 秒（LAN），以及 33.1 / 121.1 秒（400 / 50 Mbps），而 LG 分别需要 25.2 秒（LAN）和 54.1 / 234.4 秒（400 / 50 Mbps），因此分别实现了 $5.8 \times$ 和 $1.64 \times$ / $1.94 \times$ 的性能提升。
+\item \textbf{在线计算性能的提升.}
+在 LAN 环境下，SK-MPSU 协议相比 LG 实现了 $3.9 \sim 10.0 \times$ 的加速；在 400 Mbps 和 50 Mbps 网络环境下，相比 LG 分别实现了 $1.1 \sim 2.1 \times$ 和 $1.1 \sim 2.6 \times$ 的加速。例如，在在线阶段计算 3 个参与方、每方集合规模为 $2^{20}$ 的并集时，SK-MPSU 协议在 LAN、400 Mbps 和 50 Mbps 环境下的耗时分别仅需 4.4 秒、33.1 秒和 121.1 秒，而 LG 协议分别需要 25.2 秒、54.1 秒和 234.4 秒，从而分别实现了 $5.8 \times$、$1.64 \times$ 和 $1.94 \times$ 的性能提升。
 
-\item \textbf{总计算性能提升。}
-在 LAN 环境下，SK-MPSU 协议相比 LG 实现了 $1.2-7.8 \times$ 的加速。在 400 / 50 Mbps 网络环境下，PK-MPSU 协议相比 LG 分别实现了 $1.2-4.0 \times$ / $1.8-9.2 \times$ 的加速。例如，在 3 个参与方、每方集合规模为 $2^{20}$ 的并集计算中，SK-MPSU 协议在 LAN 环境下总运行时间为 96.2 秒，而 LG 需要 610.8 秒，因此实现了 $6.4 \times$ 的加速。又例如，在 9 个参与方、每方集合规模为 $2^{18}$ 的并集计算中，PK-MPSU 协议在 400 / 50 Mbps 网络下的总运行时间为 38.4 / 47.2 分钟，而 LG 分别需要 106.4 / 396.9 分钟，因此分别实现了 $2.8 \times$ / $8.5 \times$ 的性能提升。
+\item \textbf{总计算性能的提升.}
+在 LAN 环境下，SK-MPSU 协议相比 LG 实现了 $1.2 \sim 7.8 \times$ 的加速。在 400 Mbps 和 50 Mbps 网络环境下，PK-MPSU 协议相比 LG 分别实现了 $1.2 \sim 4.0 \times$ 和 $1.8 \sim 9.2 \times$ 的加速。例如，在 3 个参与方、每方集合规模为 $2^{20}$ 的并集计算中，SK-MPSU 协议在 LAN 环境下的总运行时间为 96.2 秒，而 LG 需要 610.8 秒，实现了 $6.4 \times$ 的加速。在 9 个参与方、每方集合规模为 $2^{18}$ 的并集计算中，PK-MPSU 协议在 400 Mbps 和 50 Mbps 网络下的总运行时间分别为 38.4 分钟和 47.2 分钟，而 LG 分别需要 106.4 分钟和 396.9 分钟，分别实现了 $2.8 \times$ 和 $8.5 \times$ 的性能提升。
 
-\item \textbf{在线通信开销降低。}
-SK-MPSU 协议的在线通信开销相比 LG 减少了 $1.2-4.9 \times$。例如，在在线阶段计算 3 个参与方、每方集合规模为 $2^{20}$ 的并集时，SK-MPSU 协议需要 455.6 MB 的通信量，而 LG 需要 917.0 MB，因此通信开销降低了 $2.0 \times$。
+\item \textbf{在线通信开销的降低.}
+SK-MPSU 协议的在线通信开销相比 LG 减少了 $1.2 \sim 4.9 \times$。例如，在在线阶段计算 3 个参与方、每方集合规模为 $2^{20}$ 的并集时，SK-MPSU 协议需要 455.6 MB 的通信量，而 LG 需要 917.0 MB，通信开销降低了 $2.0 \times$。
 
-\item \textbf{总通信开销降低。}
-PK-MPSU 协议的总通信开销相比 LG 减少了 $3.0-36.5\times$。例如，在计算 9 个参与方、每方集合规模为 $2^{18}$ 的并集时，PK-MPSU 协议仅需要 960.1 MB 的通信量，而 LG 需要 33360 MB，因此通信开销降低了 $34.8 \times$。
+\item \textbf{总通信开销的降低.}
+PK-MPSU 协议的总通信开销相比 LG 减少了 $3.0 \sim 36.5 \times$。例如，在计算 9 个参与方、每方集合规模为 $2^{18}$ 的并集时，PK-MPSU 协议仅需 960.1 MB 的通信量，而 LG 高达 33360 MB，通信开销降低了 $34.8 \times$。
 \end{trivlist}
 
-综上所述，本文提出的协议在不同应用场景中均表现出明显优势，并适用于不同的使用需求：
+综上所述，本文提出的两个 MPSU 协议在不同应用场景中形成了完美的互补，并适用于不同的实际需求：
 
 \begin{itemize}
-\item \textbf{SK-MPSU。}
-该协议在 LAN 与 WAN 环境下均具有最优的在线性能。特别地，在 LAN 环境中，当 3 个参与方各自持有 $2^{20}$ 个元素的集合时，在线阶段仅需 $4.4$ 秒；当 5 个参与方各自持有 $2^{20}$ 个元素的集合时，在线阶段仅需 $7$ 秒。在 WAN 环境下，由于在线通信开销更低，该协议在带宽较低的网络（50 Mbps）中相比 LG 取得了更显著的性能提升。此外，在 LAN 环境的大多数实验中，该协议也具有最优的总运行性能。因此，当在线性能是主要关注点，或者在高带宽网络中综合考虑总性能时，SK-MPSU 是最佳选择。
+\item \textbf{SK-MPSU：} 该协议在 LAN 与 WAN 环境下均具有最优的在线性能。特别地，在 LAN 环境中，当 3 个参与方各自持有 $2^{20}$ 个元素的集合时，在线阶段仅需 4.4 秒；当 5 个参与方各自持有 $2^{20}$ 个元素的集合时，在线阶段仅需 7.0 秒。在 WAN 环境下，由于在线通信开销更低，该协议在低带宽网络（50 Mbps）中相比 LG 取得了更显著的性能提升。此外，在 LAN 环境的大多数实验中，该协议也具有最优的总运行性能。因此，当系统对在线延迟要求极高，或者处于高带宽网络环境中时，SK-MPSU 是首选方案。
 
-\item \textbf{PK-MPSU。}
-该协议在 WAN 环境下具有最优的总运行性能，并且在带宽较低的网络（50 Mbps）中相比 LG 具有更显著的优势，这主要得益于其更低的总通信开销。例如，在 50 Mbps 网络环境中，当 9 个参与方各自持有 $2^{18}$ 个元素的集合时，LG 完整执行协议需要约 6.6 小时，而PK-MPSU 协议仅需 47 分钟。这表明 PK-MPSU 在带宽受限的网络环境中表现尤为突出。此外，从实验数据中可以看出，在参与方数量 $m$ 较多时，PK-MPSU 的开销增长远比非线性协议平缓，并且 PK-MPSU 是实验中唯一能够支持 10 个参与方、每方 $2^{18}$ 个元素规模运行的协议，充分证明了其“双线性”特征的实用价值。
+\item \textbf{PK-MPSU：} 该协议在 WAN 环境下具有最优的总运行性能，并且在低带宽网络（50 Mbps）中相比 LG 展现出更显著的优势，这主要得益于其极低的总通信开销。例如，在 50 Mbps 网络环境中，当 9 个参与方各自持有 $2^{18}$ 个元素的集合时，LG 完整执行协议需要约 6.6 小时，而 PK-MPSU 协议仅需 47 分钟，表明 PK-MPSU 在带宽受限的网络环境中具有较高的实用性。此外，实验数据表明，当参与方数量 $m$ 较多时，PK-MPSU 的开销增长远比非线性协议平缓。在测试中，PK-MPSU 是唯一能够支持 10 个参与方、每方 $2^{18}$ 元素规模稳定运行的协议，这得益于其线性的计算和通信复杂度，充分证明了其“双线性”特征所带来的理论优势在解决大规模网络拥塞与系统扩展性上的巨大实用价值。
 \end{itemize}
-
-
 
 \section{本章小结}
 \esection{Summary}

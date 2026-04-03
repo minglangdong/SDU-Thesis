@@ -9203,16 +9203,12 @@ isbn="978-3-030-75248-4"
 author = {Rosulek, Mike and Trieu, Ni},
 title = {Compact and Malicious Private Set Intersection for Small Sets},
 year = {2021},
-isbn = {9781450384544},
 publisher = {Association for Computing Machinery},
 address = {New York, NY, USA},
 url = {https://doi.org/10.1145/3460120.3484778},
 doi = {10.1145/3460120.3484778},
-abstract = {We describe a protocol for two-party private set intersection (PSI) based on Diffie-Hellman key agreement. The protocol is proven secure against malicious parties, in the ideal permutation + random oracle model.For small sets (500 items or fewer), our protocol requires the least time and communication of any known PSI protocol, even ones that are only semi-honest secure and ones that are not based on Diffie-Hellman. It is one of the few significant improvements to the 20-year old classical Diffie-Hellman PSI protocol of Huberman, Franklin, and Hogg (ACM Elec. Commerce 1999).Our protocol is actually a generic transformation that constructs PSI from a class of key agreement protocols. This transformation is inspired by a technique of Cho, Dachman-Soled, and Jarecki (CT-RSA 2016), which we streamline and optimize in several important ways to achieve our superior efficiency.},
-booktitle = {Proceedings of the 2021 ACM SIGSAC Conference on Computer and Communications Security},
 pages = {1166–1181},
 numpages = {16},
-location = {Virtual Event, Republic of Korea},
 series = {CCS '21}
 }
 
@@ -10155,4 +10151,51 @@ author    = {Peter Rindal},
   booktitle    = {{CCS} 2024},
   publisher    = {{ACM}},
   year         = {2024},
+}
+
+@inproceedings{RindalR17,
+  author       = {Peter Rindal and Mike Rosulek},
+  title     = {Malicious-Secure Private Set Intersection via Dual Execution},
+  booktitle    = {Proceedings of the 2017 {ACM} {SIGSAC} Conference on Computer and
+                  Communications Security, {CCS} 2017},
+  pages        = {1229--1242},
+  publisher    = {{ACM}},
+  year         = {2017}
+}
+
+@inproceedings{MiaoP0SY20,
+  author       = {Peihan Miao and
+                  Sarvar Patel and
+                  Mariana Raykova and
+                  Karn Seth and
+                  Moti Yung},
+  title     = {Two-Sided Malicious Security for Private Intersection-Sum with Cardinality},
+  booktitle    = {Advances in Cryptology - {CRYPTO} 2020 - 40th Annual International
+                  Cryptology Conference, {CRYPTO} 2020},
+  series       = {Lecture Notes in Computer Science},
+  pages        = {3--33},
+  publisher    = {Springer},
+  year         = {2020}
+}
+
+@inproceedings{PuGT26,
+  author       = {Sihang Pu and
+                  Jiahui Gao and
+                  Ni Trieu},
+  title     = {Malicious Private Set Union with Two-Sided Output},
+  booktitle    = {Advances in Cryptology - {EUROCRYPT} 2026},
+  series       = {Lecture Notes in Computer Science},
+    publisher    = {Springer},
+  year      = {2026}
+}
+
+@article{HN-JOC-2012,
+  author    = {Carmit Hazay and Kobbi Nissim},
+  title     = {Efficient Set Operations in the Presence of Malicious Adversaries},
+  journal   = {Journal of Cryptology},
+  volume    = {25},
+  number    = {3},
+  pages     = {383--433},
+  year      = {2012},
+  publisher = {Springer}
 }
