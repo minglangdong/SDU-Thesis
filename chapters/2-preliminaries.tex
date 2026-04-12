@@ -102,10 +102,11 @@
 本节将介绍构建本文协议所需的底层密码学原语。
 
 \subsection{不经意传输}
+\esubsection{Oblivious Transfer}
 
 不经意传输（Oblivious Transfer, OT）是 MPC 中的核心密码学原语，由 Rabin \cite{Rabin05} 首次提出。在最基础的二选一（1-out-of-2）OT 中，发送方 $\Sd$ 持有两条消息，接收方 $\Rcv$ 持有一个选择比特；协议执行结束后，$\Rcv$仅能获得其选择比特所对应的消息，而无法获得另一条消息的任何信息，同时发送方也无法获知接收方的选择比特。
 
-传统的 OT 协议构造往往高度依赖于公钥密码体制，这导致大量执行 OT 时会带来难以承受的计算开销。为了突破这一瓶颈，。Ishai 等人提出了 OT 扩展（OT Extension）技术 \cite{IKNP-CRYPTO-2003}。该技术允许参与方仅通过少量的公钥操作生成基础 OT，随后只需执行廉价的对称密钥操作便能将其扩展为大量的 OT 实例，从而极大降低了计算开销。近年来，Boyle 等人基于带噪声的奇偶性学习（Learning Parity with Noise, LPN）假设的伪随机相关性生成器（Pseudorandom Correlation Generator, PCG）技术~\cite{BCGIKS19,BCGIKRS19,RRT23} 进一步将 OT 扩展推向了极致，将通信开销压缩至次线性级别。
+传统的 OT 协议构造往往高度依赖于公钥密码体制，这导致大量执行 OT 时会带来难以承受的计算开销。为了突破这一瓶颈，。Ishai 等人提出了 OT 扩展（OT Extension）技术 \cite{IKNP-CRYPTO-2003}。该技术允许参与方仅通过少量的公钥密码操作生成基础 OT，随后只需执行廉价的对称密码操作便能将其扩展为大量的 OT 实例，从而极大降低了计算开销。近年来，Boyle 等人基于带噪声的奇偶性学习（Learning Parity with Noise, LPN）假设的伪随机相关性生成器（Pseudorandom Correlation Generator, PCG）技术~\cite{BCGIKS19,BCGIKRS19,RRT23} 进一步将 OT 扩展推向了极致，将通信开销压缩至次线性级别。
 
 本文主要使用随机不经意传输（Random OT, ROT），其理想功能 $\mathcal{F}_{\mathsf{ROT}}$ 如图 \ref{fig:func-rot} 所示。在 ROT 中，发送方 $\Sd$ 的两条消息不再由其事先指定，而是由理想功能均匀随机采样生成。本文的 ROT 组件采用 SoftSpokenOT \cite{Roy22} 协议来高效实例化。
 
@@ -126,7 +127,7 @@
 \end{figure}
 
 \subsection{向量不经意线性求值}
-\esection{Vector Oblivious Linear Evaluation}
+\esubsection{Vector Oblivious Linear Evaluation}
 
 不经意线性函数求值（Oblivious Linear-function Evaluation, OLE）可以被视为 OT 功能在算术域上的一种自然推广。具体而言，OLE 允许接收方安全地获得发送方持有的两个有限域上元素的线性组合，是 MPC 中的另一基础组件。
 
@@ -153,8 +154,8 @@
 \caption{子域向量不经意线性求值的理想功能 $\FuncSubVOLE$}\label{fig:func-subvole}
 \end{figure}
 
-\subsection{不经意伪随机函数}
-\label{sec:boprf}
+\subsection{不经意伪随机函数}\label{sec:boprf}
+\esubsection{Oblivious Pseudorandom Function}
 
 不经意伪随机函数（Oblivious Pseudorandom Function, OPRF）~\cite{FIPR-TCC-2005,CM-CRYPTO-2020,RS-EUROCRYPT-2021} 是 PSO 领域的核心原语。Kolesnikov 等人~\cite{KKRT-CCS-2016} 引入了批量不经意伪随机函数（batch oblivious pseudorandom function, batch OPRF），在第 $i$ 个实例中，发送方 $\Sd$ 获得一个 PRF 密钥 $k_i$，而接收方 $\Rcv$ 输入 $x_i$ 并获得该输入在对应密钥下的 PRF 结果 $\PRF(k_i, x_i)$。需要强调的是，对于每个独立的密钥，$\Rcv$ 仅能获得一个点的求值结果。图 \ref{fig:func-boprf} 中给出了 batch OPRF 的理想功能 $\FuncbOPRF$ 的形式化描述。
 
@@ -189,8 +190,8 @@
 \end{aligned}
 \end{gather*}
 
-\subsection{不经意键值存储}
-\label{sec:okvs}
+\subsection{不经意键值存储}\label{sec:okvs}
+\esubsection{Oblivious Pseudorandom Function}
 
 键值存储（Key-Value Store, KVS）~\cite{PRTY20,GPRTY-CRYPTO-2021} 是一种能够将一组键到对应值的映射关系进行高度紧凑表示的数据结构。
 
@@ -213,7 +214,7 @@
 \noindent \textbf{随机性（Randomness）.} 对于任意键值对集合 $A = \{(k_1, v_1), \cdots ,(k_n, v_n)\}$ 以及任意不在集合中的键 $k^* \notin \{k_1, \cdots , k_n\}$，在给定 $D \gets \Encode(A)$ 的情况下，$\Decode(D, k^*)$ 的输出分布与 $\mathcal{V}$ 上的均匀分布在统计上是不可区分的。
 
 \subsection{哈希分桶}
-\esection{Hashing to Bins}
+\esubsection{Hashing to Bins}
 
 哈希分桶（Hashing to Bins）技术~\cite{PSZ-USENIX-2014,PSZ-USENIX-2015} 被广泛用于 PSO 中，以确保不同参与方持有的相同元素被分配到具有相同索引的桶（bin）中。这种对齐是通过简单哈希（Simple Hashing）和布谷鸟哈希（Cuckoo Hashing）~\cite{PR04} 对输入集合进行预处理来实现的。
 
@@ -230,6 +231,7 @@
 该表达式表示使用哈希函数 $h_1, h_2, h_3$ 将集合 $X$ 中的元素哈希到 $B$ 个桶中。输出为布谷鸟哈希表 $\mathcal{C}^1, \cdots, \mathcal{C}^B$，其中对于任意 $x \in X$，存在唯一的 $i \in \{1, 2, 3\}$ 使得 $\mathcal{C}^{h_i(x)} = \{x \Vert i\}$。
 
 \subsection{不经意可编程伪随机函数}\label{sec:bopprf}
+\esubsection{Oblivious Programmable Pseudorandom Function}
 
 不经意可编程伪随机函数（Oblivious Programmable Pseudorandom Function, OPPRF）~\cite{KMPRT-CCS-2017,PSTY-EUROCRYPT-2019,CGS22,RS-EUROCRYPT-2021,RR-CCS-2022} 是 OPRF 的扩展，其允许发送方 $\Sd$ 首先生成一个均匀随机密钥 $k$，并根据 $k$ 和给定的键值对集合生成一个“提示值” $\mathsf{hint}$（提示生成算法记为 $\mathsf{hint} \gets \mathsf{Hint}(k, K, V)$，其中 $K$ 为键集合，$V$ 为值集合）。利用 $\mathsf{hint}$ 对 PRF $F$ 进行编程，使得 $F$ 对于特定输入（$K$ 中的键）输出特定的均匀值（$V$ 中的值），而对其他输入则输出伪随机值。这种在特定输入集上输出编程值的的 PRF 被称为可编程 PRF（Programmable PRF, PPRF）~\cite{PSTY-EUROCRYPT-2019}。接收方 $\Rcv$ 利用其输入和给定的 $\mathsf{hint}$ 计算 OPPRF，但其无法区分自己获得的是编程后的输出还是伪随机值。批量版本的 OPPRF（batch OPPRF）的理想功能 $\mathcal{F}_{\mathsf{bOPPRF}}$ 如图 \ref{fig:func-bopprf} 所示。
 
@@ -285,9 +287,8 @@ $\Sd$ 计算 OKVS $D = \Encode(A)$ 并将 $D$ 发送给 $\Rcv$。
 \caption{基于 batch OPRF 和 OKVS 的 batch OPPRF 协议 $\ProtobOPPRF$}\label{fig:proto-bopprf}
 \end{figure}
 
-\subsection{秘密分享隐私等值测试}
-\esection{Secret-Shared Private Equality Test}
-\label{sec:sspeqt}
+\subsection{秘密分享隐私等值测试}\label{sec:sspeqt}
+\esubsection{Secret-Shared Private Equality Test}
 
 秘密分享隐私等值测试（Secret-Shared Private Equality Test, ssPEQT）~\cite{PSTY-EUROCRYPT-2019,CGS22} 是一个两方协议，其中每个参与方各自输入一个元素。若双方输入元素相同，则他们获得 1 的比特秘密分享，否则获得 0 的比特秘密分享。图 \ref{fig:func-sspeqt} 定义了该理想功能。\footnote{为简化协议描述，假设输入元素的比特长度 $\gamma$ 是 2 的幂；否则，参与方在各自输入元素的末尾补 0。}
 
@@ -327,9 +328,8 @@ $\Sd$ 计算 OKVS $D = \Encode(A)$ 并将 $D$ 发送给 $\Rcv$。
 \caption{基于通用 MPC 的 ssPEQT 协议 $\ProtossPEQT$}\label{fig:proto-sspeqt}
 \end{figure}
 
-\subsection{多方秘密分享洗牌}
-\esection{Multi-Party Secret-Shared Shuffle}
-\label{sec:ms}
+\subsection{多方秘密分享洗牌}\label{sec:ms}
+\esubsection{Multi-Party Secret-Shared Shuffle}
 
 多方秘密分享洗牌是一个 $m$ 方协议，其目标是随机置换所有参与方持有的一组秘密分享向量并重分享其中每个秘密分量，同时确保置换顺序对于任意 $m-1$ 个参与方的共谋都是保密的。多方秘密分享洗牌的理想功能 $\FuncMS$ 在图 \ref{fig:func-ms} 中给出。
 
@@ -383,9 +383,8 @@ Eskandarian 等人~\cite{EB22} 提出了一种具有在线阶段极其高效的�
 \caption{在线高效的多方秘密分享洗牌协议 $\ProtoMS$}\label{fig:proto-ms}
 \end{figure}
 
-\subsection{多密钥重随机化公钥加密}
-\esection{Multi-Key Rerandomizable Public-Key Encryption}
-\label{sec:mkr-pke}
+\subsection{多密钥重随机化公钥加密}\label{sec:mkr-pke}
+\esubsection{Multi-Key Rerandomizable Public-Key Encryption}
 
 Gao 等人~\cite{GNT-eprint-2023} 引入了多密钥重随机化公钥加密（Multi-Key Rerandomizable Public-Key Encryption, MKR-PKE）的概念，这是 PKE 的一种变体，具有若干额外的属性。令 $\mathcal{SK}$ 表示私钥空间（在运算 $+$ 下构成阿贝尔群），$\mathcal{PK}$ 表示公钥空间（在运算 $\cdot$ 下构成阿贝尔群）。$\mathcal{M}$ 表示明文空间，$\mathcal{C}$ 表示密文空间。MKR-PKE 是一个 PPT 算法组 $(\Gen, \Enc, \ParDec, \Dec, \ReRand)$，满足：
 \begin{itemize}

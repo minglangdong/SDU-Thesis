@@ -231,7 +231,7 @@
 \newcommand{\content}{
 	\maketableofcontents
 	% English TOC
-	% \tableofengcontents
+	\tableofengcontents
 	\cleartochapter
 }
 % ---- 中文目录 ----
@@ -289,7 +289,7 @@
 }
 % ---- 英文摘要 ----
 \newcommand\enabstractname{ABSTRACT}
-\newcommand\enkeywordsname{Keywords}
+\newcommand\enkeywordsname{Key words}
 \newcommand\enkeywords[1]{\vspace{1cm}\noindent{\bfseries\zihao{-4}\enkeywordsname: }#1}
 \newenvironment{enabstract}{%
 	\cleartochapter

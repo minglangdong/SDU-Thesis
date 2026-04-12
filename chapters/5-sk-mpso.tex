@@ -1,10 +1,10 @@
-\chapter{基于对称密钥的通用多方隐私集合运算框架}
-\echapter{Generic Multi-Party Private Set Operations Framework Based on Symmetric-Key Operations}
+\chapter{基于对称密码技术的通用多方隐私集合运算框架}
+\echapter{Generic Symmetric-Key Multi-Party Private Set Operations Framework}
 
 \section{引言}
 \esection{Introduction}
 
-在第三章和第四章中，本文重点研究了多方隐私集合求并（Multi-party Private Set Union, MPSU）这一特定功能，并分别基于对称密钥技术和公钥密码技术提出了满足标准半诚实安全的高效协议。然而，在实际应用中，多方隐私集合运算（MPSO）的需求远不止于单一的交集或并集计算。现实的数据协作场景通常需要对交、并、差等基本运算进行组合，从而形成更为复杂的集合公式计算。以下三个典型应用场景生动地说明了现实世界的数据共享与协作分析对集合复合公式计算的的迫切需求：
+在第三章和第四章中，本文重点研究了多方隐私集合求并（Multi-party Private Set Union, MPSU）这一特定功能，并分别基于对称密码技术和公钥密码技术提出了满足标准半诚实安全的高效协议。然而，在实际应用中，多方隐私集合运算（MPSO）的需求远不止于单一的交集或并集计算。现实的数据协作场景通常需要对交、并、差等基本运算进行组合，从而形成更为复杂的集合公式计算。以下三个典型应用场景生动地说明了现实世界的数据共享与协作分析对集合复合公式计算的的迫切需求：
 
 \begin{itemize}
     \item \textbf{公共卫生监测与决策支持.}在传染病防控中，卫生部门需精准识别“已接种特定疫苗但仍被确诊感染”的人群。这要求首先联合多家疾控中心的接种名单计算并集 $\bigcup V_i$，随后与各医疗机构持有的确诊名单的并集 $\bigcup D_i$ 计算交集 $(\bigcup V_i) \cap (\bigcup D_i)$，其中 $V_i$ 与 $D_i$ 分别代表第 $i$ 家疾控中心持有的接种名单与第 $i$ 家医疗机构持有的确诊名单。此类分析对于评估疫苗有效性及制定后续防疫政策至关重要。
@@ -39,6 +39,7 @@
 本节给出一种用于表示任意集合公式的统一形式 —— 规范集合谓词公式（Canonical Set Predicate Formula, CSPF）。该表示方式是本章统一框架的表示层基础，通过把目标集合公式表示为若干个子公式的析取，将其对应的结果集合 $Y$ 划分为若干个相互不相交的子集合 $\{Y_1, \cdots, Y_s\}$，并且满足每个 $Y_i$ 一定是某个输入集合的子集，从而为后续 MPSO 框架的设计和其中基于成员零分享的模块化计算提供结构支持。下面通过定义一系列概念来精确地刻画这些结构性质，从而形式化规范集合谓词公式的定义。
 
 \subsection{可构造集合与集合谓词公式}
+\esubsection{Constructible Sets and Set Predicate Formulas}
 
 设 $X_1,\cdots,X_m$ 为 $m$ 个参与方的私有集合。首先形式化由这些集合通过任意集合公式的计算所能得到的结果集合，称为 $X_1, \cdots, X_m$ 上的可构造集合（constructible set）。
 
@@ -92,6 +93,7 @@ $$\varphi(x, X_1, \cdots, X_m) = (x \in X_i) \land \psi(x, X_1, \cdots, X_{i-1},
 \end{corollary}
 
 \subsection{规范集合谓词公式表示}
+\esubsection{Canonical Set Predicate Formula Representation}
 
 在上述概念的基础上，下面正式给出规范集合谓词公式的定义。
 
@@ -170,6 +172,7 @@ $$C'_i = \bigwedge_{j=1}^{i-1} \neg C_j \land (x \in X_j) \land D_i = (x \in X_j
 本节引入一种新型密码学原语 —— 谓词零分享（Predicative Zero-Sharing）。该原语本质上是一类协议族，其中每个协议都与一个谓词公式相关联，其核心功能是将该公式在参与方输入上的真值“不经意地”编码为参与方之间的一个零分享（当真值结果为真时）或随机分享（当真值结果为假时）。该原语可以看作是多种现有 MPC 协议的统一抽象，并为后续 MPSO 框架的设计提供统一的组合接口。
 
 \subsection{功能定义}\label{def:pzs}
+\esubsection{Functionality Definition}
 
 谓词零分享协议允许 $m$ ($m \ge 2$) 个持有私有输入的参与方获得一组在有限域 $\mathbb{F}$ 上的秘密分享：如果与协议相关联的谓词公式 $Q$ 在所有参与方的输入上的取值为真，那么参与方获得 $0$ 的秘密分享；否则，参与方获得一个独立且均匀采样的随机值的秘密分享。该\textbf{概率性}功能 $\FuncPZS^Q$ 的形式化定义如图~\ref{fig:func-pzs} 所示。
 
@@ -186,6 +189,7 @@ $$C'_i = \bigwedge_{j=1}^{i-1} \neg C_j \land (x \in X_j) \land D_i = (x \in X_j
 \end{figure}
 
 \subsection{安全性松弛}\label{relaxed-pzs}
+\esubsection{Security Relaxation}
 
 谓词零分享的提出源于对许多现有 MPC 协议的高度抽象。鉴于该功能的概率性本质，这些协议必须满足定义~\ref{def:prob-secure} 才能安全地计算谓词零分享。该定义蕴含以下结论：当 $Q(x) = 0$ 时，参与方之间分享的随机秘密值独立于任意 $m-1$ 个参与方的联合视图。在这些协议中，一些协议，例如第三章提出的 mss-ROT，其安全性严格遵循标准定义，实现了标准的谓词零分享功能；然而，我们注意到，更广泛的一类协议，例如 ROT 和等值条件随机数生成（Equality-Conditional Randomness Generation, ECRG）~\cite{Jia0ZG24} 实现的是一种类似的功能，其不同之处在于：若 $Q(x) = 0$，则参与方之间分享的均匀随机秘密值并不独立于任意 $m-1$ 个参与方的联合视图。
 下面以 ROT 为例说明 ROT 协议实现了该类松弛版本的谓词零分享（Relaxed Predicative Zero-Sharing）功能（其关联谓词公式为用于测试选择比特是否为 $1$ 的简单谓词：设发送方 $\Sd$ 将其分享份额设置为 $s_1 = -r_0$，其中 $r_0$ 是来自 ROT 的第一条消息；设接收方 $\Rcv$ 将其分享份额设置为 $s_2 = r_e$，即接收到的消息。鉴于 ROT 的功能可以表示为 $-r_0 + r_e = e \cdot (-r_0 + r_1)$，若 $e = 0$，则 $s_1 + s_2 = 0$；否则，$s_1 + s_2 = -r_0 + r_1$，该值是均匀随机分布的，但依赖于发送方 $\Sd$ 视图中 ROT 的输出消息。
@@ -300,6 +304,7 @@ $$f(\textbf{x}) =
 \end{remark}
 
 \subsection{从松弛到标准的转化技术}\label{transform-pzs}
+\esubsection{Transformation from Relaxed to Standard Version}
 
 本节给出一种将松弛谓词零分享转化为关联相同谓词公式的满足标准半诚实安全的谓词零分享的高效方法：
 假设所有参与方已调用松弛谓词零分享协议 $\ProtorPZS^Q$ 获得了一组秘密分享 $[\! [ r ] \!] = (r_1, \cdots, r_m)$，其目标是生成一组满足标准谓词零分享安全性定义的秘密分享 $[\! [ s ] \!] = (s_1, \cdots, s_m)$。为此，参与方只需在离线阶段准备一组随机值的秘密分享 $[\! [ b ] \!]$（由每个参与方 $P_i$ 采样一个均匀随机的分享份额 $b_i$），并在在线阶段协作执行一次安全乘法计算 $[\! [ s ] \!] = [\! [ r ] \!] \cdot [\! [ b ] \!]$。
@@ -332,6 +337,7 @@ s = r \cdot b = (r+a-a) \cdot b = (r+a) \cdot b - a \cdot b
 上述优化后的转化技术采用星型通信拓扑，这使其能够集成到后续将介绍的 MPSO 协议中而不改变其原有拓扑结构 —— 从而在保证其标准半诚实安全性的同时，实现优越的复杂度性能。
 
 \subsection{从简单到复合的组合技术}\label{compound-pzs}
+\esubsection{Composition from Simple to Composite Version}
 
 根据所关联的谓词公式 $Q$ 的类型，可将谓词零分享协议分为两类：若 $Q$ 是一个简单谓词，则称之为简单谓词零分享（Simple Predicative Zero-Sharing）；若 $Q$ 是一个复合谓词，即 $Q$ 由 $q>1$ 个文字（原子命题或其否定）和逻辑联结词 $\land$ 与 $\lor$ 构成，其中每个文字 $Q_i$ 是一个简单谓词或其否定 ($i \in [q]$)，则称对应的谓词零分享为复合谓词零分享（Compound Predicative Zero-Sharing）。本节将介绍将简单谓词零分享协议组合成复合谓词零分享协议的高效方法 —— 对于任何复合谓词 $Q$，只要为其中每个文字 $Q_i$ 构造对应的松弛版本的简单谓词零分享协议，就可以构造与 $Q$ 相关联的满足标准半诚实安全的复合谓词零分享协议。
 
@@ -381,6 +387,7 @@ s = r \cdot b = (r+a-a) \cdot b = (r+a) \cdot b - a \cdot b
 本节的目标是为任意一阶集合谓词公式构造完整的成员零分享协议。从宏观来看，我们的构造遵循图~\ref{fig:proto-cpzs} 中给出的构建谓词零分享的技术路线。要构造具体协议，我们还需要实例化其中的松弛谓词零分享组件 —— 更具体地，在本章集合谓词公式的语境下，松弛成员零分享。鉴于任何集合谓词公式仅由两类文字组成 —— 集合成员谓词 $x \in Y$ 及其否定 $x \notin Y$，因此问题可归约为在两方场景下分别构造与这两个简单谓词相关联的松弛成员零分享协议。
 
 \subsection{功能定义}\label{sec:mzs}
+\esubsection{Functionality Definition}
 
 成员零分享协议允许 $m$ ($m \ge 2$) 个参与方参与，其中一个参与方（记为 $P_\mathsf{pivot}$）持有一个元素 $x$ 作为输入，而其他每个参与方 $P_j$ ($j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}$) 持有一个集合 $X_j$ 作为输入。如果关联的集合谓词公式 $Q(x,X_1,\cdots,X_{\mathsf{pivot}-1},X_{\mathsf{pivot}+1},\cdots, X_m) = 1$，参与方将获得 $0$ 的秘密分享；否则，他们将获得一个随机值的秘密分享。
 
@@ -399,18 +406,21 @@ s = r \cdot b = (r+a-a) \cdot b = (r+a) \cdot b - a \cdot b
 \end{figure}
 
 \subsection{针对集合成员谓词的松弛成员零分享}\label{zs-PMT}
+\esubsection{Relaxed Membership Zero-Sharing for Set Membership Predicate}
 
 针对集合成员谓词 $x \in Y$ 的一类松弛成员零分享可以定义为如下两方功能：包含两个参与方，即持有集合 $Y$ 的发送方 $\Sd$ 和持有元素 $x$ 的接收方 $\Rcv$。该功能采样 $s,r \gets \mathbb{F}$，若 $x \in Y$，则设 $u = -r$；否则 $u = s - r$。同时，它生成一个包含关于 $s$ 的部分信息的中间消息 $\mathsf{leak}$。最后，该功能向 $\Sd$ 输出 $r, \mathsf{leak}$，向 $\Rcv$ 输出 $u$。其中的 $\mathsf{leak}$ 允许在 $x \notin Y$ 时向 $\Sd$ 泄露关于秘密值 $s$ 的部分信息，从而体现了松弛谓词零分享中的安全性松弛。
 
 从 $\Rcv$ 的视角看，若 $x \in Y$，则 $u = -r$；否则由于 $s$ 是由该功能均匀采样的，且 $\Rcv$ 未获得关于 $s$ 的额外信息，故 $u = s - r$ 是随机的。因此，$u$ 可以看作是一个“可编程”随机函数 $f$ 在 $x$ 处的取值，其中 $f$ 在集合 $Y$ 的元素上的取值均被编程为相同的均匀随机值 $-r$，而其他位置的取值为随机值。为了高效实例化该功能，令 $f$ 为一个可编程 PRF（programmable PRF, PPRF）。向 $\Sd$ 泄露的 $\mathsf{leak}$ 即为 PRF 密钥，而 $\Rcv$ 通过与 $\Sd$ 调用 OPPRF 来不经意地计算 $u = f(\mathsf{leak}, x)$。具体构造如下：$\Sd$ 采样一个均匀随机值 $r$，并将 $Y$ 设置为关键字集合，将 $n$ 个重复的值 $-r$ 设置为对应的值集合。随后 $\Sd$ 和 $\Rcv$ 调用 OPPRF，其中 $\Rcv$ 输入 $x$ 并获得 $u$。最后，$\Sd$ 和 $\Rcv$ 分别输出 $r$ 和 $u$。根据 OPPRF 的功能，若 $x \in Y$，则 $u = -r$；否则 $u$ 是伪随机的。向 $\Sd$ 输出的 $\mathsf{leak}$ 即为来自 OPPRF 的 PRF 密钥。该协议可以利用 batch OPPRF 自然地扩展到批量版本。
 
 \subsection{针对集合非成员谓词的松弛成员零分享}\label{zs-PNMT}
+\esubsection{Relaxed Membership Zero-Sharing for Set Non-membership Predicate}
 
 针对集合非成员谓词 $x \notin Y$ 的一类松弛成员零分享协议可以定义为如下两方功能：发送方 $\Sd$ 输入集合 $Y$，接收方 $\Rcv$ 输入元素 $x$。该功能采样 $s,r \gets \mathbb{F}$，若 $x \notin Y$，则设 $u = -r$；否则 $u = s - r$。它同样生成一个包含关于 $s$ 的部分信息的中间消息 $\mathsf{leak}$。最后，该功能向 $\Sd$ 输出 $r, \mathsf{leak}$，向 $\Rcv$ 输出 $u$。
 
 该功能在直觉上与秘密分享隐私成员测试（ssPMT）高度相似： —— 两者在 $x \notin Y$ 时均产生 0 的秘密分享。核心区别在于，本协议输出的是有限域 $\mathbb{F}$ 上的零分享，其中输出 $0$ 的秘密分享的对立事件是输出 $\mathbb{F}$ 中一个随机值的秘密分享；而 ssPMT 输出的是 $\mathbb{F}_2$ 上的比特秘密分享，其中输出 $0$ 的秘密分享的对立事件是输出 $1$ 的秘密分享。鉴于第三章中给出了高效的批量秘密分享隐私成员测试（batch ssPMT）构造，我们的目标是高效地将比特秘密分享转化为零分享（批量版本首先由参与方调用 batch ssPMT，随后执行 $n$ 次转化）。回顾第 \ref{def:pzs} 节中，ROT 被视为一种与谓词 $e = 0$ 相关联的松弛简单谓词零分享。ROT 的一种变体涉及由 $\Sd$ 和 $\Rcv$ 分别持有的两个选择比特 $e_0, e_1$~\cite{LG-ASIACRYPT-2023,Jia0ZG24,DongCZB24}，它是一种关联谓词为 $e_0 \oplus e_1 = 0$ 的松弛简单谓词零分享。这种“双选择比特”的 ROT 实际上可以看作是从比特秘密分享到零分享的一种转化：执行协议后，$\Sd$ 获得 $r_0, r_1 \in \mathbb{F}$，而 $\Rcv$ 获得 $r_{e_0 \oplus e_1} \in \mathbb{F}$\footnote{这种双选择比特 ROT 与标准的 2 选 1 ROT 等价，其中 $e_0$ 由 $\Sd$ 采样，用于指示是否交换 $r_0$ 和 $r_1$ 的顺序，如图~\ref{fig:proto-cmzs} 所示。}。令 $\Sd$ 设置 $r = -r_0$，$\Rcv$ 设置 $u = r_{e_0 \oplus e_1}$，则若 $e_0 \oplus e_1 = 0$，有 $r + u = 0$；否则 $r + u = r_1 - r_0 = s$ 是随机的。向 $\Sd$ 泄露的 $s$ 即为 $r_1$（因为 $\Sd$ 获知了 $r_0, r_1$，故可计算 $s$）。
 
 \subsection{针对任意集合谓词公式的成员零分享}\label{sec:compound-mzs}
+\esubsection{Membership Zero-Sharing for Arbitrary Set Predicate Formulas}
 
 利用上述针对两方松弛成员零分享协议的实例化，我们在图~\ref{fig:proto-cmzs} 中给出了针对任意集合谓词公式 $Q$ 的完整批量成员零分享协议。
 
@@ -452,9 +462,10 @@ $Q_i$ 的 $n$ 组秘密分享向量记作 $[\! [ \textbf{r}_i ] \!] = (\textbf{r
 \end{trivlist}
 
 \section{实现通用功能及其扩展的 MPSO 框架}
-\esection{MPSO Framework with Generic MPSO and Extended Functionalities}
+\esection{MPSO Framework with Generic Functionality and Extensions}
 
 \subsection{技术路线概述}
+\esubsection{Technical Overview}
 
 本章提出的 MPSO 框架可分为两个阶段：第一阶段基于任何可构造集合 $Y$ 的 CSPF 表示 $\psi(x, X_1, \cdots, X_m)$，目标是各方获得与 $Y$ 的一个划分相对应的秘密分享。回顾 $\psi = Q_1 \lor \cdots \lor Q_s$，对于每个子公式 $Q_i$（$i \in [s]$），
 设 $X_{i_1},\cdots,X_{i_q}$（$q \in [m]$）为 $Q_i$ 中所有原子命题涉及的集合，并用 $X_j$ ($j \in \{{i_1},\cdots,{i_q}\}$) 表示 $Q_i$ 相对于其满足局部性的集合。即：$$Q_i(x,X_{i_1},\cdots,X_{i_q}) = (x \in X_j) \land Q'_i(x,X_{i_1},\cdots,X_{j-1},X_{j+1},\cdots,X_{i_q})$$ 其中 $Q'_i$ 是 $Q_i$ 的 $X_j$-局部剩余公式。设 $Y_i$ 为由 $Q_i$ 表示的集合，则 $Q'_i$ 本质上是针对 $X_j$ 中元素关于 $Y_i$ 的成员测试集合谓词公式。我们先给出第一阶段的初步构造：对于每个 $Q_i$，$P_{i_1},\cdots,P_{i_q}$ 调用 $n$ 个与 $Q'_i$ 相关联的成员零分享实例。在每个实例中，$P_j$ 作为 $P_{\mathsf{pivot}}$ 输入 $X_j$ 中的一个元素。对于每个 $x \in X_j$，如果 $Q'_i = 1$，参与方收到 0 的秘密分享，否则收到随机值的秘密分享。$P_j$ 将 $x$ 加到其对应的分享份额上，使得对于每个 $x \in X_j$，如果 $Q_i = 1$（即 $Q'_i = 1$），各方收到 $x$ 的秘密分享，否则还是收到随机值的秘密分享。
@@ -476,6 +487,7 @@ $Q_i$ 的 $n$ 组秘密分享向量记作 $[\! [ \textbf{r}_i ] \!] = (\textbf{r
 \end{itemize}
 
 \subsection{框架构造及安全性证明}\label{sec:mpso}
+\esubsection{Framework Construction and Security Proof}
 
 令 $C_{s,B,l}^1$ 和 $C_{N,l'}^2$ 为两个电路：
 \begin{itemize}[itemsep=2pt,topsep=5pt,parsep=0pt,leftmargin=10pt]
@@ -583,6 +595,7 @@ Circuit-MPSO（方案2）的安全性证明相同。协议的安全性证明与�
 \end{trivlist}
 
 \subsection{复杂度分析}
+\esubsection{Complexity Analysis}
 
 图~\ref{fig:proto-MPSO} 中的计算和通信复杂度均由所计算的可构造集合 $Y$ 的 CPSF 表示 $\psi(x, X_1, \cdots, X_m)$ 形式决定，其中 $\psi = Q_1 \lor \cdots \lor Q_s$。
 
@@ -614,11 +627,13 @@ $P_j$ 的通信复杂度同样可以计算为两部分：
 \section{本章小结}
 \esection{Summary}
 
-本章致力于解决多方隐私集合运算（MPSO）领域中通用性与效率难以兼顾的长期挑战。针对现实世界中复杂的集合复合公式计算需求，本章构建了一套标准半诚实模型下、兼具通用表达能力与实际可用效率的统一 MPSO 计算框架。
+本章致力于解决多方隐私集合运算（MPSO）领域中通用性与效率难以兼顾的长期挑战。针对现实世界中复杂的集合复合公式计算需求，本章构建了一套在标准半诚实模型下同时实现通用 MPSO 功能并且具备实际可用效率的 MPSO 统一框架。本章的技术体系主要涵盖了三个关键层面：
 
-本章的技术体系主要涵盖了三个关键层面：
-首先，在表示层，本章引入了“规范集合谓词公式（CSPF）”，通过将任意可构造集合公式转化为若干互不相交的局部子公式析取范式，成功地将复杂的复合集合运算问题规约为了若干相互独立的原子子公式计算问题，为系统的并行化与模块化设计奠定了理论基础。
-其次，在原语层，本章提出并实例化了“成员零分享（Membership Zero-Sharing）”协议。该原语作为本框架的核心构建模块，不仅通过松弛定义有效地兼容了多种底层密码学原语，还通过一套严谨的组合与转化技术，实现了从原子谓词到任意复杂集合谓词公式的高效计算能力，确保了协议的模块化扩展性。
-最后，在框架层，本章结合布谷鸟哈希分桶技术与多方秘密分享洗牌协议，构造了 MPSO 统一计算框架。该框架能够无缝支持 MPSO、MPSO-card（求势）以及基于电路的通用 MPSO（Circuit-MPSO）功能，从而能够灵活适配从简单交并集计算到复杂跨机构隐私决策分析等多样化的实际应用场景。
+\begin{itemize}
+    \item \textbf{表示层：} 本章引入了规范集合谓词公式（CSPF）表示方式。该方法将目标集合公式表示为一类由原子集合谓词构成的析取范式。其中每个子公式满足特定的局部性并共同表示目标集合的一个划分。这使得复杂的集合运算被转化为若干个相互独立的子公式计算问题，为系统的并行化与模块化设计奠定了理论基础。
+    \item \textbf{原语层：} 本章提出了一类可组合的新型密码学原语——谓词零分享（Predicative Zero-Sharing），并在集合运算场景下给出了其特化实例——成员零分享（Membership Zero-Sharing）。同时，本章设计了一种自底向上的高效构造范式，从关联于原子命题（或其否定）的松弛成员零分享出发，逐步构造出关联于任意集合谓词公式、满足标准半诚实安全的成员零分享协议。该范式为框架的通用性和实用性提供了核心技术支撑。
+。
+    \item \textbf{框架层：} 基于 CSPF 表示法与成员零分享原语，并结合哈希分桶技术与多方秘密分享洗牌协议，本章构建了支持任意集合公式计算的 MPSO 统一框架。该框架的基本思想是将输入集合中所有满足目标公式的元素转化为各方持有的秘密分享序列。这一思想赋予了该框架极强的扩展性，使其能进一步安全、高效地实现任意集合公式结果求势（MPSO-card）及基于电路的通用 MPSO（Circuit-MPSO）功能，从而满足了更加复杂的数据分析需求。
+\end{itemize}
 
-综上所述，本章所提出的 MPSO 统一框架通过一套规范化的技术路线，在实现任意集合公式计算通用性的同时，最大限度地降低了密码学原语的调用开销。其模块化、可组合的设计理念，为大规模、复杂隐私计算场景下的协议部署提供了通用且高效的技术基石。
+综上所述，本章所提出的 MPSO 统一框架通过一套从表示方法、密码学原语到系统框架的规范化技术路线，成功克服了传统方案在表达能力与计算效率之间难以兼顾的严峻挑战。该框架能够灵活适配从简单交并集计算到复杂跨机构隐私决策分析等多样化的实际应用场景，为解决现实规模数据场景下的多方隐私集合运算需求提供了极具实用价值的理论指导与解决方案。

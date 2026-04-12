@@ -1,12 +1,12 @@
-\chapter{基于公钥体制的通用多方隐私集合运算框架}
-\echapter{Generic Multi-Party Private Set Operations Framework Based on Public-Key Operations}
+\chapter{基于公钥密码技术的通用多方隐私集合运算框架}
+\echapter{Generic Public-Key Multi-Party Private Set Operations Framework}
 
 \section{引言}
 \esection{Introduction}
 
-在第五章中，本文基于对称密钥技术构建了通用的多方隐私集合运算（MPSO）统一框架，通过引入规范集合谓词公式（CSPF）与谓词零分享（Predicative Zero-Sharing）原语，成功打破了现有研究中的“功能孤岛”，解决了传统 MPSO 协议功能局限与缺乏统一理论框架的问题。随后在第六章中，本文通过结合特定集合公式的代数结构特性，对该通用框架下的实例化协议进行了深度的协议级优化。优化后的实例化协议（包括 MPSI、MPSI-card 以及 MPSI-card-sum）均成功消除了框架的冗余开销，在标准半诚实模型下首次实现了理论最优的渐近复杂度（即 Leader 计算与通信复杂度为 $O(mn)$，Client 为 $O(n)$）。
+在第五章中，本文基于对称密码技术构建了通用的多方隐私集合运算（MPSO）统一框架，通过引入规范集合谓词公式（CSPF）与谓词零分享（Predicative Zero-Sharing）原语，成功打破了现有研究中的“功能孤岛”，解决了传统 MPSO 协议功能局限与缺乏统一理论框架的问题。随后在第六章中，本文通过结合特定集合公式的代数结构特性，对该通用框架下的实例化协议进行了深度的协议级优化。优化后的实例化协议（包括 MPSI、MPSI-card 以及 MPSI-card-sum）均成功消除了框架的冗余开销，在标准半诚实模型下首次实现了理论最优的渐近复杂度（即 Leader 计算与通信复杂度为 $O(mn)$，Client 为 $O(n)$）。
 
-然而，对于多方隐私集合求并（MPSU）及其相关协议，尽管第六章的优化构造实现了基于对称密钥的 MPSU 范式下的最佳渐近复杂度（Leader 为 $O(m^2 n)$，Client 为 $O(mn)$），但受限于基于秘密分享技术路线的固有机制，其始终无法突破超线性复杂度的瓶颈。正如第四章中所剖析的，在秘密分享框架下，Leader 最终必须收集来自所有其他参与方的分享份额以完成秘密重构，这种结构决定了其处理总体元素时必须承受 $m^2 n$ 量级的通信与计算负担。因此，基于对称密钥的 MPSO 框架在理论上无法实现如第四章（PK-MPSU 协议）中基于公钥密码技术所达成的严格线性复杂度（即 $O(mn)$）。这一理论遗憾促使我们思考，能否在统一框架的层面弥补这一复杂度缺陷。
+然而，对于多方隐私集合求并（MPSU）及其相关协议，尽管第六章的优化构造实现了基于对称密码技术的 MPSU 范式下的最佳渐近复杂度（Leader 为 $O(m^2 n)$，Client 为 $O(mn)$），但受限于基于秘密分享技术路线的固有机制，其始终无法突破超线性复杂度的瓶颈。正如第四章中所剖析的，在秘密分享框架下，Leader 最终必须收集来自所有其他参与方的分享份额以完成秘密重构，这种结构决定了其处理总体元素时必须承受 $m^2 n$ 量级的通信与计算负担。因此，基于对称密码技术的 MPSO 框架在理论上无法实现如第四章（PK-MPSU 协议）中基于公钥密码技术所达成的严格线性复杂度（即 $O(mn)$）。这一理论遗憾促使我们思考，能否在统一框架的层面弥补这一复杂度缺陷。
 
 鉴于此，本文提出以下关键的研究问题：
 \begin{center}
@@ -14,14 +14,15 @@
 \end{center}
 
 本章围绕上述问题展开研究。通过借鉴第四章的研究思路，本文在第五章构建的框架基础上引入公钥加密机制，旨在探讨如何在公钥体制下构造支持任意集合公式计算且理论最优的 MPSO 统一框架。
-针对原语层面的等效映射，我们将基于对称密钥体制的核心原语拓展至公钥加密体制，提出了一种名为“谓词零加密”（Predicative Zero-Encryption）的新型密码学原语。该原语是第五章中谓词零分享协议在多密钥重随机化公钥加密（MKR-PKE）方案下的对应变体。与谓词零分享的定义类似，该功能在实际构造中同样可以被松弛化为“松弛谓词零加密”（Relaxed Predicative Zero-Encryption）协议。利用 MKR-PKE 强大的加法同态特性，接收方仅需将各方生成的松弛秘密份额加密后进行同态累加，便可直接从底层的松弛谓词零分享中派生出松弛谓词零加密，从而完美继承了谓词零分享原语高度的可组合性与灵活的表达能力。进一步地，本章通过定义 MKR-PKE 的一项新性质 —— 零保持可重随机化性（Zero-Preserving Randomizable），并利用该性质实现了将松弛谓词零加密转化为满足标准安全谓词零加密的转化技术。
+针对原语层面的等效映射，我们将基于对称密码技术的核心原语拓展至公钥加密体制，提出了一种名为“谓词零加密”（Predicative Zero-Encryption）的新型密码学原语。该原语是第五章中谓词零分享协议在多密钥重随机化公钥加密（MKR-PKE）方案下的对应变体。与谓词零分享的定义类似，该功能在实际构造中同样可以被松弛化为“松弛谓词零加密”（Relaxed Predicative Zero-Encryption）协议。利用 MKR-PKE 强大的加法同态特性，接收方仅需将各方生成的松弛秘密份额加密后进行同态累加，便可直接从底层的松弛谓词零分享中派生出松弛谓词零加密，从而完美继承了谓词零分享原语高度的可组合性与灵活的表达能力。进一步地，本章通过定义 MKR-PKE 的一项新性质 —— 零保持可重随机化性（Zero-Preserving Randomizable），并利用该性质实现了将松弛谓词零加密转化为满足标准安全谓词零加密的转化技术。
 
 成员零加密（Membership Zero-Encryption）是谓词零加密在集合运算场景下的特化实例，同时也是成员零分享在公钥架构下的对应物。其构造遵循“从松弛成员零分享到松弛成员零加密，最后转化为标准成员零加密”的自底向上范式。以成员零加密为核心构建模块，本章提出了一个基于公钥体制的 MPSO 框架，该框架能够实现通用的 MPSO 和 MPSO-card 功能。
-该框架通过利用第四章中基于 MKR-PKE “可重随机化”和“可部分解密”特性所设计的“协作解密与洗牌”阶段，替代了基于对称密钥框架中的秘密分享重构，从而使得其渐近复杂度只与 CSPF 中子公式的数量相关，而不依赖于参与方数量。当框架实例化为 MPSI 和 MPSI-card 协议时，Leader 计算及通信复杂度为 $O(mn)$，Client 计算及通信复杂度为 $O(n)$，仍实现了与明文计算开销同量级的\textbf{最优渐进复杂度}；当框架实例化为 MPSU 协议时，Leader 与 Client 的计算及通信复杂度均达到了 $O(mn)$，成功打破了基于对称密钥的 MPSU 协议的理论枷锁，实现了与第四章相同的\textbf{线性复杂度}。
+该框架通过利用第四章中基于 MKR-PKE “可重随机化”和“可部分解密”特性所设计的“协作解密与洗牌”阶段，替代了基于对称密码技术的 MPSO 框架中的秘密分享重构，从而使得其渐近复杂度只与 CSPF 中子公式的数量相关，而不依赖于参与方数量。当框架实例化为 MPSI 和 MPSI-card 协议时，Leader 计算及通信复杂度为 $O(mn)$，Client 计算及通信复杂度为 $O(n)$，仍实现了与明文计算开销同量级的\textbf{最优渐进复杂度}；当框架实例化为 MPSU 协议时，Leader 与 Client 的计算及通信复杂度均达到了 $O(mn)$，成功打破了基于对称密码技术的 MPSU 协议的理论枷锁，实现了与第四章相同的\textbf{线性复杂度}。
 
-综上所述，本章所构建的基于公钥的 MPSO 框架在理论层面实现了包括 MPSI、MPCSI 和 MPSU 的所有典型实例化功能渐近复杂度的理论最优，与第五章的对称密钥框架共同构筑了兼顾实际运行性能与理论复杂度边界的完整 MPSO 技术体系。
+综上所述，本章所构建的基于公钥的 MPSO 框架在理论层面实现了包括 MPSI、MPCSI 和 MPSU 的所有典型实例化功能渐近复杂度的理论最优，与第五章中基于对称密码技术的 MPSO 框架共同构筑了兼顾实际运行性能与理论复杂度边界的完整 MPSO 技术体系。
 
-本章的后续内容安排如下：第 7.2 节对 MKR-PKE 的定义进行代数扩展，并提出零保持可重随机化性质及满足该性质的 MKR-PKE 具体实例化方案；第 7.3 节给出谓词零加密的定义、松弛版本及其向标准安全的转化技术；第 7.4 节介绍成员零加密及其在不同判定逻辑下的特化变体；第 7.5 节详细描述基于公钥体制的通用 MPSO 框架的完整执行流程，并给出其在 MPSI 和 MPSU 等典型功能下的优化实例化协议；第 7.6 节对基于公钥体制和基于对称密钥体制的两个 MPSO 框架进行深入的理论复杂度对比；最后，第 7.7 节对本章内容进行总结。
+本章的后续内容安排如下：第 7.2 节对 MKR-PKE 的定义进行代数扩展，并提出零保持可重随机化性质及满足该性质的 MKR-PKE 具体实例化方案；第 7.3 节给出谓词零加密的定义、松弛版本及其向标准安全的转化技术；第 7.4 节介绍成员零加密及其在不同判定逻辑下的特化变体；第 7.5 节详细描述基于公钥密码技术的通用 MPSO 框架的完整执行流程，并给出其在 MPSI / MPCSI 和 
+MPSU / MPCSU 等典型功能下优化的实例化协议；第 7.6 节对基于公钥密码技术的 MPSO 框架及其实例化协议进行深入的复杂度分析，并和基于对称密码技术的 MPSO 框架进行了对比；最后，第 7.7 节对本章内容进行总结。
 
 \section{多密钥重随机化公钥加密}\label{sec:MKR-PKE}
 \esection{Multi-Key Rerandomizable Public-Key Encryption}
@@ -53,9 +54,10 @@
 \section{谓词零加密}
 \esection{Predicative Zero-Encryption}
 
-作为对第五章基于对称密钥的谓词零分享的公钥体制映射，本节引入一种新型密码学原语 —— 谓词零加密（Predicative Zero-Encryption）。与谓词零分享类似，该原语同样是一类协议族，其中每个协议都关联一个一阶谓词公式。其核心功能是将特定公式在各方输入上的联合真值，以 MKR-PKE 密文的形式不经意地传递给指定的接收方。
+作为对第五章中基于对称密码技术的谓词零分享的公钥密码技术映射，本节引入一种新型密码学原语 —— 谓词零加密（Predicative Zero-Encryption）。与谓词零分享类似，该原语同样是一类协议族，其中每个协议都关联一个一阶谓词公式。其核心功能是将特定公式在各方输入上的联合真值，以 MKR-PKE 密文的形式不经意地传递给指定的接收方。
 
 \subsection{功能定义}
+\esubsection{Functionality Definition}
 
 在谓词零加密协议中，存在 $m$ ($m \ge 2$) 个持有私有输入的参与方，其中一方被指定为接收方。如果与协议相关联的一阶谓词公式 $Q$ 在各方输入上的真值为真，则接收方获得一个加密的 0；否则，接收方获得一个加密的均匀随机值。底层的加密方案采用满足第\ref{sec:MKR-PKE}节定义的 MKR-PKE（假设所有参与方已运行密钥生成算法并协作生成了公共公钥 $pk$）。谓词零加密的理想功能 $\FuncPZE^Q$ 的形式化定义如图~\ref{fig:func-pze} 所示。
 
@@ -72,6 +74,7 @@
 \end{figure}
 
 \subsection{安全性松弛}
+\esubsection{Security Relaxation}
 
 类比于松弛谓词零分享，本节引入松弛谓词零加密（Relaxed Predicative Zero-Encryption）的概念。具体而言，松弛谓词零加密实现了与图~\ref{fig:func-pze} 相同的功能，但仅需满足正确性和隐私性要求，不需要满足独立性要求 —— 当 $Q(\textbf{x}) = 0$ 时，均匀随机分布的明文 $s$ 在实际执行中未必独立于任意 $t \le m-1$ 个参与方的联合视图。
 后文将与谓词公式 $Q$ 相关联的松弛谓词零分享功能记作 $\FuncrPZE^Q$。
@@ -84,8 +87,9 @@
 由于输出密文中对应的明文 $r$，完全继承了松弛谓词零分享输出秘密分享中对应的秘密 $r$ 的代数特性，因此满足松弛谓词零加密的功能。
 
 \subsection{从松弛到标准的转化技术}
+\esubsection{Transformation from Relaxed to Standard Version}
 
-与第\ref{transform-pzs}节中基于对称密钥的转化技术不同，本节利用了 MKR-PKE 的加法同态性与在第 7.2 节中特别定义的“零保持可重随机化”特性，在公钥体制下实现了将松弛谓词零加密转化为满足标准半诚实安全的谓词零加密的转化技术，不需要预处理阶段生成 Beaver 三元组，具体转化方法如下：
+与第\ref{transform-pzs}节中基于对称密码技术的转化技术不同，本节利用了 MKR-PKE 的加法同态性与在第 7.2 节中特别定义的“零保持可重随机化”特性，在公钥密码技术路线下实现了将松弛谓词零加密转化为满足标准半诚实安全的谓词零加密的转化技术，不需要预处理阶段生成 Beaver 三元组，具体转化方法如下：
 
 假设接收方已从松弛谓词零加密协议中得到了密文 $\Enc(pk,r)$，其目标是生成一个新的目标密文 $\Enc(pk,s)$，使其明文 $s$ 满足标准谓词零加密的严格独立性要求。转化技术的具体步骤如下：
 \begin{enumerate}
@@ -113,14 +117,19 @@
 \section{成员零加密}
 \esection{Membership Zero-Encryption}
 
-成员零加密是成员零分享在加密领域的对应物，其中 $P_\mathsf{pivot}$ 是持有元素 $x$ 的参与方（而其余各方持有集合），同时他也是接收方。如果关联的集合谓词公式 $Q(x,X_1,\cdots,X_{\mathsf{pivot}-1},X_{\mathsf{pivot}+1},\cdots, X_m) = 1$，$P_\mathsf{pivot}$ 将接收到一个加密的 0，否则 $P_\mathsf{pivot}$ 将接收到一个加密的均匀随机值。 
+谓词零加密刻画了一类基于公钥密码技术的 MPC 协议的统一抽象。只有指定相关联的谓词公式，谓词零加密才可被实例化为具体协议。为了在 MPSO 语境下实例化谓词零加密，本节在公钥密码技术路线下引入了一类更具体的 MPC 协议 —— 成员零加密（Membership Zero-Encryption），作为谓词零加密的一个子集，每个成员零加密协议都与一个集合谓词公式相关联，并构成后续基于公钥密码技术的 MPSO 框架的技术核心。
+
+\subsection{功能定义}\label{sec:mze}
+\esubsection{Functionality Definition}
+
+成员零加密（Membership Zero-Encryption）是第五章提出的成员零分享在公钥密码技术路线下的对等原语。在 $m$ 个参与方中，指定的 $P_\mathsf{pivot}$ 持有单个元素 $x$ 并作为接收方，而其余参与方持有对应的私有集合。具体地，如果关联的集合谓词公式在各方输入上的真值 $Q(x,X_1,\cdots,X_{\mathsf{pivot}-1},X_{\mathsf{pivot}+1},\cdots, X_m) = 1$，$P_\mathsf{pivot}$ 将接收到一个加密的 0，否则 $P_\mathsf{pivot}$ 将接收到一个加密的均匀随机值。 
 批量成员零加密的理想功能 $\FuncbMZE^Q$ 在图~\ref{fig:func-bmze} 中给出。
 
 \begin{figure}[!htb]
 \begin{framed}
 \begin{minipage}[c]{\textwidth}
 \begin{trivlist}
-\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots, P_m$，其中仅有 $P_\mathsf{pivot}$ 持有 $n$ 个元素（而非 $n$ 个集合），且 $P_\mathsf{pivot}$ 为接收方。集合成员谓词公式 $Q$。批量大小 $n$。明文空间为域 $\mathbb{F}$ 且拥有公共公钥 $pk$ 的 MKR-PKE 方案。
+\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots, P_m$，其中仅有 $P_\mathsf{pivot}$ 持有 $n$ 个元素（而非 $n$ 个集合），且 $P_\mathsf{pivot}$ 为接收方。集合成员谓词公式 $Q$。批量大小 $n$。MKR-PKE 方案 $\mathcal{E} = (\Gen, \Enc, \ParDec, \Dec, \ReRand)$。
 \item \textbf{功能：} 收到来自 $P_\mathsf{pivot}$ 的输入 $\textbf{x} = (x_1, \cdots, x_n)$ 以及来自每个 $P_j$ ($j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}$) 的输入 $\textbf{X}_j = (X_{j,1}, \cdots, X_{j,n})$ 后，对于 $i \in [n]$，若 $Q(x_i,X_{1,i},X_{\mathsf{pivot}-1,i},X_{\mathsf{pivot}+1,i},\cdots,X_{m,i})=1$，则将 $\Enc(pk,0)$ 发送给 $P_\mathsf{pivot}$。否则，采样 $s_i \gets \mathbb{F}$ 并将 $\Enc(pk,s_i)$ 发送给 $P_\mathsf{pivot}$。
 \end{trivlist}
 \end{minipage}
@@ -128,18 +137,18 @@
 \caption{批量成员零加密功能 $\FuncbMZE^Q$}\label{fig:func-bmze}
 \end{figure}
 
-与批量成员零分享类似，本章定义了批量成员零加密的若干特化变体：
-\begin{itemize}
-    \item 批量全成员零加密（Batch Full Membership Zero-Encryption, 图~\ref{fig:func-bpmze}）；
-    \item 批量全非成员零加密（Batch Full Non-Membership Zero-Encryption, 图~\ref{fig:func-bpnmze}）；
-    \item 带载荷的批量全成员零加密（Batch Full Membership Zero-Encryption with Payloads, 图~\ref{fig:func-mzep}）。
-\end{itemize}
+\subsection{全成员零加密}
+\esubsection{Full Membership Zero-Encryption}
+
+当成员零加密关联的集合谓词公式 $Q$ 形如 $P_\mathsf{pivot}$ 的输入元素 $x$ 和其他每个参与方 $P_j$ 的输入集合 $X_j$ 组成的集合成员谓词的合取，即 $\bigwedge_{j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}} (x \in X_j)$ 时，称该协议为全成员零加密（Full Membership Zero-Encryption）。如果输入元素 $x$ 属于所有其他参与方的集合，作为接收方的 $P_\mathsf{pivot}$ 将获得加密的 0；否则获得加密的伪随机值。该功能在公钥密码技术路线下完美契合并交集计算的核心需求。
+
+批量版本的全成员零加密的理想功能 $\FuncbpMZE$ 在图 \ref{fig:func-bpmze} 中给出。其协议构造遵循从“松弛谓词零分享”到“标准谓词零加密”的转化范式：首先，参与方利用批量大小为 $n$ 的松弛全成员零分享协议计算底层特征。随后，$P_\mathsf{pivot}$ 收集由其余参与方对其分享份额加密后的密文，并利用 MKR-PKE 的加法同态性进行本地聚合，从而获得满足松弛安全性的中间密文。最后，各方协作执行基于零保持可重随机化算法（$\ZeroRand$）的转化技术，以彻底盲化密文内的随机明文，最终向 $P_\mathsf{pivot}$ 输出满足标准半诚实安全独立性要求的全成员零加密密文。
 
 \begin{figure}[!htb]
 \begin{framed}
 \begin{minipage}[c]{\textwidth}
 \begin{trivlist}
-\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots P_m$，其中仅有 $P_\mathsf{pivot}$ 持有 $n$ 个元素，且 $P_\mathsf{pivot}$ 为接收方。批量大小 $n$。明文空间为域 $\mathbb{F}$ 且具有公钥 $pk$ 的 MKR-PKE 方案。
+\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots P_m$，其中仅有 $P_\mathsf{pivot}$ 持有 $n$ 个元素，且 $P_\mathsf{pivot}$ 为接收方。批量大小 $n$。MKR-PKE 方案 $\mathcal{E} = (\Gen, \Enc, \ParDec, \Dec, \ReRand)$。
 \item \textbf{功能：} 收到输入 $\textbf{x} = (x_1, \cdots, x_n)$ 和每个 $P_j$ 的 $\textbf{X}_j = (X_{j,1}, \cdots, X_{j,n})$。对于 $i \in [n]$，若 $\bigwedge_{j \neq \mathsf{pivot}} (x_i \in X_{j,i}) = 1$，则给 $P_\mathsf{pivot}$ 发送 $\Enc(pk,0)$。否则，采样 $s_i \gets \mathbb{F}$ 并发送 $\Enc(pk,s_i)$ 给 $P_\mathsf{pivot}$。
 \end{trivlist}
 \end{minipage}
@@ -147,23 +156,22 @@
 \caption{批量全成员零加密功能 $\FuncbpMZE$}\label{fig:func-bpmze}
 \end{figure}
 
-\begin{figure}[!htb]
-\begin{framed}
-\begin{minipage}[c]{\textwidth}
 \begin{trivlist}
-\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots P_m$，其中仅有 $P_\mathsf{pivot}$ 持有 $n$ 个元素，且 $P_\mathsf{pivot}$ 为接收方。批量大小 $n$。明文空间为域 $\mathbb{F}$ 且具有公钥 $pk$ 的 MKR-PKE 方案。
-\item \textbf{功能：} 收到输入 $\textbf{x} = (x_1, \cdots, x_n)$ 和每个 $P_j$ 的 $\textbf{X}_j = (X_{j,1}, \cdots, X_{j,n})$。对于 $i \in [n]$，若 $\bigwedge_{j \neq \mathsf{pivot}} (x_i \notin X_{j,i}) = 1$，则给 $P_\mathsf{pivot}$ 发送 $\Enc(pk,0)$。否则，采样 $s_i \gets \mathbb{F}$ 并发送 $\Enc(pk,s_i)$ 给 $P_\mathsf{pivot}$。
+\item \textbf{复杂度分析.} 在批量全成员零加密协议的构造中，由于底层利用了第六章中复杂度为线性的松弛全成员零分享协议，并且在基于 MKR-PKE 的转化技术中，各参与方仅需对 $O(n)$ 规模的密文进行一轮处理与传输。因此其在线阶段的复杂度和批量全成员零分享协议相同：$P_\mathsf{pivot}$ 的计算和通信复杂度为 $O(mn)$，每个 $P_j$ 的计算和通信复杂度为 $O(n)$。 
 \end{trivlist}
-\end{minipage}
-\end{framed}
-\caption{批量全非成员零加密功能 $\FuncbpNMZE$}\label{fig:func-bpnmze}
-\end{figure}
+
+\subsection{带载荷的全成员零加密}
+\esubsection{Full Membership Zero-Encryption with Payloads}
+
+为了使基于公钥密码技术的 MPSO 框架同样能够原生地支持属性数据的联合统计分析（如广告转化金额累加等），本节引入全成员零加密的一种功能变体 —— 带载荷的全成员零加密（Full Membership Zero-Encryption with Payloads）。在该变体中，$P_\mathsf{pivot}$ 持有元素 $x$，其他参与方持有元素集合及关联的载荷集合。如果公式 $Q$ 取值为真，即 $x$ 属于所有集合时，$P_\mathsf{pivot}$ 获得加密 0 的同时，还能获得 $x$ 的所有关联载荷之和的加密密文；否则，其将获得两个加密了独立随机值的密文。
+
+带载荷的批量全成员零加密功能 $\FuncbpMZEp$ 在图 \ref{fig:func-mzep} 中给出。
 
 \begin{figure}[!htb]
 \begin{framed}
 \begin{minipage}[c]{\textwidth}
 \begin{trivlist}
-\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots P_m$，其中仅有 $P_\mathsf{pivot}$ 持有 $n$ 个元素，且 $P_\mathsf{pivot}$ 为接收方。批量大小 $n$。映射函数 $\mathsf{payload}_j()$ 用于关联元素与载荷。明文空间为域 $\mathbb{F}$ 且具有公钥 $pk$ 的 MKR-PKE 方案。
+\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots P_m$，其中仅有 $P_\mathsf{pivot}$ 持有 $n$ 个元素，且 $P_\mathsf{pivot}$ 为接收方。批量大小 $n$。映射函数 $\mathsf{payload}_j()$ 用于关联元素与载荷。MKR-PKE 方案 $\mathcal{E} = (\Gen, \Enc, \ParDec, \Dec, \ReRand)$。
 \item \textbf{功能：} 收到 $P_\mathsf{pivot}$ 的输入 $\textbf{x}$，以及每个 $P_j$ 的 $\textbf{X}_j$ 和 $\textbf{V}_j$。对于 $i \in [n]$，若 $\bigwedge_{j \neq \mathsf{pivot}} (x_i \in X_{j,i}) = 1$，则给 $P_\mathsf{pivot}$ 发送 $\Enc(pk,0)$ 和 $\Enc(pk, \sum_{j \neq \mathsf{pivot}} v_{j,i})$，其中 $v_{j,i} = \mathsf{payload}_j(x_i)$。否则，采样 $s_i \gets \mathbb{F}$ 和 $w_i \gets \mathbb{F}$，并发送 $\Enc(pk,s_i)$ 和 $\Enc(pk,w_i)$ 给 $P_\mathsf{pivot}$。
 \end{trivlist}
 \end{minipage}
@@ -171,117 +179,56 @@
 \caption{带载荷的批量全成员零加密功能 $\FuncbpMZEp$}\label{fig:func-mzep}
 \end{figure}
 
-这些理想功能的协议构造遵循了之前讨论过的相同路线：首先，参与方针对给定的集合谓词公式 $Q$ 执行对应变体的松弛批量成员零分享协议。接着，接收方对加密形式的秘密进行重构，以生成满足松弛成员零加密条件的密文。最后，各方协作执行转化技术，使这些密文满足标准成员零加密的独立性要求。
-值得注意的是，在带载荷的全成员零加密中，载荷加密部分（即输出给接收方的第二个密文）不需要满足独立性要求。因此，最终的转化技术仅应用于第一个输出密文（即状态判定密文）。
+该变体的构造思路与纯成员零加密相似：首先由各方执行带载荷的松弛全成员零分享，随后将份额加密并汇聚至 $P_\mathsf{pivot}$ 进行同态加法，生成一对松弛密文。
+需要特别注意的是，在执行最后一步的协作转化技术时，载荷加密部分（即输出给 $P_\mathsf{pivot}$ 的第二个密文）不需要进行状态判定的独立性要求，因此基于 $\ZeroRand$ 的转化技术仅需应用于表征成员关系的第一个输出密文。由于底层机制与不带载荷的版本几乎相同，该变体的在线计算与通信复杂度依然严格保持在 Leader $O(mn)$、Client $O(n)$ 的最优水平。
+
+\subsection{全非成员零加密} 
+\esubsection{Full Non-Membership Zero-Encryption}
+
+当成员零加密关联的集合谓词公式 $Q$ 形如 $P_\mathsf{pivot}$ 的输入元素 $x$ 和其他每个参与方 $P_j$ 的输入集合 $X_j$ 组成的集合非成员谓词的合取，即 $\bigwedge_{j \in \{1,\cdots,m\} \setminus \{\mathsf{pivot}\}} (x \notin X_j)$ 时，称该协议为全非成员零加密（Full Non-Membership Zero-Encryption）。如果元素 $x$ 不属于任何其他参与方的集合，$P_\mathsf{pivot}$ 获得加密的 0；否则获得加密的随机值。该功能完美契合多方并集（MPSU）计算中提取正交差集的需求。
+
+批量版本的全非成员零加密的理想功能 $\FuncbpNMZE$ 在图 \ref{fig:func-bpnmze} 中给出。
+其协议构造同样遵循本章的统一范式：底层依赖基于 batch ssPMT 与 ROT 构造的松弛全非成员零分享组件；接着由 $P_\mathsf{pivot}$ 对其余各方发来的加密份额进行同态求和；最终通过一轮基于 $\ZeroRand$ 的转化技术，输出符合标准半诚实安全的全非成员零加密密文。
+
+\begin{figure}[!htb]
+\begin{framed}
+\begin{minipage}[c]{\textwidth}
+\begin{trivlist}
+\item \textbf{参数：} $m$ 个参与方 $P_1, \cdots P_m$，其中仅有 $P_\mathsf{pivot}$ 持有 $n$ 个元素，且 $P_\mathsf{pivot}$ 为接收方。批量大小 $n$。MKR-PKE 方案 $\mathcal{E} = (\Gen, \Enc, \ParDec, \Dec, \ReRand)$。
+\item \textbf{功能：} 收到输入 $\textbf{x} = (x_1, \cdots, x_n)$ 和每个 $P_j$ 的 $\textbf{X}_j = (X_{j,1}, \cdots, X_{j,n})$。对于 $i \in [n]$，若 $\bigwedge_{j \neq \mathsf{pivot}} (x_i \notin X_{j,i}) = 1$，则给 $P_\mathsf{pivot}$ 发送 $\Enc(pk,0)$。否则，采样 $s_i \gets \mathbb{F}$ 并发送 $\Enc(pk,s_i)$ 给 $P_\mathsf{pivot}$。
+\end{trivlist}
+\end{minipage}
+\end{framed}
+\caption{批量全非成员零加密功能 $\FuncbpNMZE$}\label{fig:func-bpnmze}
+\end{figure}
+
+\begin{trivlist}
+\item \textbf{复杂度分析.} 在批量全非成员零加密协议的构造中，由于底层利用了第六章中复杂度为线性的松弛全非成员零分享协议，并且在基于 MKR-PKE 的转化技术中，各参与方仅需对 $O(n)$ 规模的密文进行一轮处理与传输。因此其在线阶段的复杂度和批量全非成员零分享协议相同：$P_\mathsf{pivot}$ 的计算和通信复杂度为 $O(mn)$，每个 $P_j$ 的计算和通信复杂度为 $O(n)$。 
+\end{trivlist}
 
 \section{实现通用功能及其扩展的 PK-MPSO 框架}
 \esection{Our MPSO Framework}
 
-在先前基于对称密钥的 MPSO 框架的基础上，我们开发了全新的公钥 MPSO 框架。总体而言，协议的第一阶段基本保持不变：针对每一个子公式 $Q_i$，参与方将输入元素分配到哈希桶中。随后，他们不再调用批量成员零分享，而是调用\textbf{批量成员零加密}。这使得对于 $P_\mathsf{pivot}$ 的每个哈希桶中的元素 $x$，若 $x \in Y_i$（$Y_i$ 为 $Q_i$ 表示的子集），$P_\mathsf{pivot}$ 将接收到加密的 0；否则接收到加密的随机值（在先前的框架中，这些值以秘密分享的形式在参与方之间分布）。
+\subsection{技术路线概述}
+\esubsection{Technical Overview}
 
-第二阶段原本是调用多方秘密分享洗牌协议——旨在防止通过数据物理排列顺序泄露信息——并进行最终重构。在这个基于公钥加密的框架中，它被替换为加密体制下的对应方案：\textbf{协作解密与洗牌（Collaborative Decryption and Shuffle）}过程~\cite{GNT-eprint-2023}。该过程允许 $P_1$ 在随机置换的顺序下获得所有明文结果，同时防止任何 $m-1$ 方共谋联盟获知置换映射。
-该阶段的具体执行如下：各方首先将他们持有的密文发送给 $P_1$。在发送密文之前，他们可以利用 MKR-PKE 的加法同态性，将对应桶中的元素（与之前一样，追加全零字符串）叠加到明文上。这一元素叠加步骤视具体功能需求而定。接着，$P_1$ 对第一阶段收集到的密文进行重随机化，使用随机置换 $\pi_1$ 打乱密文顺序，然后将这些密文发送给 $P_2$。$P_2$ 对接收到的密文进行部分解密、重随机化，再使用随机置换 $\pi_2$ 打乱顺序，并转发给 $P_3$。这一迭代过程持续进行，直到最后一个参与方 $P_m$ 将其打乱并部分解密的密文返回给 $P_1$。最后，$P_1$ 执行完全解密，并识别所有追加了全零字符串的明文元素，以恢复最终的目标结果集合（或统计零的数量作为基数输出）。
+在先前第五章基于对称密码技术的 MPSO 框架的基础上，本节构建了全新的基于公钥加密的 MPSO 框架（PK-MPSO）。本章提出的 PK-MPSO 框架同样可分为两个阶段：第一阶段基于目标可构造集合 $Y$ 的 CSPF 表示 $\psi(x, X_1, \cdots, X_m)$，目标是使参与方获得与 $Y$ 的划分相对应的密文集合。
 
-需要指出的是，Circuit-MPSO（基于电路的通用 MPSO）功能无法在此加密框架下实现。完整的通用 MPSO 和 MPSO-card 协议详见图~\ref{fig:proto-MPSO2}。此外，第 6.3 节中描述的针对特定功能的优化技术同样适用于本框架下的典型协议。我们在此也一并给出了基于公钥加密框架的 MPSI/MPSI-card（图~\ref{fig:proto-MPSI}）、MPSI-card-sum（图~\ref{fig:proto-MPSI-Sum}）以及 MPSU/MPSU-card（图~\ref{fig:proto-MPSU}）协议的形式化描述。
+回顾 $\psi = Q_1 \lor \cdots \lor Q_s$，对于每个子公式 $Q_i$（$i \in [s]$），设 $X_{i_1},\cdots,X_{i_q}$（$q \in [m]$）为 $Q_i$ 中所有原子命题涉及的集合，并用 $X_j$ ($j \in \{{i_1},\cdots,{i_q}\}$) 表示 $Q_i$ 相对于其满足局部性的集合。即：
+$$Q_i(x,X_{i_1},\cdots,X_{i_q}) = (x \in X_j) \land Q'_i(x,X_{i_1},\cdots,X_{j-1},X_{j+1},\cdots,X_{i_q})$$ 
+其中 $Q'_i$ 是 $Q_i$ 的 $X_j$-局部剩余公式。设 $Y_i$ 为由 $Q_i$ 表示的集合，则 $Q'_i$ 本质上是针对 $X_j$ 中元素关于 $Y_i$ 的成员测试集合谓词公式。在此第一阶段的初步构造中，对于每个 $Q_i$，相关的参与方 $P_{i_1},\cdots,P_{i_q}$ 不再调用成员零分享，而是调用与 $Q'_i$ 相关联的\textbf{成员零加密}实例。在每个实例中，$P_j$ 作为 $P_{\mathsf{pivot}}$ 且兼任接收方，输入 $X_j$ 中的一个元素。对于每个 $x \in X_j$，如果 $Q'_i = 1$（即满足局部剩余公式），$P_j$ 接收到 $\Enc(pk, 0)$；否则，接收到加密的均匀随机值（在第五章的框架中，这些状态判定值是以秘密分享的形式在参与方之间共同持有的）。
+随后，为实现集合元素的提取，$P_j$ 能够利用 MKR-PKE 的加法同态性，将其元素 $x$ 追加到接收到的状态密文上。这一使得对于每个 $x \in X_j$，如果 $Q_i = 1$（即 $Q'_i = 1$ 且 $x \in X_j$），$P_j$ 最终持有 $x$ 的加密密文；否则，其持有的依然是某个不可预测随机值的密文。
 
-\begin{figure}[!t]
-\begin{framed}
-\begin{minipage}[c]{\textwidth}
-\textbf{参数.} $m$ 个参与方 $P_1, \cdots, P_m$。集合大小 $n$。元素比特长度 $l$。布谷鸟哈希参数：哈希函数 $h_1, h_2, h_3$ 和桶数 $B$。MKR-PKE 方案 $\mathcal{E} = (\Gen, \Enc, \ParDec, \Dec, \ReRand)$。
+为了将每个成员零加密实例的均摊开销降低至 $O(1)$，PK-MPSO 框架沿用了哈希分桶（Hashing-to-bins）预处理技术，其过程与第五章完全一致：$P_j$ 利用布谷鸟哈希处理 $X_j$，其余参与方利用简单哈希处理各自的集合。在预处理后，相关的参与方调用与 $Q'_i$ 相关联的\textbf{批量成员零加密}协议。这使得针对每个桶 $\mathcal{C}_j^b$ 中的元素 $x$，$P_j$ 能够以常数级的在线开销高效获取表征其成员关系的密文向量。
 
-\textbf{输入.} 每个参与方 $P_i$ 持有私有集合 $X_i = \{x_i^1,\cdots, x_i^n\} \subseteq \{0,1\}^l$。
+第二阶段的目的是防止因密文排列顺序泄露输入元素的归属信息，并进行最终结果的输出。在第五章的框架中，这一目的由多方秘密分享洗牌协议实现。而在本章 PK-MPSO 框架中，该阶段被替换为加密体制下的等效方案：\textbf{协作解密与洗牌}（Collaborative Decryption and Shuffle）机制~\cite{GNT-eprint-2023}。该过程允许 Leader 节点 $P_1$ 在随机置换的顺序下获得所有明文结果，同时防止任何 $m-1$ 方共谋联盟获知置换映射。
 
-\begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt]
-\item \textbf{MKR-PKE 密钥生成.}~\label{step:key-gen} 对于 $i \in [m]$，$P_i$ 运行 $(pk_i, sk_i) \gets \Gen(1^\lambda)$，并将其公钥 $pk_i$ 分发给其他参与方。定义私钥 $sk = sk_1 + \cdots + sk_m$，所有各方计算共同公钥 $pk= \prod_{i =1}^m pk_i$。
-\item \textbf{哈希分桶.}~\label{step:hash} $P_1$ 执行布谷鸟哈希 $\mathcal{C}_1^1, \cdots, \mathcal{C}_1^B \gets \Cuckoo_{h_1,h_2,h_3}^B(X_1)$。对于 $1 < j  \le m$，$P_j$ 执行简单哈希 $\mathcal{T}_j^1, \cdots, \mathcal{T}_j^B \gets \Simple_{h_1,h_2,h_3}^B(X_j)$。
-\item \textbf{全成员零加密.} 所有参与方调用批大小为 $B$ 的 $\FuncbpMZE$，$P_1$ 作为 $P_\mathsf{pivot}$ 输入 $\mathcal{C}_1^1, \cdots, \mathcal{C}_1^B$，每个 $P_j$ ($1 < j  \le m$) 输入 $\mathcal{T}_j^1, \cdots, \mathcal{T}_j^B$。$P_1$ 收到加密向量 $\textbf{e}_1=(e_{1,1},\cdots,e_{1,B})$。
-\end{enumerate}
+该协作阶段的具体执行流程如下：各方首先将第一阶段生成的所有密文发送给 $P_1$。在发送前，各方可利用 MKR-PKE 的加法同态性，向状态密文叠加对应哈希桶中的明文元素（并在末尾追加全零字符串以区分有效元素和随机值）。接着，$P_1$ 对收集到的全局密文向量进行重随机化，应用自身独立采样的随机置换 $\pi_1$ 打乱密文顺序，随后将该向量发送给 $P_2$。$P_2$ 接收后，依次执行部分解密（$\ParDec$）、重随机化，并应用其私有的随机置换 $\pi_2$ 再次打乱顺序，然后转发给 $P_3$。该迭代处理流程在参与方构成的链路上逐层推进，直到最后一个参与方 $P_m$ 将处理后的密文向量返回给 $P_1$。最后，$P_1$ 执行完全解密，并通过识别所有以全零字符串结尾的明文，恢复并输出最终的目标结果集合。如果功能为 MPSO-card，则各方跳过同态叠加元素的步骤，$P_1$ 最终仅统计解密明文中 0 的数量作为基数输出。
 
-参与方的后续动作取决于具体的目标功能：
+需要指出的是，由于公钥密文无法直接作为通用布尔电路或算术电路的输入，Circuit-MPSO（基于电路的通用 MPSO）功能无法在 PK-MPSO 框架下实现。完整的基于公钥密码技术的通用 MPSO / MPSO-card 协议流程详见图~\ref{fig:proto-MPSO2}。
+此外，正如我们在第六章中所探讨的，针对特定代数结构的集合功能，我们可以采用特定的优化技术来大幅削减框架的冗余开销。这些基于“子集属性”与“局部原子属性”的优化技术同样完美适用于本节提出的 PK-MPSO 框架。下面，我们分两个子节详细阐述如何在 PK-MPSO 框架下特化并优化 MPSI / MPCSI 以及 MPSU / MPCSU 等典型协议。
 
-    \textbf{MPSI.} 
-    \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt] \addtocounter{enumi}{3}
-    \item \textbf{协作解密.} $P_1$ 将 $\textbf{e}_1$ 发送给 $P_{2}$。对于 $1 < j \le m$， $P_j$ 计算 $\textbf{e}_j = (e_{j,1},\cdots,e_{j,B})$，其中 $e_{j,b} = \ParDec(sk_j,e_{j-1,b})$。若 $j \ne m$，$P_j$ 将 $\textbf{e}_{j}$ 发给 $P_{j+1}$，否则发回 $P_{1}$。
-    \item $P_{1}$ 设置 $Y = \emptyset$。对于 $b \in [B]$，$P_1$ 计算 $u_b = \Dec(sk_1,e_{m,b})$。若 $u_i = 0$，$P_1$ 将 $\mathcal{C}_1^b$ 中的元素加入 $Y$ 并输出。      
-    \end{enumerate}
-    \textbf{MPSI-card.} 
-    \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt] \addtocounter{enumi}{3}
-        \item \textbf{协作解密与洗牌.} $P_1$ 将 $\textbf{e}_1$ 发送给 $P_{2}$。对于 $1 < j \le m$： 
-        \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt]
-        \item 对于 $b \in [B]$，$P_j$ 计算 $e'_{j,b} = \ParDec(sk_j,e_{j-1,b})$，累积公钥 $pk_{A_j} = pk_1 \cdot \prod_{d = j+1}^m pk_d$，并重随机化 $e''_{j,b} = \ReRand(pk_{A_j},e'_{j,b})$。 
-        \item $P_j$ 采样随机置换 $\pi_j:[B] \to [B]$。$P_j$ 将向量打乱为 $\textbf{e}_{j} = {\pi_j}(\textbf{e}''_{j})$。若 $j \ne m$，$P_j$ 发送 $\textbf{e}_{j}$ 给 $P_{j+1}$，否则发回 $P_{1}$。
-        \end{enumerate}
-        \item $P_{1}$ 定义解密向量 $\textbf{u} = (u_1, \cdots, u_{B})$，其中 $u_b = \Dec(sk_1,e_{m,b})$。$P_1$ 统计并输出 $\textbf{u}$ 中 0 的数量作为基数。
-    \end{enumerate}
-\end{minipage}
-\end{framed}
-\caption{基于公钥的 MPSI / MPSI-card 协议}\label{fig:proto-MPSI}
-\end{figure} 
-
-\begin{figure}[!t]
-\begin{framed}
-\begin{minipage}[c]{\textwidth}
-\begin{trivlist}
-\item \textbf{参数.} $m$ 个参与方 $P_1, \cdots, P_m$。集合大小 $n$。元素比特长度 $l$。布谷鸟哈希参数：哈希函数 $h_1, h_2, h_3$ 和桶数 $B$。MKR-PKE 方案 $\mathcal{E} = (\Gen, \Enc, \ParDec, \Dec, \ReRand)$。
-\item \textbf{输入.} 每个参与方 $P_i$ 的输入集合为 $X_i = \{x_i^1,\cdots, x_i^n\} \subseteq \{0,1\}^l$，载荷集合为 $V_i = \{v_i^1,\cdots, v_i^n\}$，并具有从元素到载荷的映射函数 $\mathsf{payload}_i()$。
-\begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt]
-    \item \textbf{MKR-PKE 密钥生成.}~\label{step:key-gen} 对于 $i \in [m]$，$P_i$ 运行 $(pk_i, sk_i) \gets \Gen(1^\lambda)$，并将其公钥 $pk_i$ 分发给其他参与方。定义私钥 $sk = sk_1 + \cdots + sk_m$，所有各方计算共同公钥 $pk= \prod_{i =1}^m pk_i$。
-    \item \textbf{哈希分桶.}~\label{step:hash} $P_1$ 执行布谷鸟哈希 $\mathcal{C}_1^1, \cdots, \mathcal{C}_1^B \gets \Cuckoo_{h_1,h_2,h_3}^B(X_1)$。对于 $1 < j  \le m$，$P_j$ 执行简单哈希 $\mathcal{T}_j^1, \cdots, \mathcal{T}_j^B \gets \Simple_{h_1,h_2,h_3}^B(X_j)$，并构建对应的载荷哈希桶 $\mathcal{V}_j^1, \cdots, \mathcal{V}_j^B$。
-    \item \textbf{带载荷的全成员零加密.} 所有参与方调用批大小为 $B$ 的 $\FuncbpMZEp$。$P_1$ 收到加密状态向量 $\textbf{e}_1=(e_{1,1},\cdots,e_{1,B})$ 以及加密载荷向量 $\textbf{w}_1=(w_{1,1},\cdots,w_{1,B})$。
-    \item 对于 $b \in [B]$，若 $\mathcal{C}_1^b$ 非空，$P_1$ 同态累加自身的本地载荷 $w_{1,b} = w_{1,b} \boxplus \Enc(pk,v)$。
-    \item \textbf{协作解密与洗牌.} $P_1$ 将 $\textbf{e}_1$ 和 $\textbf{w}_1$ 发送给 $P_{2}$。对于 $1 < j \le m$： 
-        \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt]
-        \item 对于 $b \in [B]$，$P_j$ 计算 $e'_{j,b} = \ParDec(sk_j,e_{j-1,b})$，累积公钥 $pk_{A_j}$，并重随机化 $e''_{j,b} = \ReRand(pk_{A_j},e'_{j,b})$ 且 $w'_{j,b} = \ReRand(pk,w_{j-1,b})$（载荷仅重随机化，求解密留至最后）。 
-        \item $P_j$ 使用相同的随机置换 $\pi_j$ 并行打乱 $\textbf{e}''_{j}$ 和 $\textbf{w}'_{j}$。将结果传递给下一方。
-        \end{enumerate}
-    \item $P_{1}$ 计算向量 $\textbf{u}$ 并输出其中 0 的数量作为基数。随后，$P_1$ 同态聚合所有合法元素的载荷密文：$s_1 = \boxplus_{u_b = 0} w_{m,b}$，并将 $s_1$ 发送给 $P_2$。
-    \item 各方依次对 $s_1$ 执行协作部分解密 $s_j = \ParDec(sk_j, s_{j-1})$ 并传递。最终 $P_1$ 完全解密 $s = \Dec(sk_1, s_m)$ 并输出交集载荷总和。
-\end{enumerate}
-
-\end{trivlist}
-\end{minipage}
-\end{framed}
-\caption{基于公钥的 MPSI-card-sum 协议}\label{fig:proto-MPSI-Sum}
-\end{figure}
-
-\begin{figure}[!htb]
-\begin{framed}
-\begin{minipage}[c]{\textwidth}
-\begin{trivlist}
-\item \textbf{参数.} $m$ 个参与方 $P_1, \cdots, P_m$。集合大小 $n$。元素长度 $l$。全零字符串长度 $l'$。有限域 $\mathbb{F}$。布谷鸟哈希参数：哈希函数 $h_1, h_2, h_3$ 及桶数量 $B$。MKR-PKE 方案 $\mathcal{E} = (\Gen, \Enc, \ParDec, \Dec, \ReRand)$。
-\item \textbf{输入.} 每个参与方 $P_i$ 持有私有集合 $X_i = \{x_i^1,\cdots, x_i^n\} \subseteq \{0,1\}^l$。
-\begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt]
-\item \textbf{MKR-PKE 密钥生成.} 对于 $i \in [m]$，$P_i$ 运行 $(pk_i, sk_i) \gets \Gen(1^\lambda)$，并将其公钥 $pk_i$ 分发给其他参与方。定义私钥 $sk = sk_1 + \cdots + sk_m$，所有各方计算共同公钥 $pk= \prod_{i =1}^m pk_i$。
-\item \textbf{哈希分桶阶段.} $P_1$ 执行 $\mathcal{T}_1^1, \cdots, \mathcal{T}_1^B \gets \Simple(X_1)$。对于 $1 < j \le m $，$P_j$ 执行布谷鸟哈希 $\mathcal{C}_j^1, \cdots, \mathcal{C}_j^B \gets \Cuckoo(X_j)$ 和简单哈希 $\mathcal{T}_j^1, \cdots, \mathcal{T}_j^B \gets \Simple(X_j)$。
-\item \textbf{全非成员零加密阶段.} 对于 $1 < j \le m$，$P_1, \cdots, P_j$ 调用批量大小为 $B$ 的 $\FuncbpNMZE$，其中 $P_j$ 作为 $P_\mathsf{pivot}$ 输入 $\mathcal{C}_j^1, \cdots, \mathcal{C}_j^B$，每个 $P_{j'}$（$j' \in \{1,\cdots,j-1\}$）输入 $\mathcal{T}_{j'}^1, \cdots, \mathcal{T}_{j'}^B$（。$P_{j}$ 收到向量 $\textbf{e}_{j}=(e_{j,1},\cdots,e_{j,B})$。
-\end{enumerate}
-
-参与方的后续动作取决于具体的目标功能：
-
-    \item \textbf{MPSU：} 
-    \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt] \addtocounter{enumi}{3}
-        \item 对于 $1 < j \le m$，$1 \le b \le B$，若 $\mathcal{C}_j^b$ 不是空桶，$P_j$ 计算 $e'_{j,b} = e_{j,b} \boxplus \Enc(pk,x \Vert 0^{l'})$，其中 $x$ 是 $\mathcal{C}_j^b$ 中的元素；否则 $P_j$ 采样 $s'_{j,b} \gets \{0,1\}^{l+l'}$ 并计算 $e'_{j,b} = \Enc(pk,s'_{j,b})$。
-        \item 对于 $1 < j \le m$，$P_j$ 将 $\textbf{e}'_{j}=(e'_{j,1},\cdots,e'_{j,B})$ 发送给 $P_1$。$P_1$ 定义 $\textbf{c}_1 = (c_{1,1},\cdots,c_{1,(m-1)B})$，其中对于 $1 < j \le m$，$1 \le b \le B$，设置 ${c}_{1,(j-2)B+b} = e'_{j,b}$。
-        \item \textbf{协作解密与洗牌.} $P_1$ 将 $\textbf{c}_1$ 发送给 $P_{2}$。对于 $1 < j \le m$： 
-        \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt]
-        \item 对于 $1 \le i \le (m-1)B$，$P_j$ 计算 $c'_{j,i} = \ParDec(sk_j,c_{j-1,i})$，$pk_{A_j} = pk_1 \cdot \prod_{d = j+1}^m pk_d$，并计算 $c''_{j,i} = \ReRand(pk_{A_j},c'_{j,i})$。 
-        \item $P_j$ 采样 $\pi_j:[(m-1)B] \to [(m-1)B]$。$P_j$ 定义 $\textbf{c}''_j = (c''_{j,1},\cdots,c''_{j,(m-1)B})$ 并计算 $\textbf{c}_{j} = {\pi_j}(\textbf{c}''_{j})$。如果 $j \ne m$，$P_j$ 将 $\textbf{c}_{j}$ 发送给 $P_{j+1}$，否则发回 $P_{1}$。
-        \end{enumerate}
-        \item $P_{1}$ 设置 $Y = \emptyset$。对于 $1 \le i \le (m-1)B$，$P_1$ 计算 $u_i = \Dec(sk_1,c_{m,i})$。如果 $u_i = y \Vert 0^{l'}$（其中 $y \in \{0,1\}^l$），$P_1$ 更新 $Y = Y \cup \{y\}$。输出 $Y \cup X_1$。
-    \end{enumerate}
-    \item \textbf{MPSU-card：} 
-    \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt] \addtocounter{enumi}{3}
-        \item 对于 $1 < j \le m$，$P_j$ 将 $\textbf{e}_{j}$ 发送给 $P_1$。$P_1$ 定义 $\textbf{c}_1 = (c_{1,1},\cdots,c_{1,(m-1)B})$，其中对于 $1 < j \le m$，$1 \le b \le B$，设置 ${c}_{1,(j-2)B+b} = e_{j,b}$。
-        \item \textbf{协作解密与洗牌.} 联合执行协作解密与打乱流程，与上述 MPSU 相同。
-        \item $P_{1}$ 定义 $\textbf{u} = (u_1, \cdots, u_{(m-1)B})$。对于 $1 \le i \le (m-1)B$，$P_1$ 计算 $u_i = \Dec(sk_1,c_{m,i})$。$P_1$ 输出 $\textbf{u}$ 中 0 的数量并加上 $n$ 作为基数。
-    \end{enumerate}
-\end{trivlist}
-\end{minipage}
-\end{framed}
-\caption{基于公钥的 MPSU / MPSU-card 协议}\label{fig:proto-MPSU}
-\end{figure}
-
-\begin{figure}[!htb]
+\begin{figure}[!htbp]
 \begin{framed}
 \begin{minipage}[c]{\textwidth}
 \begin{trivlist}
@@ -319,26 +266,179 @@
 \end{trivlist}
 \end{minipage}
 \end{framed}
-\caption{基于公钥的通用 MPSO / MPSO-card 协议}\label{fig:proto-MPSO2}
+\caption{基于公钥密码技术的通用 MPSO / MPSO-card 协议}\label{fig:proto-MPSO2}
 \end{figure}
 
-\section{与基于对称密钥的 MPSO 框架的理论对比}
+\subsection{多方隐私集合求交与交集计算协议优化}
+\esubsection{Optimization of MPSI and MPCSI Protocols}
 
-虽然本文第五章中基于秘密分享构建的 MPSO 框架实例化得到的 MPSI 和 MPCSI 协议均实现了最先进的渐近复杂度，在其实例化的 MPSU协议，尽管它在对称密钥体制的 MPSU 协议中表现出了最优复杂度，但其复杂度的理论边界仍然略逊于本文第四章基于公钥体制提出的 MPSU 协议。后者达到了 MPSU 领域的当前最优解，其 Leader 与 Client 的计算及通信复杂度均随参与方数量 $m$ 和集合规模 $n$ 呈严格的线性扩展。相比之下，基于秘密分享的框架不可避免地导致了 Leader 承受二次方的计算与通信复杂度 $O(m^2 n)$。这是因为“在 $m$ 个参与方之间对 $O(mn)$ 个元素进行秘密分享”的过程，最终必然要求 Leader 接收来自每个 Client 的 $O(mn)$ 个份额，并在最后一步执行 $O(mn)$ 次重构操作。
+在通用 PK-MPSO 框架的设计中，为了消除按照 CSPF 中子公式生成密文的位置与重构出元素所属局部子集（及在哈希表中的位置）之间的关联，以防止最后解密阶段造成信息泄露，必须强制要求所有参与方执行协作解密与洗牌环路。然而，考虑计算目标 $Y$ 的规范集合谓词公式 $\psi$ 相对于 $X_1$ 是局部的情况（例如交集 $X_1 \cap X_2 \cap X_3$ 相对于 $X_1$ 是局部的，其局部剩余公式为 $x \in X_2 \land x \in X_3$）。在这种情况下，结果集 $Y$ 的所有元素必然完全属于 $P_1$（即 $Y \subseteq X_1$）。这意味着不论经过多少次密文洗牌，解密结果在逻辑上完全由 $X_1$ 决定。由于 $P_1$ 最终将合法地获得该结果集，这种原本会被视为泄露的“顺序信息”对 $P_1$ 而言不再构成真实的隐私泄露。
 
-通过将底层框架升级为本文所构建的基于公钥加密的版本，我们全新的公钥 MPSO 框架成功将 Leader 的渐近复杂度压低至 $O(sn)$（其中 $s$ 为 CSPF 表示中的子公式总数），从而\textbf{彻底解除了对参与方数量 $m$ 的二次方依赖}。值得瞩目的是，当我们将该框架特化实例化为 MPSU 协议时，$s = m-1$，此时 Leader 与 Client 的计算及通信复杂度\textbf{均达到了双线性 $O(mn)$}，完全持平了本文第四章创下的理论最优纪录。
+基于上述的“子集属性”，我们可以直接在基于公钥密码技术的 MPSI 协议中安全地省去多方协作解密与洗牌环路中的随机置换（Shuffle）步骤，从而极大优化实例化出的 MPSI 协议的网络传输与计算效率。
+具体地，当各方完成基于 MKR-PKE 的批量全成员零加密后，包含密文的向量将直接在各参与方之间进行流水线式的部分解密，\textbf{不再执行重随机化与置换操作}。最终 $P_1$ 完成解密，如果某位置解密的明文为 0，则说明 $P_1$ 对应哈希桶内的元素属于交集。需要注意的是，对于仅输出基数的 MPSI-card 协议，为了防止 $P_1$ 借此推断出具体哪些元素位于交集中，完整的洗牌与重随机化操作仍然是不可省略的。基于公钥密码技术的 MPSI / MPSI-card 协议的具体描述在图 \ref{fig:proto-MPSI} 中给出。
 
-总而言之，本章基于公钥体制的 MPSO 框架在理论上实现了所有已知典型功能（涵盖 MPSI、MPSI-card、MPSI-card-sum 及 MPSU）的最优渐近复杂度。然而，必须承认的是，这种在渐近理论上的极致优化，在工程落地时往往需要付出实际运行效率（特别是\textbf{在线阶段性能}）的代价。这是因为加密框架深度依赖于昂贵的公钥密码学操作（如密文同态运算与重随机化）；而我们第五章提出的基于秘密分享的框架，则完全建立在极速的 OT 与对称密钥操作之上，因而在真实的算力环境中展现出更为卓越的执行效率。
+\begin{figure}[!htb]
+\begin{framed}
+\begin{minipage}[c]{\textwidth}
+\textbf{参数.} $m$ 个参与方 $P_1, \cdots, P_m$。集合大小 $n$。元素比特长度 $l$。布谷鸟哈希参数：哈希函数 $h_1, h_2, h_3$ 和桶数 $B$。MKR-PKE 方案 $\mathcal{E} = (\Gen, \Enc, \ParDec, \Dec, \ReRand)$。
+
+\textbf{输入.} 每个参与方 $P_i$ 持有私有集合 $X_i = \{x_i^1,\cdots, x_i^n\} \subseteq \{0,1\}^l$。
+
+\begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt]
+\item \textbf{MKR-PKE 密钥生成.}~\label{step:key-gen} 对于 $i \in [m]$，$P_i$ 运行 $(pk_i, sk_i) \gets \Gen(1^\lambda)$，并将其公钥 $pk_i$ 分发给其他参与方。定义私钥 $sk = sk_1 + \cdots + sk_m$，所有各方计算共同公钥 $pk= \prod_{i =1}^m pk_i$。
+\item \textbf{哈希分桶阶段.}~\label{step:hash} $P_1$ 执行布谷鸟哈希 $\mathcal{C}_1^1, \cdots, \mathcal{C}_1^B \gets \Cuckoo_{h_1,h_2,h_3}^B(X_1)$。对于 $1 < j  \le m$，$P_j$ 执行简单哈希 $\mathcal{T}_j^1, \cdots, \mathcal{T}_j^B \gets \Simple_{h_1,h_2,h_3}^B(X_j)$。
+\item \textbf{全成员零加密阶段.} 所有参与方调用批大小为 $B$ 的 $\FuncbpMZE$，$P_1$ 作为 $P_\mathsf{pivot}$ 输入 $\mathcal{C}_1^1, \cdots, \mathcal{C}_1^B$，每个 $P_j$ ($1 < j  \le m$) 输入 $\mathcal{T}_j^1, \cdots, \mathcal{T}_j^B$。$P_1$ 收到加密向量 $\textbf{e}_1=(e_{1,1},\cdots,e_{1,B})$。
+\end{enumerate}
+
+参与方的后续动作取决于具体的目标功能：
+
+    \textbf{MPSI：} 
+    \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt] \addtocounter{enumi}{3}
+    \item \textbf{协作解密.} $P_1$ 将 $\textbf{e}_1$ 发送给 $P_{2}$。对于 $1 < j \le m$， $P_j$ 计算 $\textbf{e}_j = (e_{j,1},\cdots,e_{j,B})$，其中 $e_{j,b} = \ParDec(sk_j,e_{j-1,b})$。若 $j \ne m$，$P_j$ 将 $\textbf{e}_{j}$ 发给 $P_{j+1}$，否则发回 $P_{1}$。
+    \item $P_{1}$ 设置 $Y = \emptyset$。对于 $b \in [B]$，$P_1$ 计算 $u_b = \Dec(sk_1,e_{m,b})$。若 $u_i = 0$，$P_1$ 将 $\mathcal{C}_1^b$ 中的元素加入 $Y$ 并输出。      
+    \end{enumerate}
+    \textbf{MPSI-card：} 
+    \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt] \addtocounter{enumi}{3}
+        \item \textbf{协作解密与洗牌.} $P_1$ 将 $\textbf{e}_1$ 发送给 $P_{2}$。对于 $1 < j \le m$： 
+        \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt]
+        \item 对于 $b \in [B]$，$P_j$ 计算 $e'_{j,b} = \ParDec(sk_j,e_{j-1,b})$，累积公钥 $pk_{A_j} = pk_1 \cdot \prod_{d = j+1}^m pk_d$，并重随机化 $e''_{j,b} = \ReRand(pk_{A_j},e'_{j,b})$。 
+        \item $P_j$ 采样随机置换 $\pi_j:[B] \to [B]$。$P_j$ 将向量打乱为 $\textbf{e}_{j} = {\pi_j}(\textbf{e}''_{j})$。若 $j \ne m$，$P_j$ 发送 $\textbf{e}_{j}$ 给 $P_{j+1}$，否则发回 $P_{1}$。
+        \end{enumerate}
+        \item $P_{1}$ 定义解密向量 $\textbf{u} = (u_1, \cdots, u_{B})$，其中 $u_b = \Dec(sk_1,e_{m,b})$。$P_1$ 统计并输出 $\textbf{u}$ 中 0 的数量作为基数。
+    \end{enumerate}
+\end{minipage}
+\end{framed}
+\caption{基于公钥密码技术的 MPSI / MPSI-card 协议}\label{fig:proto-MPSI}
+\end{figure} 
+
+基于公钥密码技术的 MPSI-card-sum 协议以本章提出的“带载荷的批量全成员零加密”为核心底层组件。在协议构造中，各方分别计算状态判定密文与载荷同态累加密文。随后，通过两条并行的协作解密与洗牌环路，对状态密文和载荷密文执行\textbf{相同的多方随机置换}。最终 $P_1$ 获取乱序后的状态向量并统计基数，同时在本地提取合法状态对应的载荷密文进行同态求和。各方最后对该单一的载荷总和密文执行一轮简化的部分解密，即可输出交集的关联数据之和。该协议的形式化流程在图 \ref{fig:proto-MPSI-Sum} 中给出。
+
+\begin{figure}[!htb]
+\begin{framed}
+\begin{minipage}[c]{\textwidth}
+\begin{trivlist}
+\item \textbf{参数.} $m$ 个参与方 $P_1, \cdots, P_m$。集合大小 $n$。元素比特长度 $l$。布谷鸟哈希参数：哈希函数 $h_1, h_2, h_3$ 和桶数 $B$。MKR-PKE 方案 $\mathcal{E} = (\Gen, \Enc, \ParDec, \Dec, \ReRand)$。
+\item \textbf{输入.} 每个参与方 $P_i$ 持有私有集合 $X_i = \{x_i^1,\cdots, x_i^n\} \subseteq \{0,1\}^l$ 和对应的载荷集合 $V_i = \{v_i^1,\cdots, v_i^n\}$。定义映射函数 $\mathsf{pl}_i(x)$ 返回元素 $x \in X_i$ 对应的载荷。
+\begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt]
+    \item \textbf{MKR-PKE 密钥生成.}~\label{step:key-gen} 对于 $i \in [m]$，$P_i$ 运行 $(pk_i, sk_i) \gets \Gen(1^\lambda)$，并将其公钥 $pk_i$ 分发给其他参与方。定义私钥 $sk = sk_1 + \cdots + sk_m$，所有各方计算共同公钥 $pk= \prod_{i =1}^m pk_i$。
+    \item \textbf{哈希分桶阶段.}~\label{step:hash} $P_1$ 执行布谷鸟哈希 $\mathcal{C}_1^1, \cdots, \mathcal{C}_1^B \gets \Cuckoo_{h_1,h_2,h_3}^B(X_1)$。对于 $1 < j  \le m$，$P_j$ 执行简单哈希 $\mathcal{T}_j^1, \cdots, \mathcal{T}_j^B \gets \Simple_{h_1,h_2,h_3}^B(X_j)$，并构建对应的载荷哈希桶 $\mathcal{V}_j^1, \cdots, \mathcal{V}_j^B$。
+    \item \textbf{带载荷的全成员零加密阶段.} 所有参与方调用批大小为 $B$ 的 $\FuncbpMZEp$。$P_1$ 收到加密状态向量 $\textbf{e}_1=(e_{1,1},\cdots,e_{1,B})$ 以及加密载荷向量 $\textbf{w}_1=(w_{1,1},\cdots,w_{1,B})$。
+    \item 对于 $b \in [B]$，若 $\mathcal{C}_1^b$ 非空，$P_1$ 同态累加自身的本地载荷 $w_{1,b} = w_{1,b} \boxplus \Enc(pk,v)$。
+    \item \textbf{协作解密与洗牌.} $P_1$ 将 $\textbf{e}_1$ 和 $\textbf{w}_1$ 发送给 $P_{2}$。对于 $1 < j \le m$： 
+        \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt]
+        \item 对于 $b \in [B]$，$P_j$ 计算 $e'_{j,b} = \ParDec(sk_j,e_{j-1,b})$，累积公钥 $pk_{A_j}$，并重随机化 $e''_{j,b} = \ReRand(pk_{A_j},e'_{j,b})$ 和 $w'_{j,b} = \ReRand(pk,w_{j-1,b})$（载荷仅重随机化，求解密留至最后）。 
+        \item $P_j$ 采样随机置换 $\pi_j:[B] \to [B]$。$P_j$ 将向量打乱为 $\textbf{e}_{j} = {\pi_j}(\textbf{e}''_{j})$ 和 $\textbf{w}_{j} = {\pi_j}(\textbf{w}'_{j})$。若 $j \ne m$，将 $(\textbf{e}_{j}, \textbf{w}_{j})$ 发送给 $P_{j+1}$，否则发回 $P_{1}$。
+        \end{enumerate}
+    \item $P_{1}$ $P_{1}$ 定义解密向量 $\textbf{u} = (u_1, \cdots, u_{B})$，其中 $u_b = \Dec(sk_1,e_{m,b})$。$P_1$ 输出 $\textbf{u}$ 中 0 的数量作为基数。随后，$P_1$ 同态聚合所有交集元素的载荷密文：$s_1 = \boxplus_{b: u_b = 0} w_{m,b}$，并将 $s_1$ 发送给 $P_2$。
+    \item 对于 $1 < j \le m$，$P_j$ 计算部分解密 $s_j = \ParDec(sk_j, s_{j-1})$。若 $j \ne m$，发送 $s_j$ 给 $P_{j+1}$，否则发回 $P_1$。最终 $P_1$ 执行完全解密 $s = \Dec(sk_1, s_m)$ 并输出交集载荷总和。
+\end{enumerate}
+
+\end{trivlist}
+\end{minipage}
+\end{framed}
+\caption{基于公钥密码技术的 MPSI-card-sum 协议}\label{fig:proto-MPSI-Sum}
+\end{figure}
+
+\subsection{多方隐私集合求并与并集计算协议优化}
+\esubsection{Optimization of MPSU and MPCSU Protocols}
+
+考虑并集计算 $Y = X_1 \cup \cdots \cup X_m$，其对应的规范集合谓词公式（CSPF）通常表现为若干互不相交的局部子公式的析取。根据其代数结构，某些子公式直接退化为单一的原子命题 $x \in X_i$（对于某个 $i \in [m]$）。例如，多方并集公式可以被标准地展开为 $(x \in X_1) \lor ((x \notin X_1) \land (x \in X_2)) \lor \cdots \lor ((x \notin X_1) \land \cdots \land (x \notin X_{m-1}) \land (x \in X_m))$。在这种结构特征下，首个子公式 $x \in X_1$ 仅涉及 Leader 节点 $P_1$ 自身的成员关系判定，而完全不依赖于任何其他参与方的私有输入。
+
+基于上述的“局部原子属性”，考虑到 $P_1$ 既是 $X_1$ 的持有方，又是并集结果的最终唯一接收方，针对子公式 $x \in X_1$ 展开复杂的密文生成与多方协作解密步骤显得完全多余。在 PK-MPSO 框架的实际执行中，该子公式同样可以直接被安全地忽略。网络中的各参与方仅需利用“全非成员零加密”原语对剩余的差集序列进行状态判定密文的计算。在获得差集密文后，各方通过 MKR-PKE 同态追加元素数据并执行协作解密与洗牌环路。在协议的最终阶段，$P_1$ 只需将解密出的有效差集元素，在明文层面上与其本地存储的原始输入集合 $X_1$ 进行合并，即可无损地获取最终的并集结果。这种基于局部原子属性的剪枝优化，有效消除了 $P_1$ 处理自身私有数据时产生的无效密文计算与传输冗余。
+
+基于上述优化思路，基于公钥密码技术的 MPSU 以及 MPSU-card 协议的完整构造细节在图 \ref{fig:proto-MPSU} 中给出。
+
+\begin{figure}[!htb]
+\begin{framed}
+\begin{minipage}[c]{\textwidth}
+\begin{trivlist}
+\item \textbf{参数.} $m$ 个参与方 $P_1, \cdots, P_m$。集合大小 $n$。元素长度 $l$。全零字符串长度 $l'$。有限域 $\mathbb{F}$。布谷鸟哈希参数：哈希函数 $h_1, h_2, h_3$ 及桶数量 $B$。MKR-PKE 方案 $\mathcal{E} = (\Gen, \Enc, \ParDec, \Dec, \ReRand)$。
+\item \textbf{输入.} 每个参与方 $P_i$ 持有私有集合 $X_i = \{x_i^1,\cdots, x_i^n\} \subseteq \{0,1\}^l$。
+\begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt]
+\item \textbf{MKR-PKE 密钥生成.} 对于 $i \in [m]$，$P_i$ 运行 $(pk_i, sk_i) \gets \Gen(1^\lambda)$，并将其公钥 $pk_i$ 分发给其他参与方。定义私钥 $sk = sk_1 + \cdots + sk_m$，所有各方计算共同公钥 $pk= \prod_{i =1}^m pk_i$。
+\item \textbf{哈希分桶阶段.} $P_1$ 执行 $\mathcal{T}_1^1, \cdots, \mathcal{T}_1^B \gets \Simple(X_1)$。对于 $1 < j \le m $，$P_j$ 执行布谷鸟哈希 $\mathcal{C}_j^1, \cdots, \mathcal{C}_j^B \gets \Cuckoo(X_j)$ 和简单哈希 $\mathcal{T}_j^1, \cdots, \mathcal{T}_j^B \gets \Simple(X_j)$。
+\item \textbf{全非成员零加密阶段.} 对于 $1 < j \le m$，$P_1, \cdots, P_j$ 调用批量大小为 $B$ 的 $\FuncbpNMZE$，其中 $P_j$ 作为 $P_\mathsf{pivot}$ 输入 $\mathcal{C}_j^1, \cdots, \mathcal{C}_j^B$，每个 $P_{j'}$（$j' \in \{1,\cdots,j-1\}$）输入 $\mathcal{T}_{j'}^1, \cdots, \mathcal{T}_{j'}^B$（。$P_{j}$ 收到向量 $\textbf{e}_{j}=(e_{j,1},\cdots,e_{j,B})$。
+\end{enumerate}
+
+参与方的后续动作取决于具体的目标功能：
+
+    \item \textbf{MPSU：} 
+    \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt] \addtocounter{enumi}{3}
+        \item 对于 $1 < j \le m$，$1 \le b \le B$，若 $\mathcal{C}_j^b$ 不是空桶，$P_j$ 计算 $e'_{j,b} = e_{j,b} \boxplus \Enc(pk,x \Vert 0^{l'})$，其中 $x$ 是 $\mathcal{C}_j^b$ 中的元素；否则 $P_j$ 采样 $s'_{j,b} \gets \{0,1\}^{l+l'}$ 并计算 $e'_{j,b} = \Enc(pk,s'_{j,b})$。
+        \item 对于 $1 < j \le m$，$P_j$ 将 $\textbf{e}'_{j}=(e'_{j,1},\cdots,e'_{j,B})$ 发送给 $P_1$。$P_1$ 定义 $\textbf{c}_1 = (c_{1,1},\cdots,c_{1,(m-1)B})$，其中对于 $1 < j \le m$，$1 \le b \le B$，设置 ${c}_{1,(j-2)B+b} = e'_{j,b}$。
+        \item \textbf{协作解密与洗牌.} $P_1$ 将 $\textbf{c}_1$ 发送给 $P_{2}$。对于 $1 < j \le m$： 
+        \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt]
+        \item 对于 $1 \le i \le (m-1)B$，$P_j$ 计算 $c'_{j,i} = \ParDec(sk_j,c_{j-1,i})$，$pk_{A_j} = pk_1 \cdot \prod_{d = j+1}^m pk_d$，并计算 $c''_{j,i} = \ReRand(pk_{A_j},c'_{j,i})$。 
+        \item $P_j$ 采样 $\pi_j:[(m-1)B] \to [(m-1)B]$。$P_j$ 定义 $\textbf{c}''_j = (c''_{j,1},\cdots,c''_{j,(m-1)B})$ 并计算 $\textbf{c}_{j} = {\pi_j}(\textbf{c}''_{j})$。如果 $j \ne m$，$P_j$ 将 $\textbf{c}_{j}$ 发送给 $P_{j+1}$，否则发回 $P_{1}$。
+        \end{enumerate}
+        \item $P_{1}$ 设置 $Y = \emptyset$。对于 $1 \le i \le (m-1)B$，$P_1$ 计算 $u_i = \Dec(sk_1,c_{m,i})$。如果 $u_i = y \Vert 0^{l'}$（其中 $y \in \{0,1\}^l$），$P_1$ 更新 $Y = Y \cup \{y\}$。输出 $Y \cup X_1$。
+    \end{enumerate}
+    \item \textbf{MPSU-card：} 
+    \begin{enumerate}[itemsep=2pt,topsep=0pt,parsep=0pt] \addtocounter{enumi}{3}
+        \item 对于 $1 < j \le m$，$P_j$ 将 $\textbf{e}_{j}$ 发送给 $P_1$。$P_1$ 定义 $\textbf{c}_1 = (c_{1,1},\cdots,c_{1,(m-1)B})$，其中对于 $1 < j \le m$，$1 \le b \le B$，设置 ${c}_{1,(j-2)B+b} = e_{j,b}$。
+        \item \textbf{协作解密与洗牌.} 联合执行协作解密与打乱流程，与上述 MPSU 相同。
+        \item $P_{1}$ 定义 $\textbf{u} = (u_1, \cdots, u_{(m-1)B})$。对于 $1 \le i \le (m-1)B$，$P_1$ 计算 $u_i = \Dec(sk_1,c_{m,i})$。$P_1$ 输出 $\textbf{u}$ 中 0 的数量并加上 $n$ 作为基数。
+    \end{enumerate}
+\end{trivlist}
+\end{minipage}
+\end{framed}
+\caption{基于公钥密码技术的 MPSU / MPSU-card 协议}\label{fig:proto-MPSU}
+\end{figure}
+
+\section{复杂度分析与对比}
+
+本节对第五章提出的基于对称密码技术的 MPSO 框架与本章提出的 PK-MPSO 框架进行深度的理论剖析与对比。在下文的渐近复杂度分析中，我们主要关注协议开销对集合大小 $n$ 和参与方数量 $m$ 的依赖关系。
+
+虽然第六章中在基于对称密码技术的 MPSO 框架下优化得到的 MPSI 和 MPCSI 协议实现了最优渐近复杂度，但在处理 MPSU 等涉及差集提取的复杂功能时，该框架面临着难以逾越的结构性瓶颈。其本质原因在于：该框架基于秘密分享的技术路线，重构阶段不可避免地引入了对参与方数量 $m$ 的二次方依赖 —— 在 $m$ 个参与方之间对 $O(mn)$ 个元素进行秘密分享的过程，最终必然要求 Leader 接收来自每个 Client 的 $O(mn)$ 个分享份额，并在最后一步执行 $O(mn)$ 次重构操作 —— 因此，Leader 的计算与通信复杂度下界为 $O(m^2 n)$。
+
+ 并且其实例化的 MPSU 协议中在基于对称密码技术的 MPSU 协议中具有最先进的复杂度，但其 这是因为基于秘密分享的框架不可避免地导致了 Leader 承受二次方的计算与通信复杂度 $O(m^2 n)$ 
+
+通过将底层框架升级为本章所构建的基于公钥加密的版本，PK-MPSO 框架成功将 Leader 的渐近复杂度压低至 $O(sn)$（其中 $s$ 为 CSPF 表示中的子公式总数），从而解除了对参与方数量 $m$ 的二次方依赖。在 PK-MPSO 框架下优化的 MPSU 协议实现了 Leader 与 Client 的计算复杂度和通信复杂度均随 $m$ 和 $n$ 线性增长（即 $O(mn)$），持平了第四章中基于公钥密码技术提出的 MPSU 协议达到的理论下界。
+
+总而言之，本章的 PK-MPSO 框架在理论上实现了所有已知典型功能（涵盖 MPSI、MPSI-card、MPSI-card-sum 及 MPSU）的最优渐近复杂度。然而，必须承认的是，这种在渐近理论上的极致优化，在工程落地时往往需要付出实际运行效率（特别是在线阶段性能）的代价。这是因为加密框架深度依赖于昂贵的公钥密码操作，而第五章的 MPSO 框架则完全建立在少量的 OT 和极速的对称密码操作之上，因而在真实的算力环境中展现出更为卓越的执行效率。
+
+\subsection{PK-MPSO 框架的复杂度分析}
+\esubsection{Complexity Analysis of PK-MPSO Framework}
+
+在PK-MPSO 框架（图~\ref{fig:proto-MPSO2}）中，计算和通信复杂度均由目标可构造集合 $Y$ 的 CSPF 表示 $\psi(x, X_1, \cdots, X_m)$ 的结构决定，设 $\psi = Q_1 \lor \cdots \lor Q_s$。
+
+在第一阶段的成员零加密中，每个参与方 $P_j$ 的计算复杂度由两部分构成：
+(1) $O(\sum_{i \in [s]}(i_q \cdot \lvert \mathsf{AND}_i + \mathsf{OR}_i \rvert \cdot n))$，其中 $Q_i$ 相对于 $X_j$ 是局部的（记 $Q'_i$ 为 $Q_i$ 的 $X_j$-局部剩余公式），$i_q$ 是文字的数量，$\lvert \mathsf{AND}_i + \mathsf{OR}_i \rvert$ 是 $Q'_i$ 中 $\mathsf{AND}$ 和 $\mathsf{OR}$ 操作的总数；
+(2) $O(\sum_{i \in [s]}(\lvert \mathsf{AND}_i + \mathsf{OR}_i \rvert \cdot n))$，其中 $Q_i$ 相对于 $X_j$ 不是局部的但包含 $X_j$，且 $\lvert \mathsf{AND}_i + \mathsf{OR}_i \rvert$ 是 $Q_i$ 相对于其他某个集合的局部剩余公式中逻辑操作的总数。
+
+相应地，$P_j$ 的通信复杂度也由两部分构成：
+(1) $O(\sum_{i \in [s]}(i_q \cdot \lvert \mathsf{OR}_i \rvert \cdot n))$，对应 $Q_i$ 相对于 $X_j$ 局部的情况，其中 $\lvert \mathsf{OR}_i \rvert$ 是 $Q'_i$ 中 $\mathsf{OR}$ 操作的数量；
+(2) $O(\sum_{i \in [s]}(\lvert \mathsf{OR}_i \rvert \cdot n))$，对应 $Q_i$ 非局部但包含 $X_j$ 的情况。
+
+与基于对称密码技术的框架中执行多方秘密分享洗牌不同，本章在第二阶段采用了协作解密与洗牌环路。在此阶段，由于包含了 $sB$ 个密文的向量在 $m$ 个参与方之间依次传递并进行部分解密与重随机化，Leader $P_1$ 与每个 Client $P_j$ 的计算和通信复杂度均为 $O(sn)$，其中 $s$ 为 CSPF 表示 $\psi$ 中子公式的数量。这从根本上避免了基于对称密码技术的框架中 Leader 在重构阶段因收集其他参与方的秘密分享份额而产生的 $O(smn)$ 的超线性开销。
+
+\subsection{多方隐私集合求交与交集计算的复杂度分析}
+\esubsection{Complexity Analysis of MPSI and MPCSI Protocols}
+
+在基于 PK-MPSO 框架优化的 MPSI 协议（图~\ref{fig:proto-MPSI}）中，各参与方（以 $P_1$ 作为 $P_\mathsf{pivot}$）共同调用批量大小为 $B = O(n)$ 的批量全成员零加密协议。在该阶段，Leader $P_1$ 的计算和通信复杂度均为 $O(mn)$，而每个 Client $P_j$ ($1 < j \le m$) 的计算和通信复杂度被严格控制在 $O(n)$。
+在随后的协作解密阶段，由于多方洗牌步骤被安全裁剪，密文向量仅在各方间进行流水线式的部分解密。因此，该阶段的计算和通信复杂度保持在：$P_1$ 为 $O(mn)$，每个 $P_j$ 为 $O(n)$。
+在 MPSI-card 协议中，为了保护元数据，参与方在解密环路中保留了重随机化与置换打乱操作。但在该阶段，$P_1$ 与每个 $P_j$ 依然只需要处理 $O(n)$ 规模的密文向量。综上所述，MPSI-card 的总体渐近复杂度与 MPSI 完全相同。
+
+在 MPSI-card-sum 协议（图~\ref{fig:proto-MPSI-Sum}）中，各参与方调用了带载荷的批量全成员零加密协议。在该阶段，$P_1$ 的开销为 $O(mn)$，每个 $P_j$ 为 $O(n)$。随后，参与方对状态密文和载荷密文执行平行的解密与洗牌环路。总体而言，MPSI-card-sum 的计算和通信复杂度同样与 MPSI / MPSI-card 保持一致。
+
+现有的最先进 MPSI 协议 \cite{WuYC24,ChenDGB22} 通常需要参与方之间密集的两两在线交互，这不可避免地导致 Client 的复杂度依赖于参与方数量 $m$ 或腐化阈值 $t$。第六章中的基于对称密码技术的 MPSI 系列协议通过构建星型通信拓扑，使得 Leader 的计算和通信复杂度为 $O(mn)$，每个 Client 为 $O(n)$。本章基于公钥密码技术的 MPSI 系列协议虽然引入了环形通信拓扑结构，但不改变 Leader 和 Client 的复杂度，因此也达到了与不考虑隐私安全的朴素明文方案相同量级的复杂度。
+
+\subsection{多方隐私集合求并与并集计算的复杂度分析}
+\esubsection{Complexity Analysis of MPSU and MPCSU Protocols}
+
+在基于 PK-MPSO 框架优化的 MPSU 协议（图~\ref{fig:proto-MPSU}）中，对于 $1 < j \le m$，参与方 $P_1, \cdots, P_j$（其中 $P_j$ 作为 $P_\mathsf{pivot}$）调用批量大小为 $B = O(n)$ 的批量全非成员零加密协议。在该阶段，每个参与方的计算和通信复杂度均为 $O(mn)$。此后，各参与方的状态判定逻辑被加密在了 $(m-1)B = O(mn)$ 个公钥密文中。
+接着，各方通过协作解密与洗牌环路处理这 $O(mn)$ 个密文，其中每个参与方（包括 Leader $P_1$ 和 Client $P_j$）仅需对这批密文执行一次部分解密与重随机化操作。因此，在该步骤中，$P_1$ 与每个 $P_j$ 的计算和通信复杂度均为 $O(mn)$。
+综合来看，本章基于公钥密码技术的 MPSU 协议中，Leader $P_1$ 与每个 Client $P_j$ 的总体计算和通信复杂度均达到了 $O(mn)$。
 
 \section{本章小结}
 \esection{Summary}
 
-作为对第五章基于对称密钥的多方隐私集合运算（MPSO）框架的理论补充与延展，本章系统性地探索了如何在公钥加密体制下构建支持任意集合公式计算的通用 MPSO 统一框架。
+作为对第五章基于对称密码技术的多方隐私集合运算（MPSO）框架的理论补充与延展，本章系统性地探索了如何在公钥密码技术路线下构建支持任意集合公式计算的通用 MPSO 统一框架。
 本章的核心研究成果与理论贡献主要体现在以下三个方面：
 \begin{enumerate}
-    \item \textbf{原语从对称密钥到公钥的映射.} 本章在公钥加密体制下抽象出了基于对称密钥的 MPSO 框架中关键原语的对应原语，引入了“谓词零加密（Predicative Zero-Encryption）”与“成员零加密（Membership Zero-Encryption）”新型密码学原语，给出了从对称密钥到公钥密码的构造映射和关联于任意复杂谓词公式、满足标准半诚实安全的成员零加密构造范式。
-    \item \textbf{基于公钥的通用 MPSO 框架构建.} 本章以成员零加密为核心密码学组件，结合第四章中基于 MKR-PKE 设计的协作解密与洗牌机制，构建了基于公钥体制的通用 MPSO 框架，可实现通用的 MPSO 和 MPSO-card 功能。
+    \item \textbf{原语从对称密码技术到公钥密码技术的映射.} 本章在公钥加密体制下抽象出了基于对称密码技术的 MPSO 框架中关键原语的对应原语，引入了“谓词零加密（Predicative Zero-Encryption）”与“成员零加密（Membership Zero-Encryption）”新型密码学原语，给出了从对称密码技术到公钥密码技术的构造映射和关联于任意复杂谓词公式、满足标准半诚实安全的成员零加密构造范式。
+    \item \textbf{基于公钥密码技术的通用 MPSO 框架构建.} 本章以成员零加密为核心密码学组件，结合第四章中基于 MKR-PKE 设计的协作解密与洗牌机制，构建了基于公钥密码技术的通用 MPSO 框架，可实现通用的 MPSO 和 MPSO-card 功能。
     \item \textbf{各实例化协议理论下界的突破.} 基于本章框架优化出的 MPSI、MPSI-card 和 MPSI-card-sum 协议均实现了与明文计算开销同量级的\textbf{最优渐进复杂度}；优化出的 MPSU 和 MPSU-card 协议实现了\textbf{线性复杂度}。
 \end{enumerate}
 
-综上所述，第五章提出的基于对称密钥体制的 MPSO 框架依赖极速的不经意传输与对称密码操作，在真实的算力与网络环境中展现出了卓越的在线执行效率，具备极高的\textbf{工程实用价值}；而本章构建的基于公钥密码体制的 MPSO 框架，则凭借其在处理大规模参与方协同场景下的扩展能力，成功探索并触及了多方隐私集合运算的\textbf{理论最优复杂度边界}，具有重要的理论研究价值。这两种技术路线互为补充，共同构筑了兼顾实用性能与理论深度的完整 MPSO 统一框架体系。
+综上所述，第五章提出的基于对称密码技术的 MPSO 框架依赖极速的不经意传输与对称密码操作，在真实的算力与网络环境中展现出了卓越的在线执行效率，具备极高的\textbf{工程实用价值}；而本章构建的基于公钥密码技术的 MPSO 框架，则凭借其在处理大规模参与方协同场景下的扩展能力，成功探索并触及了多方隐私集合运算的\textbf{理论最优复杂度边界}，具有重要的理论研究价值。这两种技术路线互为补充，共同构筑了兼顾实用性能与理论深度的完整 MPSO 统一框架体系。

@@ -1,36 +1,37 @@
-\chapter{基于对称密钥的高效多方隐私集合求并协议}
-\echapter{Efficient Multi-Party Private Set Union Protocol Based on Symmetric-Key Operations}
+\chapter{基于对称密码技术的高效多方隐私集合求并协议}
+\echapter{Efficient Symmetric-Key Multi-Party Private Set Union Protocol}
 
 \section{引言}
 \esection{Introduction}
 
 隐私集合求并（Private Set Union, PSU）是隐私集合运算领域的一个重要研究分支，它允许一组互不信任的参与方在不泄露除并集外任何额外信息的前提下，协同计算各自私有集合的并集。PSU 在现实世界的协作计算和数据共享场景中具有广泛的应用价值。例如，在信息安全风险评估与管理中 \cite{LV04}，多个组织可以利用 PSU 联合各自持有的 IP 黑名单或漏洞数据库 \cite{HLSSSYY16}，从而构建更全面的威胁情报视图；在政务数据开放中，不同部门可以通过 PSU 聚合分布式的统计数据 \cite{KS-CRYPTO-2005}。此外，PSU 也是构建支持全连接（Full Join）的隐私数据库 \cite{KRTW-ASIACRYPT-2019} 以及 Private ID 协议 \cite{GMRSS-PKC-2021} 的核心底层组件。
 
-与PSO中的另一研究分支 —— 隐私集合求交（Private Set Intersection, PSI）相比，PSU 的研究起步较晚且发展相对缓慢：目前的 PSI 技术已经相对成熟，尤其是两方 PSI 在效率和实用性方面已经达到较高水平~\cite{PSZ-USENIX-2014,KKRT-CCS-2016,PRTY-CRYPTO-2019,CM-CRYPTO-2020,PRTY20,RS-EUROCRYPT-2021,RR-CCS-2022}，其性能甚至可以接近不安全的朴素哈希方法。同时，多方 PSI 也在两方协议研究成果的基础上得到了充分发展，并提出了多种适用于大规模数据处理的高效方案~\cite{KMPRT-CCS-2017,NTY-CCS-2021,CDGOSS-CCS-2021,BNOP-AsiaCCS-2022}。然而，早期由 Kissner 和 Song \cite{KS-CRYPTO-2005} 提出的两方 PSU 协议及其后续改进工作 \cite{Frikken-ACNS-2007}主要依赖于加法同态加密（AHE）或复杂的通用电路，导致其实际效率低下。直到 2019 年，Kolesnikov 等人 \cite{KRTW-ASIACRYPT-2019} 基于 OT 和对称密钥操作提出了首个适用于大规模数据集的高效两方 PSU 协议，实现了相比基于公钥密码的方案三个数量级的速度提升。随后的研究 \cite{GMRSS-PKC-2021, Jia-USENIX-2022} 继续在基于对称密钥的技术路线上探索，利用不经意切换（Oblivious Switching）等技术降低了协议的通信与计算开销。近期的研究~\cite{ZCLZL-USENIX-2023,ZCZDL-2024} 已实现计算复杂度与通信复杂度均为线性的两方 PSU 协议，标志着两方 PSU 技术也逐渐迈向成熟。
+与PSO中的另一研究分支 —— 隐私集合求交（Private Set Intersection, PSI）相比，PSU 的研究起步较晚且发展相对缓慢：目前的 PSI 技术已经相对成熟，尤其是两方 PSI 在效率和实用性方面已经达到较高水平~\cite{PSZ-USENIX-2014,KKRT-CCS-2016,PRTY-CRYPTO-2019,CM-CRYPTO-2020,PRTY20,RS-EUROCRYPT-2021,RR-CCS-2022}，其性能甚至可以接近不安全的朴素哈希方法。同时，多方 PSI 也在两方协议研究成果的基础上得到了充分发展，并提出了多种适用于大规模数据处理的高效方案~\cite{KMPRT-CCS-2017,NTY-CCS-2021,CDGOSS-CCS-2021,BNOP-AsiaCCS-2022}。然而，早期由 Kissner 和 Song \cite{KS-CRYPTO-2005} 提出的两方 PSU 协议及其后续改进工作 \cite{Frikken-ACNS-2007}主要依赖于加法同态加密（AHE）或复杂的通用电路，导致其实际效率低下。直到 2019 年，Kolesnikov 等人 \cite{KRTW-ASIACRYPT-2019} 基于 OT 和对称密码操作提出了首个适用于大规模数据集的高效两方 PSU 协议，实现了相比基于公钥密码技术的方案三个数量级的速度提升。随后的研究 \cite{GMRSS-PKC-2021, Jia-USENIX-2022} 继续在基于对称密码技术的路线上探索，利用不经意切换（Oblivious Switching）等技术降低了协议的通信与计算开销。近期的研究~\cite{ZCLZL-USENIX-2023,ZCZDL-2024} 已实现计算复杂度与通信复杂度均为线性的两方 PSU 协议，标志着两方 PSU 技术也逐渐迈向成熟。
 
 随着跨组织数据协作需求的增长，多方场景相较两方场景更具实际意义。与两方 PSU 相比，多方隐私集合求并（Multi-party Private Set Union, MPSU）在多组织联合数据分析、分布式威胁情报共享以及跨域数据协同计算等场景中具有更为广泛的应用需求。但 MPSU 领域的研究进展依然滞后，现有协议的效率与安全性方面仍面临较大挑战。
 根据底层所采用的密码学技术，现有的 MPSU 协议构造主要分为以下两类：\footnote{本文不考虑基于通用电路的 MPSU 方案，因为其性能开销在实际应用中通常难以接受。}
 \begin{itemize}
-    \item \textbf{基于公钥密码技术的 MPSU：} 该类协议 \cite{KS-CRYPTO-2005, Frikken-ACNS-2007, VCE22, GNT-eprint-2023} 主要依赖于公钥密钥技术（如 AHE），其共同缺陷在于每个参与方需执行大量耗时的公钥操作，在多方和大规模数据场景下计算与通信开销较高，实际效率难以满足应用需求。
-    \item \textbf{基于对称密钥技术的 MPSU：} 这一路线目前仅有 Liu 和 Gao \cite{LG-ASIACRYPT-2023} 的工作。虽然该协议利用 OT 和对称密钥技术实现了远超公钥路线的性能（比 \cite{VCE22} 快约两个数量级），但其安全性存在严重缺陷：其安全性证明本质上依赖于“非共谋假设”（Non-collusion Assumption），即假设获得结果的领导者（Leader）不会与其他参与方（Client）共谋。在现实世界的开放网络或存在利益竞争的商业合作中，该假设难以成立，导致协议无法抵御任意共谋攻击，存在严重的安全风险。
+    \item \textbf{基于公钥密码技术的 MPSU：} 该类协议 \cite{KS-CRYPTO-2005, Frikken-ACNS-2007, VCE22, GNT-eprint-2023} 主要依赖于公钥密码技术（如 AHE），其共同缺陷在于每个参与方需执行大量耗时的公钥密码操作，在多方和大规模数据场景下计算与通信开销较高，实际效率难以满足应用需求。
+    \item \textbf{基于对称密码技术的 MPSU：} 这一路线目前仅有 Liu 和 Gao \cite{LG-ASIACRYPT-2023} 的工作。虽然该协议利用 OT 和对称密码技术实现了远超公钥密码技术路线的性能（比 \cite{VCE22} 快约两个数量级），但其安全性存在严重缺陷：其安全性证明本质上依赖于“非共谋假设”（Non-collusion Assumption），即假设获得结果的领导者（Leader）不会与其他参与方（Client）共谋。在现实世界的开放网络或存在利益竞争的商业合作中，该假设难以成立，导致协议无法抵御任意共谋攻击，存在严重的安全风险。
 
 \end{itemize}
 
-综上所述，现有 MPSU 研究在效率与安全性之间仍存在明显权衡：基于公钥密码技术的方案安全性强但效率低，而基于对称密钥技术的方案效率高但安全性弱，由此引出了一个关键的研究问题：
+综上所述，现有 MPSU 研究在效率与安全性之间仍存在明显权衡：基于公钥密码技术的方案安全性强但效率低，而基于对称密码技术的方案效率高但安全性弱，由此引出了一个关键的研究问题：
 \begin{center}
-\emph{能否在标准半诚实模型下，构造出基于 OT 与对称密钥操作、且不依赖任何非共谋假设的高效 MPSU 协议？}
+\emph{能否在标准半诚实模型下，构造出基于 OT 与对称密码操作、且不依赖任何非共谋假设的高效 MPSU 协议？}
 \end{center}
 
-本章围绕上述问题展开研究，通过提出两种新型密码学组件 —— 批量秘密分享隐私成员测试（batch secret-shared private membership test, batch ssPMT）和多方秘密分享随机不经意传输（multi-party secret-shared ROT, mss-ROT），分别突破了现有对称密钥 MPSU 方案 \cite{LG-ASIACRYPT-2023} 的性能瓶颈和消除了其对非共谋假设的依赖，最终实现首个满足标准半诚实安全的基于对称密钥的高效 MPSU 协议。
+本章围绕上述问题展开研究，通过提出两种新型密码学组件 —— 批量秘密分享隐私成员测试（batch secret-shared private membership test, batch ssPMT）和多方秘密分享随机不经意传输（multi-party secret-shared ROT, mss-ROT），分别突破了现有基于对称密码技术的 MPSU 方案 \cite{LG-ASIACRYPT-2023} 的性能瓶颈和消除了其对非共谋假设的依赖，最终实现首个满足标准半诚实安全的基于对称密码技术的高效 MPSU 协议。
 
 本章余下内容安排如下：第 3.2 节对 LG 协议进行回顾与局限性分析，并基于 LG 协议的两大“痛点”，概述本章提出的 SK-MPSU 协议的技术路线；第 3.3 节介绍 batch ssPMT 的功能定义、协议构造与安全性证明，以及复杂度分析，并与 LG 协议的核心组件 mq-ssPMT 进行对比；第 3.4 节介绍 mss-ROT的功能定义、协议构造与安全性证明；第 3.5 节详细阐述 SK-MPSU 协议的完整构造及安全性证明；第 3.6 节对 SK-MPSU 协议进行复杂度分析，并与 LG 协议的复杂度进行对比；最后，第 3.7 节对本章工作进行总结。
 
 \section{技术路线概述}
 \esection{Technical Overview}
 
-本节从整体层面对本章的研究思路与技术路线进行概述。本节首先对 Liu 和 Gao \cite{LG-ASIACRYPT-2023} 提出的基于对称密钥的 MPSU 协议（以下简称 LG 协议）进行回顾与深度分析，指出其在性能和安全性方面的局限性。随后，本节将阐述本文如何通过引入“批量秘密分享隐私成员测试”（batch ssPMT）和“多方秘密分享随机不经意传输”（mss-ROT）这两个新原语，以逐个突破现有框架的性能和安全性瓶颈，从而构建满足标准半诚实安全且更高效的 MPSU 协议。
+本节从整体层面对本章的研究思路与技术路线进行概述。本节首先对 Liu 和 Gao \cite{LG-ASIACRYPT-2023} 提出的基于对称密码技术的 MPSU 协议（以下简称 LG 协议）进行回顾与深度分析，指出其在性能和安全性方面的局限性。随后，本节将阐述本文如何通过引入“批量秘密分享隐私成员测试”（batch ssPMT）和“多方秘密分享随机不经意传输”（mss-ROT）这两个新原语，以逐个突破现有框架的性能和安全性瓶颈，从而构建满足标准半诚实安全且更高效的 MPSU 协议。
 
 \subsection{LG 协议的回顾与局限性分析}
+\esubsection{Revisit LG Protocol and Limitation Analysis.}
 
 我们首先将 LG 协议抽象为一种基于秘密分享（Secret-Sharing）的 MPSU 框架。该框架的核心思想是将复杂的并集计算转化为一系列差集的秘密分享问题。
 设共有 $m$ 个参与方 $P_1,\dots,P_m$，各自输入集合 $X_1,\dots,X_m$。定义第 $j$ 个参与方的差集为 $Y_j = X_j \setminus (X_1 \cup \cdots \cup X_{j-1}), \quad 2 \le j \le m$，则有 $X_1 \cup \cdots \cup X_m = X_1 \cup Y_2 \cup \cdots \cup Y_m$，即所有的差集构成全集的一个划分。因此，只要各参与方能够获得所有差集元素的加法秘密分享，并在最终阶段由 Leader（以下指定为 $P_1$）重构，即可得到并集结果。该框架具体可分为以下两个阶段：
@@ -49,6 +50,7 @@ LG 协议利用两个核心组件来实现第一阶段：
 上述 LG 协议的构造存在两个严重的“痛点”：首先，在差集计算过程中，需要反复执行 mq-ssPMT 的现有实例化高度依赖昂贵的通用 MPC 技术，计算与通信开销较大，成为整个协议的效率瓶颈；其次，第一阶段无法抵抗 $P_1$ 与其他参与方之间的共谋攻击，其安全性依赖于非共谋假设，即要求最终获得结果的 $P_1$ 不与其他参与方共谋。基于上述观察，下面从效率与安全两个方面对 LG 进行改进。
 
 \subsection{高效的 batch ssPMT 原语}
+\esubsection{Efficient Batch ssPMT Primitive}
 
 针对 mq-ssPMT 的效率瓶颈，本文提出了一种全新的原语 —— \textbf{批量秘密分享隐私成员测试（batch ssPMT）}。它是 ssPMT 的批量化版本：发送方 $\Sd$ 输入 $n$ 个不相交集合 $X_1, \dots, X_n$，接收方 $\Rcv$ 输入 $n$ 个元素 $y_1, \dots, y_n$；双方获得比特向量的秘密分享，若 $y_i \in X_i$ 则第 $i$ 位为 1，否则为 0。
 
@@ -58,9 +60,9 @@ LG 协议利用两个核心组件来实现第一阶段：
 相比于依赖通用两方计算（2PC）的 mq-ssPMT，本文的 batch ssPMT 基于两个轻量级的组件构建：批量不经意可编程伪随机函数（batch oblivious programmable pseudorandom function, batch OPPRF）和秘密分享隐私等值测试（secret-shared private equality test, ssPEQT）。其中，batch OPPRF 可通过向量不经意线性求值（textbftor Oblivious Linear Evaluation, VOLE）~\cite{BCGIKRS19,BCGIKS19,RRT23}和不经意键值存储（oblivious key-value store, OKVS）~\cite{PRTY20,GPRTY-CRYPTO-2021,RR-CCS-2022,BPSY-USENIX-2023} 获得极其高效的实例化，而 ssPEQT 虽然需利用通用 2PC 实现，但因其仅涉及规模较小的电路，计算和通信开销小，并不会成为性能瓶颈。因此，该构造显著减少了协议对通用 2PC 的依赖，从而大幅提升了协议的整体性能。
 
 \subsection{基于 batch ssPMT 和 mss-ROT 的 SK-MPSU 协议} \label{sec:sk-overview}
-\esubsection{SK-MPSU from batch ssPMT and mss-ROT}
+\esubsection{SK-MPSU from Batch ssPMT and mss-ROT}
 
-本节将在 LG 协议的基础上以递增的方式重新设计 LG 协议的第一阶段，从而构建标准半诚实模型下的首个基于对称密钥的 MPSU 协议（以下称该协议为 SK-MPSU 协议）。首先给出用上述基于哈希分桶和 batch ssPMT 的构造替代 mq-ssPMT 后的新的秘密分享差集 $Y_j$ 的过程：令 $P_j$ 通过布谷鸟哈希预处理其集合 $X_j$，其余 $P_{i<j}$ 通过简单哈希预处理其集合 $X_i$。$P_j$ 作为接收方与每个 $P_i$ 执行 batch ssPMT。对于每个桶，$P_j$ 和 $P_i$ 分别获得成员关系比特的秘密分享 $e_{j,i}$ 和 $e_{i,j}$。随后，$P_j$ 作为发送方与每个 $P_i$ 执行双选择比特 ROT，其中 $P_j$ 输入 $e_{j,i}$，$P_i$ 输入 $e_{i,j}$。执行结束后，$P_j$ 获得随机对 $(r_{j,i}^0, r_{j,i}^1)$。若 $e_{j,i} \oplus e_{i,j} = 0$，则 $P_i$ 获得 $r_{j,i}^0$；否则获得 $r_{j,i}^1$。$P_i$ 将获得的输出 $r_{j,i}^{e_{j,i} \oplus e_{i,j}}$ 设为其秘密分享份额 $s_{j,i}$。$P_j$ 则将其分享份额 $s_{j,j}$ 设置为 $\bigoplus_{i=1}^{j-1} r_{j,i}^0 \oplus x \Vert \text{H}(x)$，其中 $x \in X_j$ 是 $P_j$ 桶中的元素，附加的哈希值 $\text{H}(x)$ 用于在重构阶段区分真实元素和随机秘密。
+本节将在 LG 协议的基础上以递增的方式重新设计 LG 协议的第一阶段，从而构建标准半诚实模型下的首个基于对称密码技术的 MPSU 协议（以下称该协议为 SK-MPSU 协议）。首先给出用上述基于哈希分桶和 batch ssPMT 的构造替代 mq-ssPMT 后的新的秘密分享差集 $Y_j$ 的过程：令 $P_j$ 通过布谷鸟哈希预处理其集合 $X_j$，其余 $P_{i<j}$ 通过简单哈希预处理其集合 $X_i$。$P_j$ 作为接收方与每个 $P_i$ 执行 batch ssPMT。对于每个桶，$P_j$ 和 $P_i$ 分别获得成员关系比特的秘密分享 $e_{j,i}$ 和 $e_{i,j}$。随后，$P_j$ 作为发送方与每个 $P_i$ 执行双选择比特 ROT，其中 $P_j$ 输入 $e_{j,i}$，$P_i$ 输入 $e_{i,j}$。执行结束后，$P_j$ 获得随机对 $(r_{j,i}^0, r_{j,i}^1)$。若 $e_{j,i} \oplus e_{i,j} = 0$，则 $P_i$ 获得 $r_{j,i}^0$；否则获得 $r_{j,i}^1$。$P_i$ 将获得的输出 $r_{j,i}^{e_{j,i} \oplus e_{i,j}}$ 设为其秘密分享份额 $s_{j,i}$。$P_j$ 则将其分享份额 $s_{j,j}$ 设置为 $\bigoplus_{i=1}^{j-1} r_{j,i}^0 \oplus x \Vert \text{H}(x)$，其中 $x \in X_j$ 是 $P_j$ 桶中的元素，附加的哈希值 $\text{H}(x)$ 用于在重构阶段区分真实元素和随机秘密。
 上述构造的正确性在于：若 $x \in Y_j$，则对于所有 $i$ 都有 $e_{j,i} \oplus e_{i,j} = 0$，此时所有秘密分享份额之和 $\bigoplus_{i=1}^j s_{j,i} = x \Vert \text{H}(x)$，即各方持有该元素的秘密分享。反之，若 $x \notin Y_j$，则至少有一个 $r_{j,i}^0 \oplus r_{j,i}^1$ 项无法在求和中抵消，从而导致各方持有的是一个随机秘密的分享。
 
 尽管上述构造比 LG 协议更高效，但其同样无法抵御 $P_1$ 和其他参与方的共谋攻击。例如，在第二阶段中，若 $P_1$ 重构出秘密 $r_{j,i'}^0 \oplus r_{j,i'}^1 \oplus x \Vert \text{H}(x)$（$1 \le i' < j$），
@@ -137,6 +139,7 @@ LG 协议利用两个核心组件来实现第一阶段：
 在本章提出的 MPSU 协议以及后续章节 batch ssPMT 的使用中，batch ssPMT 始终与哈希分桶技术相结合，其中 $\Rcv$ 利用布谷鸟哈希将输入向量 $\textbf{y}$ 中的元素分配至 $B$ 个桶中，$\Sd$ 则利用简单哈希将输入集合 $X$ 中的元素分配至对应的所有桶中。双方调用包含 $B$ 个ssPMT 实例的 batch ssPMT 协议。本节将上述过程看作一个整体进行复杂度分析。为了使得调用包含 $B$ 个ssPMT 实例的 batch ssPMT 协议的计算与通信开销相对于集合规模 $n$ 呈线性增长，本文采用无 stash 的三哈希布谷鸟哈希技术 \cite{PSTY-EUROCRYPT-2019}，在该参数设置下，为保证哈希失败概率（即元素无法存入哈希表而必须存入 stash 的概率）小于 $2^{-40}$，本文设置桶数 $B = 1.27n = O(n)$。本文实现 batch ssPMT 相对于 $n$ 的线性复杂度，主要依靠两个关键技术：首先，本文遵循文献~\cite{PSTY-EUROCRYPT-2019} 的范式，利用批量不经意随机函数（batch oblivious pseudorandom function, batch OPRF）与不经意键值存储（oblivious key-value store, OKVS）构造批量不经意可编程 PRF（batch OPPRF）。通过通信摊销技术，计算 $B = O(n)$ 个 OPPRF 实例的总通信开销仅与元素总数 $3n$ 相关。其次，本文采用子域向量不经意线性求值（subfield-VOLE）实例化 batch OPRF，并结合文献~\cite{RR-CCS-2022} 中的 OKVS 构造，确保了规模为 $O(n)$ 的 batch OPPRF 的计算复杂度与 $n$ 线性相关。
 
 \subsection{batch ssPMT 的复杂度细节}~\label{sec:analysis-bsspmt}
+\esubsection{Complexity Details of Batch ssPMT}
 
 $\ProtobssPMT$ 协议中各阶段的具体开销分析如下：
 
@@ -168,8 +171,9 @@ $\ProtobssPMT$ 协议中各阶段的具体开销分析如下：
 \end{trivlist}
 
 \subsection{与 mq-ssPMT 的对比}~\label{compare:lg}
+\esubsection{Comparison with mq-ssPMT}
 
-Liu 和 Gao 将 \cite{ZCLZL-USENIX-2023} 中基于对称密钥加密（SKE）的 mq-RPMT构造改造为 mq-ssPMT，其核心开销来自其中的秘密分享不经意解密匹配（secret-shared oblivious decryption-then-matching, ssVODM）。该协议需通过 GMW 协议实现解密与比较电路，总计需要 $(T + \gamma' - \log n - 1)n$ 个 AND 门，其中 $T$ 为解密电路中的 AND 门数量，典型参数下 $T \approx 600$；$\gamma'$ 为 SKE 密文比特长度，其下界与 mq-ssPMT 的总调用次数有关：在 LG 协议中，对于 $1 \le i < j \le m$，总共存在 $1 + 2 + \dots + (m-1) = (m^2 - m) / 2$ 次 mq-ssPMT 调用。为了控制错误概率可忽略不计，需保证 $((m^2 - m) / 2) n \cdot 2^{-\gamma'} \le 2^{-\sigma}$，因此 $\gamma' \ge \sigma + \log((m^2 - m) / 2) + \log_2 n$。\footnote{LG 原文中错误地将 $\gamma'$ 设置为了输入元素的比特长度，这一参数设置可能导致其安全性在多方环境下无法得到保证。}
+Liu 和 Gao 将 \cite{ZCLZL-USENIX-2023} 中基于对称加密方案（Symmetric-Key Encryption, SKE）的 mq-RPMT 构造改造为 mq-ssPMT，其核心开销来自其中的秘密分享不经意解密匹配（secret-shared oblivious decryption-then-matching, ssVODM）。该协议需通过 GMW 协议实现解密与比较电路，总计需要 $(T + \gamma' - \log n - 1)n$ 个 AND 门，其中 $T$ 为解密电路中的 AND 门数量，典型参数下 $T \approx 600$；$\gamma'$ 为 SKE 密文比特长度，其下界与 mq-ssPMT 的总调用次数有关：在 LG 协议中，对于 $1 \le i < j \le m$，总共存在 $1 + 2 + \dots + (m-1) = (m^2 - m) / 2$ 次 mq-ssPMT 调用。为了控制错误概率可忽略不计，需保证 $((m^2 - m) / 2) n \cdot 2^{-\gamma'} \le 2^{-\sigma}$，因此 $\gamma' \ge \sigma + \log((m^2 - m) / 2) + \log_2 n$。\footnote{LG 原文中错误地将 $\gamma'$ 设置为了输入元素的比特长度，这一参数设置可能导致其安全性在多方环境下无法得到保证。}
 
 相比之下，规模为 $B$ 的 batch ssPMT 由规模为 $B$ 的批量 OPPRF 和 $B$ 个 ssPEQT 实例构成。其中，batch OPPRF 采用了最先进的线性构造~\cite{CGS22,RS-EUROCRYPT-2021,RR-CCS-2022}，该部分可实现相对于 $n$ 的线性计算与通信复杂度。在 ssPEQT 环节，各参与方仅需协同处理 $1.27 (\gamma-1) n$ 个 AND 门，其中 $\gamma$ 为 OPPRF 的输出长度。
 在典型的参数设置下，$(T + \gamma' - \log n - 1) n$ 的规模远大于 $1.27 (\gamma-1) n$。这意味着 batch ssPMT 实际所需的 AND 门数量远少于 mq-ssPMT。因此，基于 batch ssPMT 的构造不仅极大地降低了对通用 2PC 组件的依赖，相较于 mq-ssPMT，在计算与通信复杂度上均实现了大幅度的性能优化。
@@ -364,6 +368,7 @@ $P_m$ 的视图由输入的掩码分享 $\Delta_m$、$\FuncROT$ 的输出 $(r_{m
 \esection{Complexity Analysis and Comparison}
 
 \subsection{SK-MPSU 的复杂度细节}~\label{sec:analysis-ske}
+\esubsection{Complexity Details of SK-MPSU}
 
 本节对本章提出的 SK-MPSU 协议（图 \ref{fig:proto-mpsu2}）中各阶段的具体开销进行详细分析。
 \begin{trivlist}
@@ -405,6 +410,8 @@ $P_m$ 的视图由输入的掩码分享 $\Delta_m$、$\FuncROT$ 的输出 $(r_{m
 \end{trivlist}
 
 \subsection{与 LG 协议的复杂度对比}~\label{sec:compare-lg}
+\esubsection{Comparison with LG Protocol}
+
 表 \ref{tab:compare-ske} 中展示了 LG 协议与本章提出的 SK-MPSU 协议在离线阶段和在线阶段中各参与方理论计算与通信复杂度的对比，其中 $n$ 为集合大小，$m$ 为参与方数量。$\lambda$ 和 $\sigma$ 分别表示计算和统计安全参数，且 $\lambda = 128, \sigma = 40$。$T$ 表示 SKE 解密电路中的 AND 门数量，$T \approx 600$。$l$ 表示输入元素的比特长度。$\gamma$ 为 OPPRF 的输出长度。$\gamma'$ 为 SKE 密文比特长度，且 $\gamma' \approx \gamma$。$t$ 为对偶 LPN 中的噪声权重，$t \approx 128$。
 
 \begin{table*}
@@ -444,6 +451,17 @@ SK-MPSU
 \section{本章小结}
 \esection{Summary}
 
-本章针对多方隐私集合求并（MPSU）协议在性能与安全性之间的权衡难题，深入分析了现有基于对称密钥的 MPSU 方案在抵御共谋攻击方面的局限性。为解决上述问题，本章提出了一套基于对称密钥操作的高效 MPSU 协议框架。
+本章针对现有的多方隐私集合求并（MPSU）协议在安全性与实际效率之间存在的显著权衡问题，特别是现有基于对称密码技术的 MPSU 方案由于依赖通用两方计算而导致开销过大和安全性严重依赖“非共谋假设”（Non-collusion Assumption）的双重痛点，系统性地探索了在标准半诚实模型下构建高效的基于对称密码技术的 MPSU 协议的新型技术路径。
 
-首先，本章提出了批量秘密分享隐私成员测试（batch ssPMT）原语。通过结合哈希分桶技术与批量 OPPRF，该原语有效降低了对复杂通用两方计算技术的依赖，显著提升了大规模数据集处理场景下的计算与通信效率。其次，本章设计了多方秘密分享随机不经意传输（mss-ROT）原语，通过将选择比特与随机掩码以秘密分享的形式分布于各参与方之间，成功消除了协议对“非共谋假设”的依赖，确保了协议在标准半诚实模型下的安全性。在此基础上，本章构造了首个能够抵御任意 $m-1$ 方共谋攻击的高效 MPSU 协议。理论分析与复杂度评估表明，本章所提协议在计算与通信效率方面均优于现有的同类最优方案，为大规模、高安全性需求下的多方隐私数据协同计算提供了切实可行的技术支撑。
+本章的核心研究成果与理论贡献主要体现在以下三个方面：
+
+\begin{enumerate}
+    \item \textbf{提出了高效的批量秘密分享隐私成员测试（batch ssPMT）原语.}  针对现有框架中多查询隐私成员测试（mq-ssPMT）对通用 MPC 技术严重依赖而导致的性能瓶颈，本章提出了批量秘密分享隐私成员测试（batch ssPMT）原语，通过结合哈希分桶技术，设计了可替代框架中原有 mq-ssPMT 的安全高效方案。
+    该原语可基于轻量级组件实例化，并且实现了线性计算和通信复杂度，为后续构建其他高性能的多方隐私集合运算（MPSO）协议集合运算协议提供了高效的底层组件。
+    
+    \item \textbf{定义并构造了多方秘密分享随机不经意传输（mss-ROT）原语：} 针对现有基于对称密码技术的 MPSU 协议在重构阶段时容易被 Leader 与其他参与方共谋攻击的安全漏洞，本章将双选择比特 ROT 推广至多方场景，提出了 多方秘密分享随机不经意传输（mss-ROT）这一密码学原语。该原语允许将用于掩蔽真实数据的随机项掩码，以加法秘密分享的形式灵活分布在由任意潜在共谋方构成的集合之间，用于消除协议对“非共谋假设”的依赖，确保在标准半诚实模型下的安全性。
+    
+    \item \textbf{构建了首个标准半诚实安全的基于对称密码技术的 MPSU 协议：} 结合上述两项新型密码学组件，本章对基于秘密分享的 MPSU 框架进行了彻底的重构。通过用 batch ssPMT 替代低效的 mq-ssPMT 以实现效率飞跃，并用 mss-ROT 替代双选择比特 ROT 来实施多方掩码保护，本章提出的 SK-MPSU 协议不仅在理论上成功消除了对脆弱“非共谋假设”的安全依赖，实现了能够抵御任意 $m-1$ 方共谋攻击的标准半诚实安全；同时在渐近复杂度上，将通信与计算的沉重常数项剥离，展现出了极高的工程实用价值。
+\end{enumerate}
+
+综上所述，本章所提出的 SK-MPSU 协议不仅弥补了对称密钥体制下 MPSU 协议在安全性理论上的关键缺失，更在执行效率上取得了阶跃式的提升。该协议的成功构造为后续章节中构建更普适、更统一的多方隐私集合运算（MPSO）框架提供了极其重要的方法论指导与原语支撑。
